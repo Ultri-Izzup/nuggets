@@ -26,7 +26,7 @@
         href="https://github.com/Ultri-Izzup/nuggets/blob/main/LICENSE"
         target="_blank"
       >
-        MIT License
+        GPLv3 License
       </a>
     </div>
   </v-footer>
