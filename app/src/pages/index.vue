@@ -1,5 +1,5 @@
 <template>
-  <NuggetsHome />
+  <NuggetHome />
 </template>
 
 <script setup>
