@@ -95,9 +95,39 @@
             </v-tabs-window-item>
 
             <v-tabs-window-item value="search">
-              <v-card class="bg-grey-darken-3 pa-4"
-                >Search</v-card
-              ></v-tabs-window-item
+              <v-form v-model="valid" @submit.prevent>
+                <v-container>
+                  <v-row>
+                    <v-text-field
+                      v-model="name"
+                      label="Search text"
+                    ></v-text-field>
+                  </v-row>
+                  <v-row>
+                    <v-autocomplete
+                      v-model="tags"
+                      clearable
+                      chips
+                      multiple
+                      label="Tags"
+                      :items="[
+                        'California',
+                        'Colorado',
+                        'Florida',
+                        'Georgia',
+                        'Texas',
+                        'Wyoming',
+                      ]"
+                    ></v-autocomplete>
+                  </v-row>
+                  <v-row justify="center">
+                    <v-col cols="6">
+                      <v-btn type="submit" block color="primary">Search</v-btn>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-tabs-window-item
             >
           </v-tabs-window>
         </v-card-text>
