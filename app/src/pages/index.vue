@@ -1,5 +1,5 @@
 <template>
-  <HelloWorld />
+  <NuggetsHome />
 </template>
 
 <script setup>
