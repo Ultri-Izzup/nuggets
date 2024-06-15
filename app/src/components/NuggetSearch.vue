@@ -22,7 +22,7 @@
           ></v-autocomplete>
         </v-row>
         <v-row justify="center">
-          <v-col cols="6">
+          <v-col cols="5">
             <v-btn type="submit" block color="primary">Search</v-btn>
           </v-col>
         </v-row>
