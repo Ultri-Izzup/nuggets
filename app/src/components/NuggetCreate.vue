@@ -53,7 +53,7 @@
         ></v-icon>
 
         <v-spacer />
-        <v-icon id="trigger-camera-dialog" color="gray" icon="mdi-camera" size="x-large"></v-icon>
+        <v-icon @click="showCamera" color="gray" icon="mdi-camera" size="x-large"></v-icon>
 
         <v-spacer />
         <v-icon @click="showScreenPicker" color="gray" icon="mdi-monitor" size="x-large"></v-icon>
@@ -93,28 +93,40 @@
           :title="videoSource"
           class="ma-0 pa-0"
         >
-        <v-card-text class="flex ma-1 pa-1">
-        <video
-            ref="video"
-            :muted="videoMuted"
-            width="100%"
-            height="100%"
-            :autoplay="videoAutoplay"
-            :playsinline="videoPlaysinline"
-          />
-        </v-card-text>
+          <v-card-text class="flex ma-1 pa-1">
+            <v-row v-if="videoSource === 'Camera'" justify="center">
+              <v-select
+                density="compact"
+                label="Camera"
+                :items="cameras"
+                item-title="label"
+                item-value="value"
+              ></v-select>
+            </v-row>
+            <video
+              ref="video"
+              :muted="videoMuted"
+              :width="videoWidth"
+              :height="videoHeight"
+              :autoplay="videoAutoplay"
+              :playsinline="videoPlaysinline"
+            />
+            <v-row justify="center" class="mt-1">
+              <v-btn icon="mdi-camera-iris" class="mx-1" ></v-btn>
+              <v-btn icon="mdi-record"  class="mx-1" ></v-btn>
+            </v-row>
+          </v-card-text>
 
           <template v-slot:actions>
             <v-btn
-              class="ml-auto"
-              text="Close"
+              prepend-icon="mdi-close" size="xl" color="grey"
               @click="isActive.value = false"
             ></v-btn>
+
           </template>
         </v-card>
       </template>
     </v-dialog>
-
 
   </v-form>
 </template>
@@ -125,12 +137,15 @@ import { ref } from "vue";
 import { useNuggetStore } from "../stores/nugget";
 const nug = useNuggetStore();
 
-const videoWidth = ref('640');
-const videoHeight = ref('480');
+const cameras = ref([]);
+const selectedCamera = ref();
+
+const videoWidth = ref('100%');
+const videoHeight = ref('100%');
 const videoAutoplay = ref(true);
 const videoPlaysinline = ref(true);
 const videoMuted = ref(true);
-const videoSource = ref('Video')
+const videoSource = ref('Video');
 
 const valid = ref();
 
@@ -222,5 +237,50 @@ const streamVideo = (stream, srcName) => {
   videoSource.value = srcName;
   video.value.srcObject = stream;
 }
+
+const showCamera = async () => {
+  console.log('CAMERA')
+  if (cameras.value.length === 0) {
+    initCameras();
+  }
+  videoSource.value = 'Camera';
+  showVideoDialog.value = true;
+};
+
+const initCameras = () => {
+  const constraints = { video: true, audio: { echoCancellation: true } };
+
+  // if (resolution.value) {
+  //   constraints.video = {};
+  //   constraints.video.height = resolution.value.height;
+  //   constraints.video.width = resolution.value.width;
+  // }
+
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then((stream) => {
+      const tracks = stream.getTracks();
+      for (const track of tracks) {
+        track.stop();
+      }
+      // tracks.forEach((track) => {
+      //   track.stop();
+      // });
+      navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
+        for (let i = 0; i !== deviceInfos.length; ++i) {
+          const deviceInfo = deviceInfos[i];
+          console.log(deviceInfo)
+          if (deviceInfo.kind === "videoinput") {
+            // store only the data we need
+            cameras.value.push({
+              label: deviceInfo.label,
+              value: deviceInfo.deviceId,
+            });
+          }
+        }
+      });
+    })
+    .catch((error) => console.error(error));
+};
 
 </script>
