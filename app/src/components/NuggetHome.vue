@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height">
+  <v-container class="flex">
     <v-responsive class="align-centerfill-height mx-auto py-6" max-width="600">
       <div class="text-center">
         <h1 class="text-h2 font-weight-bold">Nugget</h1>
@@ -19,114 +19,11 @@
         <v-card-text>
           <v-tabs-window v-model="tab">
             <v-tabs-window-item value="create">
-              <v-form v-model="valid" @submit.prevent="submitCreate">
-                <v-container>
-                  <v-row>
-                    <v-text-field
-                      v-model="name"
-                      label="Name"
-                      :rules="nameRules"
-                      required
-                    ></v-text-field>
-                  </v-row>
-                  <v-row>
-                    <v-textarea
-                      v-model="description"
-                      label="Description"
-                      :rules="descriptionRules"
-                      rows="1"
-                      auto-grow
-                    ></v-textarea>
-                  </v-row>
-                  <v-row>
-                    <v-combobox
-                      v-model="tags"
-                      clearable
-                      chips
-                      multiple
-                      label="Tags"
-                      :items="[
-                        'California',
-                        'Colorado',
-                        'Florida',
-                        'Georgia',
-                        'Texas',
-                        'Wyoming',
-                      ]"
-                    ></v-combobox>
-                  </v-row>
-                  <v-row justify="center">
-                    <v-spacer />
-                    <v-icon
-                      color="gray"
-                      icon="mdi-microphone"
-                      size="x-large"
-                    ></v-icon>
-
-                    <v-spacer />
-                    <v-icon
-                      color="gray"
-                      icon="mdi-upload"
-                      size="x-large"
-                    ></v-icon>
-
-                    <v-spacer />
-                    <v-icon
-                      color="gray"
-                      icon="mdi-camera"
-                      size="x-large"
-                    ></v-icon>
-
-                    <v-spacer />
-                    <v-icon
-                      color="gray"
-                      icon="mdi-monitor"
-                      size="x-large"
-                    ></v-icon>
-                    <v-spacer />
-                  </v-row>
-                  <v-row justify="center">
-                    <v-col cols="6">
-                      <v-btn type="submit" block color="primary">Create</v-btn>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-form>
+              <NuggetCreate></NuggetCreate>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="search">
-              <v-form v-model="valid" @submit.prevent="submitSearch">
-                <v-container>
-                  <v-row>
-                    <v-text-field
-                      v-model="name"
-                      label="Search text"
-                    ></v-text-field>
-                  </v-row>
-                  <v-row>
-                    <v-autocomplete
-                      v-model="tags"
-                      clearable
-                      chips
-                      multiple
-                      label="Tags"
-                      :items="[
-                        'California',
-                        'Colorado',
-                        'Florida',
-                        'Georgia',
-                        'Texas',
-                        'Wyoming',
-                      ]"
-                    ></v-autocomplete>
-                  </v-row>
-                  <v-row justify="center">
-                    <v-col cols="6">
-                      <v-btn type="submit" block color="primary">Search</v-btn>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-form>
+              <NuggetSearch></NuggetSearch>
             </v-tabs-window-item
             >
           </v-tabs-window>
@@ -138,6 +35,9 @@
 
 <script setup>
 import { ref } from "vue";
+
+import { useNuggetStore } from "../stores/nugget";
+const nug = useNuggetStore();
 
 // Tabs
 const tab = ref("create");
@@ -176,11 +76,45 @@ const descriptionRules = [
 const tags = ref([]);
 
 // Content
+const selectedFiles = ref();
 const pendingFiles = ref();
 
 const submitCreate = async () => {
-  console.log('CREATING...');
 
+  const nuggetData = {
+    name: name.value,
+    description: description.value,
+    tags: tags.value
+  }
+
+  console.log('CREATING...', nuggetData);
+
+  const nuggetId = await nug.createNugget(nuggetData);
+
+  console.log('NEW NUGGET ID:', nuggetId);
+
+  console.log('UPLOADS', selectedFiles.value)
+
+}
+
+const uploadFiles = async () => {
+  console.log('FILE UPLOAD REQUESTED', selectedFiles.value)
+}
+
+const showFilePicker = async () => {
+  const pickerOpts = {
+  types: [
+    {
+      description: "Images",
+      accept: {
+        "image/*": [".png", ".gif", ".jpeg", ".jpg"],
+      },
+    },
+  ],
+  excludeAcceptAllOption: true,
+  multiple: true,
+};
+  selectedFiles.value = await window.showOpenFilePicker(pickerOpts);
 }
 
 const submitSearch = async () => {
