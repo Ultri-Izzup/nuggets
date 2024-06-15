@@ -60,8 +60,8 @@
         <v-spacer />
       </v-row>
       <v-row justify="center">
-        <v-col cols="6">
-          <v-btn type="submit" block color="primary">Create</v-btn>
+        <v-col cols="5">
+          <v-btn type="submit" block color="primary" :disabled="!valid">Save</v-btn>
         </v-col>
       </v-row>
       <v-row v-if="selectedFiles && selectedFiles.length > 0">
@@ -90,7 +90,7 @@
       <template v-slot:default="{ isActive }">
         <v-card
           prepend-icon="mdi-video"
-          title="Video"
+          :title="videoSource"
           class="ma-0 pa-0"
         >
         <v-card-text class="flex ma-1 pa-1">
@@ -129,7 +129,8 @@ const videoWidth = ref('640');
 const videoHeight = ref('480');
 const videoAutoplay = ref(true);
 const videoPlaysinline = ref(true);
-const videoMuted = ref(true)
+const videoMuted = ref(true);
+const videoSource = ref('Video')
 
 const valid = ref();
 
@@ -211,13 +212,14 @@ const showScreenPicker = async () => {
     showVideoDialog.value = true;
     navigator.mediaDevices
       .getDisplayMedia({ video: true, audio: true })
-      .then((stream) => streamVideo(stream));
+      .then((stream) => streamVideo(stream, 'Screenshare'));
   } catch (err) {
     console.error(`Error: ${err}`);
   }
 };
 
-const streamVideo = (stream) => {
+const streamVideo = (stream, srcName) => {
+  videoSource.value = srcName;
   video.value.srcObject = stream;
 }
 
