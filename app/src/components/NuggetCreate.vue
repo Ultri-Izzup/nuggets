@@ -46,7 +46,7 @@
 
         <v-spacer />
         <v-icon
-          id="trigger-microphone-dialog"
+        @click="showAudio"
           color="gray"
           icon="mdi-microphone"
           size="x-large"
@@ -156,6 +156,49 @@
         </v-card>
       </template>
     </v-dialog>
+
+    <v-dialog v-model="showAudioDialog" class="flex ma-0 pa-0">
+      <template v-slot:default="{ isActive }">
+        <v-card prepend-icon="mdi-microphone" title="Audio Recorder" class="ma-0 pa-0">
+          <v-card-text class="flex ma-1 pa-1">
+            <!-- <v-row justify="center">
+              <v-select
+                v-model="selectedMicrophone"
+                density="compact"
+                label="Audio"
+                :items="audioInputs"
+                item-title="label"
+                item-value="value"
+              ></v-select>
+            </v-row> -->
+
+            <v-row justify="center" class="mt-1">
+              <v-btn
+                icon="mdi-record"
+                class="mx-1"
+                @click="recordAudio"
+                :disabled="recordingAudio"
+              ></v-btn>
+              <v-btn
+                icon="mdi-stop"
+                class="mx-1"
+                @click="stopRecordAudio"
+                :disabled="!recordingAudio"
+              ></v-btn>
+            </v-row>
+          </v-card-text>
+
+          <template v-slot:actions>
+            <v-btn
+              prepend-icon="mdi-close"
+              size="xl"
+              color="grey"
+              @click="isActive.value = false"
+            ></v-btn>
+          </template>
+        </v-card>
+      </template>
+    </v-dialog>
   </v-form>
 </template>
 
@@ -170,7 +213,7 @@ const cameras = ref([]);
 const selectedCamera = ref();
 const snapshot = ref(null);
 
-const microphones = ref([]);
+const audioInputs = ref([]);
 
 const videoWidth = ref("100%");
 const videoHeight = ref("auto");
@@ -179,6 +222,7 @@ const videoPlaysinline = ref(true);
 const videoMuted = ref(true);
 const videoSource = ref("Video");
 const recordingVideo = ref(false);
+const recordingAudio = ref(false);
 
 const valid = ref();
 
@@ -212,9 +256,14 @@ const descriptionRules = [
 
 const tags = ref([]);
 
-const video = ref(); // shared video object
+const video = ref();
+const videoChunks = ref([]);
 
-const showVideoDialog = ref();
+const audio = ref();
+const audioChunks = ref([]);
+
+const showVideoDialog = ref(false);
+const showAudioDialog = ref(false);
 
 const selectedFiles = ref(); // Filehandles from local file picker
 const dataURLs = ref([]); // dataURLs captured from the device
@@ -279,13 +328,40 @@ const streamVideo = (stream, srcName) => {
 const showCamera = async () => {
   console.log("CAMERA");
   if (cameras.value.length === 0) {
-    initCameras();
+    initDevices();
   }
   videoSource.value = "Camera";
   showVideoDialog.value = true;
 };
 
-const initCameras = () => {
+const showAudio = async () => {
+  console.log("AUDIO");
+  if (audioInputs.value.length === 0) {
+    initDevices();
+  }
+
+  const constraints = { audio: true };
+  let chunks = [];
+
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then((stream) => {
+      const mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = (e) => {
+        chunks.push(e.data);
+      };
+
+      audio.value = mediaRecorder;
+    })
+    .catch((err) => {
+      console.error(`The following error occurred: ${err}`);
+    });
+
+  showAudioDialog.value = true;
+};
+
+const initDevices = () => {
   const constraints = { video: true, audio: { echoCancellation: true } };
 
   // if (resolution.value) {
@@ -316,7 +392,7 @@ const initCameras = () => {
               });
             break;
             case 'audioinput':
-              microphones.value.push({
+              audioInputs.value.push({
                 label: deviceInfo.label,
                 value: deviceInfo.deviceId,
               });
@@ -383,6 +459,18 @@ const recordVideo = async () => {
 const stopRecordVideo = async () => {
   console.log("Stop Recording video");
   recordingVideo.value = false;
+};
+
+const recordAudio = async () => {
+  console.log("Record Audio");
+  recordingAudio.value = true;
+};
+
+const stopRecordAudio = async () => {
+
+  console.log("Stop Recording audio");
+  recordingAudio.value = false;
+  showAudioDialog.value = false;
 };
 
 watch(selectedCamera, (newVal, oldVal) => {
