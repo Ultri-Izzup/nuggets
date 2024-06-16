@@ -86,19 +86,21 @@
           {{ file.name }}
         </v-col>
       </v-row>
-      <v-row v-if="mediaFiles && mediaFiles.length > 0">
+      <v-row v-if="dataURLs && dataURLs.length > 0">
         <v-col cols="12" class="text-h6">Media</v-col>
         <v-col
-          v-for="(file, index) in mediaFiles"
+          v-for="(file, index) in dataURLs"
           :key="index"
           class="text-body-2"
         >
-          {{ file.name }}
+          <img :src="file.url" width="250px"/>
+          <br />
+          <span class="text-caption">{{ file.name }}</span>
         </v-col>
       </v-row>
     </v-container>
 
-    <canvas ref="snapshot" style="overflow: auto" class="flex"></canvas>
+    <canvas ref="snapshot" style="overflow: auto" class="flex" hidden></canvas>
 
     <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
       <template v-slot:default="{ isActive }">
@@ -126,9 +128,9 @@
               <v-btn
                 icon="mdi-camera-iris"
                 class="mx-1"
-                @click="recordImage"
+                @click="takeSnapshot"
               ></v-btn>
-              <v-btn
+              <!-- <v-btn
                 v-if="recordingVideo"
                 icon="mdi-stop"
                 class="mx-1"
@@ -139,7 +141,7 @@
                 icon="mdi-record"
                 class="mx-1"
                 @click="recordVideo"
-              ></v-btn>
+              ></v-btn> -->
             </v-row>
           </v-card-text>
 
@@ -212,8 +214,8 @@ const video = ref(); // shared video object
 
 const showVideoDialog = ref();
 
-const selectedFiles = ref(); // Files from local file picker
-const mediaFiles = ref(); // Files cpatured from device to OPFS
+const selectedFiles = ref(); // Filehandles from local file picker
+const dataURLs = ref([]); // dataURLs captured from the device
 
 const submitCreate = async () => {
   const nuggetData = {
@@ -225,7 +227,7 @@ const submitCreate = async () => {
   console.log("CREATING...", nuggetData);
 
   try {
-    const nuggetId = await nug.createNugget(nuggetData, mediaFiles.value);
+    const nuggetId = await nug.createNugget(nuggetData, dataURLs.value);
   } catch (e) {
     console.error('FAILED to create IDB record', nuggetData)
   }
@@ -325,11 +327,6 @@ const loadCamera = (device) => {
     audio: { echoCancellation: true },
   };
 
-  // if (resolution.value) {
-  //   constraints.video.height = resolution.value.height;
-  //   constraints.video.width = resolution.value.width;
-  // }
-
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
@@ -338,15 +335,20 @@ const loadCamera = (device) => {
     .catch((error) => console.error(error));
 };
 
-const recordImage = async () => {
-  console.log(`Record image from ${videoSource.value} video`);
+const takeSnapshot = async () => {
+  console.log(`Take snapshot image from ${videoSource.value} video`);
 
   await drawSnapshot();
 
-  snapshot.value.toBlob(async (blob) => {
-    //await ultri.writeNuggetFile(props.nuggetId, fileName, meta, blob);
-    console.log(blob)
-  });
+  const dataURL = snapshot.value.toDataURL();
+
+  const urlObj = {
+    name: `${videoSource.value}-img-${new Date().toISOString()}.png`,
+    url: dataURL
+  }
+
+  dataURLs.value.push(urlObj)
+
 };
 
 const drawSnapshot = async () => {
