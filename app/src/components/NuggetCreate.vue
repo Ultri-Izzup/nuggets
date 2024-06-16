@@ -78,10 +78,10 @@
       </v-row>
       <v-row v-if="selectedFiles && selectedFiles.length > 0">
         <v-col cols="12" class="text-h6">Attachments</v-col>
-        <v-col
+        <v-col cols="12"
           v-for="(file, index) in selectedFiles"
           :key="index"
-          class="text-body-2"
+          class="text-caption py-0"
         >
           {{ file.name }}
         </v-col>
@@ -169,6 +169,8 @@ const nug = useNuggetStore();
 const cameras = ref([]);
 const selectedCamera = ref();
 const snapshot = ref(null);
+
+const microphones = ref([]);
 
 const videoWidth = ref("100%");
 const videoHeight = ref("auto");
@@ -306,13 +308,27 @@ const initCameras = () => {
         for (let i = 0; i !== deviceInfos.length; ++i) {
           const deviceInfo = deviceInfos[i];
           console.log(deviceInfo);
-          if (deviceInfo.kind === "videoinput") {
-            // store only the data we need
-            cameras.value.push({
-              label: deviceInfo.label,
-              value: deviceInfo.deviceId,
-            });
+          switch(deviceInfo.kind) {
+            case 'videoinput':
+              cameras.value.push({
+                label: deviceInfo.label,
+                value: deviceInfo.deviceId,
+              });
+            break;
+            case 'audioinput':
+              microphones.value.push({
+                label: deviceInfo.label,
+                value: deviceInfo.deviceId,
+              });
+            break;
           }
+          // if (deviceInfo.kind === "videoinput") {
+          //   // store only the data we need
+          //   cameras.value.push({
+          //     label: deviceInfo.label,
+          //     value: deviceInfo.deviceId,
+          //   });
+          // }
         }
       });
     })
