@@ -86,10 +86,10 @@
           {{ file.name }}
         </v-col>
       </v-row>
-      <v-row v-if="pendingFiles && pendingFiles.length > 0">
+      <v-row v-if="mediaFiles && mediaFiles.length > 0">
         <v-col cols="12" class="text-h6">Media</v-col>
         <v-col
-          v-for="(file, index) in pendingFiles"
+          v-for="(file, index) in mediaFiles"
           :key="index"
           class="text-body-2"
         >
@@ -98,7 +98,7 @@
       </v-row>
     </v-container>
 
-    <canvas ref="snapshot" style="overflow: auto"></canvas>
+    <canvas ref="snapshot" style="overflow: auto" class="flex"></canvas>
 
     <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
       <template v-slot:default="{ isActive }">
@@ -161,6 +161,7 @@
 import { ref, watch } from "vue";
 
 import { useNuggetStore } from "../stores/nugget";
+import { slotFlagsText } from "@vue/shared";
 const nug = useNuggetStore();
 
 const cameras = ref([]);
@@ -212,7 +213,7 @@ const video = ref(); // shared video object
 const showVideoDialog = ref();
 
 const selectedFiles = ref(); // Files from local file picker
-const pendingFiles = ref(); // Files cpatured from device to OPFS
+const mediaFiles = ref(); // Files cpatured from device to OPFS
 
 const submitCreate = async () => {
   const nuggetData = {
@@ -223,7 +224,12 @@ const submitCreate = async () => {
 
   console.log("CREATING...", nuggetData);
 
-  const nuggetId = await nug.createNugget(nuggetData);
+  try {
+    const nuggetId = await nug.createNugget(nuggetData, mediaFiles.value);
+  } catch (e) {
+    console.error('FAILED to create IDB record', nuggetData)
+  }
+
 
   console.log("NEW NUGGET ID:", nuggetId);
 
