@@ -108,7 +108,7 @@
       <template v-slot:default="{ isActive }">
         <v-card prepend-icon="mdi-video" :title="videoSource" class="ma-0 pa-0">
           <v-card-text class="flex ma-1 pa-1">
-            <VideoCapture emitAs="dataURL" :targetSource="selectedSource" @snapshot="tempStoreSnapshot" @sourceSelected="saveSource"></VideoCapture>
+            <VideoCapture emitAs="dataURL" :targetSource="selectedDevice" @snapshot="tempStoreSnapshot" @deviceSelected="saveSource"></VideoCapture>
           </v-card-text>
           <template v-slot:actions>
             <v-btn
@@ -130,43 +130,7 @@
           class="ma-0 pa-0"
         >
           <v-card-text class="flex ma-1 pa-1">
-            <v-row justify="center">
-              <v-col sm="11" md="8" lg="6" xl="5" xxl="3">
-                <v-select
-                  v-model="selectedAudioInput"
-                  density="compact"
-                  label="Choose Audio Input"
-                  :items="audioInputs"
-                  item-title="label"
-                  item-value="value"
-                ></v-select>
-              </v-col>
-            </v-row>
 
-            <v-row justify="center">
-              <audio ref="audioPlayer" controls></audio>
-            </v-row>
-
-            <v-row justify="center" class="mt-1">
-              <v-btn
-                icon="mdi-record"
-                class="mx-1"
-                @click="recordAudio"
-                :disabled="recordingAudio"
-              ></v-btn>
-              <v-btn
-                icon="mdi-pause"
-                class="mx-1"
-                @click="pauseRecordAudio"
-                :disabled="!recordingAudio"
-              ></v-btn>
-              <v-btn
-                icon="mdi-stop"
-                class="mx-1"
-                @click="stopRecordAudio"
-                :disabled="!recordingAudio"
-              ></v-btn>
-            </v-row>
           </v-card-text>
 
           <template v-slot:actions>
@@ -190,22 +154,11 @@ import { useNuggetStore } from "../stores/nugget";
 import { slotFlagsText } from "@vue/shared";
 const nug = useNuggetStore();
 
-const selectedSource = ref();
-const cameras = ref([]);
-const selectedCamera = ref();
-const snapshot = ref(null);
+const selectedDevice = ref();
+const preferredCamera = ref();
 
 const showVideoDialog = ref(false);
-const video = ref();
-const videoChunks = ref([]);
-
-const videoWidth = ref("100%");
-const videoHeight = ref("auto");
-const videoAutoplay = ref(true);
-const videoPlaysinline = ref(true);
-const videoMuted = ref(true);
 const videoSource = ref("Video");
-const recordingVideo = ref(false);
 
 const selectedFiles = ref(); // Filehandles from local file picker
 const dataURLs = ref([]); // dataURLs captured from the device
@@ -267,7 +220,8 @@ const tempStoreSnapshot = (snapshotObj) => {
 }
 
 const saveSource = (newSource)  => {
-  selectedSource.value = newSource;
+  selectedDevice.value = newSource;
+  preferredCamera.value = newSource;
   console.log('SOURCE SET', newSource)
 }
 
@@ -292,27 +246,14 @@ const showFilePicker = async () => {
 };
 
 const showScreenPicker = async () => {
-  try {
-    showVideoDialog.value = true;
-    navigator.mediaDevices
-      .getDisplayMedia({ video: true, audio: true })
-      .then((stream) => streamVideo(stream, "Screenshare"));
-  } catch (err) {
-    console.error(`Error: ${err}`);
-  }
-};
-
-const streamVideo = (stream, srcName) => {
-  videoSource.value = srcName;
-  video.value.srcObject = stream;
+  videoSource.value = 'Screen'
+  selectedDevice.value = 'screen';
+  showVideoDialog.value = true;
 };
 
 const showCamera = async () => {
-  console.log("CAMERA");
-  if (cameras.value.length === 0) {
-    initDevices();
-  }
   videoSource.value = "Camera";
+  selectedDevice.value = preferredCamera.value;
   showVideoDialog.value = true;
 };
 
@@ -342,125 +283,5 @@ const showAudio = async () => {
 
   showAudioDialog.value = true;
 };
-
-const initDevices = () => {
-  const constraints = { video: true, audio: { echoCancellation: true } };
-
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      const tracks = stream.getTracks();
-      for (const track of tracks) {
-        track.stop();
-      }
-      navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
-        for (let i = 0; i !== deviceInfos.length; ++i) {
-          const deviceInfo = deviceInfos[i];
-          console.log(deviceInfo);
-          switch (deviceInfo.kind) {
-            case "videoinput":
-              cameras.value.push({
-                label: deviceInfo.label,
-                value: deviceInfo.deviceId,
-              });
-              break;
-          }
-        }
-      });
-    })
-    .catch((error) => console.error(error));
-};
-
-const loadCamera = (device) => {
-  const constraints = {
-    video: {
-      deviceId: { exact: device },
-    },
-    audio: { echoCancellation: true },
-  };
-
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      video.value.srcObject = stream;
-    })
-    .catch((error) => console.error(error));
-};
-
-const loadAudioInput = (device) => {
-  const constraints = {
-    audio: {
-      echoCancellation: true,
-      deviceId: device,
-    },
-    video: false,
-  };
-
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then(handleAudioInputSuccess)
-    .catch((error) => console.error(error));
-};
-
-const handleAudioInputSuccess = async (stream) => {
-    console.log('HANDLING AUDIO INPUT STREAM')
-  };
-
-const takeSnapshot = async () => {
-  console.log(`Take snapshot image from ${videoSource.value} video`);
-
-  await drawSnapshot();
-
-  const dataURL = snapshot.value.toDataURL();
-
-  const urlObj = {
-    name: `${videoSource.value}-img-${new Date().toISOString()}.png`,
-    url: dataURL,
-  };
-
-  dataURLs.value.push(urlObj);
-};
-
-const drawSnapshot = async () => {
-  snapshot.value.width = video.value.videoWidth;
-  snapshot.value.height = video.value.videoHeight;
-
-  const ctx = snapshot.value.getContext("2d");
-  ctx.drawImage(video.value, 0, 0, snapshot.value.width, snapshot.value.height);
-};
-
-const recordVideo = async () => {
-  console.log("Record Video");
-  recordingVideo.value = true;
-};
-
-const stopRecordVideo = async () => {
-  console.log("Stop Recording video");
-  recordingVideo.value = false;
-};
-
-const recordAudio = async () => {
-  console.log("Record Audio");
-  recordingAudio.value = true;
-};
-
-const pauseRecordAudio = async () => {
-  console.log("Pause Recording Audio");
-  recordingAudio.value = false;
-};
-
-const stopRecordAudio = async () => {
-  console.log("Stop Recording Audio");
-  recordingAudio.value = false;
-  showAudioDialog.value = false;
-};
-
-watch(selectedCamera, (newVal, oldVal) => {
-  if (newVal) {
-    console.log(newVal);
-    console.log(`Use camera, ${newVal}`);
-    loadCamera(newVal);
-  }
-});
 
 </script>

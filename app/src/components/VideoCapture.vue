@@ -1,8 +1,8 @@
 <template>
   <v-container>
-    <v-row justify="center">
+    <v-row v-if="targetSource != 'screen'" justify="center">
       <v-select
-        v-model="selectedSource"
+        v-model="selectedDevice"
         density="compact"
         label="Camera"
         :items="cameras"
@@ -45,19 +45,15 @@ const props = defineProps({
     type: String,
     default: 'dataURL'
   },
-  sourceOpts: {
-    type: Array,
-    default: ['camera', 'screen']
-  },
   targetSource: {
     type: String
   }
 })
 
-const emit = defineEmits(["snapshot", "sourceSelected", "videoChunk"]);
+const emit = defineEmits(["snapshot", "deviceSelected", "videoChunk"]);
 
 const cameras = ref([]);
-const selectedSource = ref();
+const selectedDevice = ref();
 const snapshot = ref(null);
 
 const video = ref();
@@ -125,7 +121,7 @@ const takeSnapshot = async () => {
 
   await drawSnapshot();
 
-  const sourcePart = selectedSource.value === 'screen' ? 'screenshot' : 'camera'
+  const sourcePart = props.targetSource === 'screen' ? 'screenshot' : 'camera'
 
   const output = {
     name: `${sourcePart}-img-${new Date().toISOString()}.png`,
@@ -159,20 +155,32 @@ const stopRecordVideo = async () => {
 };
 
 onMounted(() => {
-  initDevices();
-  if(props.targetSource){
-    selectedSource.value = props.targetSource;
+  if(props.targetSource === 'screen') {
+
+    try {
+      navigator.mediaDevices
+        .getDisplayMedia({ video: true, audio: true })
+        .then((stream) => streamVideo(stream, "Screenshare"));
+    } catch (err) {
+      console.error(`Error: ${err}`);
+    }
+
+  } else {
+    initDevices();
+    if(props.targetSource){
+      selectedDevice.value = props.targetSource;
+    }
   }
 })
 
 watch(
-  selectedSource,
+  selectedDevice,
   (newVal, oldVal) => {
     if (newVal) {
       console.log(newVal);
       console.log(`Use camera, ${newVal}`);
       loadSource(newVal);
-      emit('sourceSelected', newVal)
+      emit('deviceSelected', newVal)
     }
   },
   { immediate: true }
