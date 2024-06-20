@@ -46,7 +46,7 @@
 
         <v-spacer />
         <v-icon
-          id="trigger-microphone-dialog"
+          @click="showAudio"
           color="gray"
           icon="mdi-microphone"
           size="x-large"
@@ -79,68 +79,87 @@
       <v-row v-if="selectedFiles && selectedFiles.length > 0">
         <v-col cols="12" class="text-h6">Attachments</v-col>
         <v-col
+          cols="12"
+          md="6"
           v-for="(file, index) in selectedFiles"
           :key="index"
-          class="text-body-2"
+          class="text-caption py-0"
         >
           {{ file.name }}
         </v-col>
       </v-row>
-      <v-row v-if="pendingFiles && pendingFiles.length > 0">
-        <v-col cols="12" class="text-h6">Media</v-col>
-        <v-col
-          v-for="(file, index) in pendingFiles"
+      <v-row v-if="dataURLs && dataURLs.length > 0">
+        <v-col cols="12" class="text-h6">Images</v-col>
+        <v-row
+          v-for="(file, index) in dataURLs"
           :key="index"
           class="text-body-2"
         >
-          {{ file.name }}
+        <v-col>
+          <v-row class="align-center justify-center">
+            <v-divider></v-divider>
+            <v-col>
+              <img :src="file.dataURL" width="250px" />
+            </v-col>
+            <v-col>
+              <span class="text-caption">{{ file.name }}</span>
+            </v-col>
+          </v-row>
         </v-col>
+        </v-row>
+      </v-row>
+      <v-row v-if="audioRecordings && audioRecordings.length > 0">
+        <v-col cols="12" class="text-h6">Audio</v-col>
+        <v-row v-for="(file, index) in audioRecordings" :key="index">
+          <v-divider></v-divider>
+          <v-col>
+            <audio :src="file.audioURL" controls />
+          </v-col>
+          <v-col>
+            <span class="text-caption">{{ file.name }}</span>
+          </v-col>
+        </v-row>
       </v-row>
     </v-container>
-
-    <canvas ref="snapshot" style="overflow: auto"></canvas>
 
     <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
       <template v-slot:default="{ isActive }">
         <v-card prepend-icon="mdi-video" :title="videoSource" class="ma-0 pa-0">
           <v-card-text class="flex ma-1 pa-1">
-            <v-row v-if="videoSource === 'Camera'" justify="center">
-              <v-select
-                v-model="selectedCamera"
-                density="compact"
-                label="Camera"
-                :items="cameras"
-                item-title="label"
-                item-value="value"
-              ></v-select>
-            </v-row>
-            <video
-              ref="video"
-              :muted="videoMuted"
-              :width="videoWidth"
-              :height="videoHeight"
-              :autoplay="videoAutoplay"
-              :playsinline="videoPlaysinline"
-            />
-            <v-row justify="center" class="mt-1">
-              <v-btn
-                icon="mdi-camera-iris"
-                class="mx-1"
-                @click="recordImage"
-              ></v-btn>
-              <v-btn
-                v-if="recordingVideo"
-                icon="mdi-stop"
-                class="mx-1"
-                @click="stopRecordVideo"
-              ></v-btn>
-              <v-btn
-                v-else
-                icon="mdi-record"
-                class="mx-1"
-                @click="recordVideo"
-              ></v-btn>
-            </v-row>
+            <VideoCapture
+              emitAs="dataURL"
+              :targetSource="selectedVideoDevice"
+              @snapshot="tempStoreSnapshot"
+              @deviceSelected="saveVideoSource"
+              @chunk="saveVideoChunk"
+            ></VideoCapture>
+          </v-card-text>
+          <template v-slot:actions>
+            <v-btn
+              prepend-icon="mdi-close"
+              size="xl"
+              color="grey"
+              @click="isActive.value = false"
+            ></v-btn>
+          </template>
+        </v-card>
+      </template>
+    </v-dialog>
+
+    <v-dialog v-model="showAudioCaptureDialog" class="flex ma-0 pa-0">
+      <template v-slot:default="{ isActive }">
+        <v-card
+          prepend-icon="mdi-microphone"
+          title="Audio Recorder"
+          class="ma-0 pa-0"
+        >
+          <v-card-text class="flex ma-1 pa-1">
+            <AudioCapture
+              :targetSource="selectedAudioDevice"
+              @recordedAudio="tempStoreAudio"
+              @deviceSelected="saveAudioSource"
+              @chunk="saveAudioChunk"
+            ></AudioCapture>
           </v-card-text>
 
           <template v-slot:actions>
@@ -161,20 +180,26 @@
 import { ref, watch } from "vue";
 
 import { useNuggetStore } from "../stores/nugget";
+import { slotFlagsText } from "@vue/shared";
 const nug = useNuggetStore();
 
-const cameras = ref([]);
-const selectedCamera = ref();
-const snapshot = ref(null);
-
-const videoWidth = ref("100%");
-const videoHeight = ref("auto");
-const videoAutoplay = ref(true);
-const videoPlaysinline = ref(true);
-const videoMuted = ref(true);
+// VIDEO
+const showVideoDialog = ref(false);
+const selectedVideoDevice = ref();
+const videoRecordings = ref([]);
+const dataURLs = ref([]);
+const preferredCamera = ref();
 const videoSource = ref("Video");
-const recordingVideo = ref(false);
 
+// AUDIO
+const showAudioCaptureDialog = ref(false);
+const selectedAudioDevice = ref();
+const audioRecordings = ref([]); // audio recordings from device
+
+// FILES
+const selectedFiles = ref(); // Filehandles from local file picker
+
+// DATA FORM
 const valid = ref();
 
 const name = ref();
@@ -207,13 +232,7 @@ const descriptionRules = [
 
 const tags = ref([]);
 
-const video = ref(); // shared video object
-
-const showVideoDialog = ref();
-
-const selectedFiles = ref(); // Files from local file picker
-const pendingFiles = ref(); // Files cpatured from device to OPFS
-
+// FUNCTIONS
 const submitCreate = async () => {
   const nuggetData = {
     name: name.value,
@@ -223,11 +242,44 @@ const submitCreate = async () => {
 
   console.log("CREATING...", nuggetData);
 
-  const nuggetId = await nug.createNugget(nuggetData);
+  try {
+    const nuggetId = await nug.createNugget(nuggetData, dataURLs.value);
+  } catch (e) {
+    console.error("FAILED to create IDB record", nuggetData);
+  }
 
   console.log("NEW NUGGET ID:", nuggetId);
 
   console.log("UPLOADS", selectedFiles.value);
+};
+
+const tempStoreSnapshot = (snapshotObj) => {
+  dataURLs.value.push(snapshotObj);
+};
+
+const tempStoreAudio = (audioCaptureObj) => {
+  audioRecordings.value.push(audioCaptureObj);
+};
+
+const saveVideoSource = (newSource) => {
+  selectedVideoDevice.value = newSource;
+  preferredCamera.value = newSource;
+  console.log("VIDEO SOURCE SET", newSource);
+};
+
+const saveAudioSource = (newSource) => {
+  selectedAudioDevice.value = newSource;
+  console.log("AUDIO SOURCE SET", newSource);
+};
+
+const saveVideoChunk = (chunk) => {
+  videoRecordings.value.push(chunk);
+  console.log("VIDEO CHUNK ADDED", chunk);
+};
+
+const saveAudioChunk = (chunk) => {
+  audioRecordings.value.push(chunk);
+  console.log("AUDIO CHUNK ADDED", chunk);
 };
 
 const uploadFiles = async () => {
@@ -240,132 +292,29 @@ const showFilePicker = async () => {
       {
         description: "Images",
         accept: {
-          "image/*": [".png", ".gif", ".jpeg", ".jpg"],
+          "*/*": [".png", ".gif", ".jpeg", ".jpg"],
         },
       },
     ],
-    excludeAcceptAllOption: true,
+    excludeAcceptAllOption: false,
     multiple: true,
   };
   selectedFiles.value = await window.showOpenFilePicker(pickerOpts);
 };
 
 const showScreenPicker = async () => {
-  try {
-    showVideoDialog.value = true;
-    navigator.mediaDevices
-      .getDisplayMedia({ video: true, audio: true })
-      .then((stream) => streamVideo(stream, "Screenshare"));
-  } catch (err) {
-    console.error(`Error: ${err}`);
-  }
-};
-
-const streamVideo = (stream, srcName) => {
-  videoSource.value = srcName;
-  video.value.srcObject = stream;
-};
-
-const showCamera = async () => {
-  console.log("CAMERA");
-  if (cameras.value.length === 0) {
-    initCameras();
-  }
-  videoSource.value = "Camera";
+  videoSource.value = "Screen";
+  selectedVideoDevice.value = "screen";
   showVideoDialog.value = true;
 };
 
-const initCameras = () => {
-  const constraints = { video: true, audio: { echoCancellation: true } };
-
-  // if (resolution.value) {
-  //   constraints.video = {};
-  //   constraints.video.height = resolution.value.height;
-  //   constraints.video.width = resolution.value.width;
-  // }
-
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      const tracks = stream.getTracks();
-      for (const track of tracks) {
-        track.stop();
-      }
-      // tracks.forEach((track) => {
-      //   track.stop();
-      // });
-      navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
-        for (let i = 0; i !== deviceInfos.length; ++i) {
-          const deviceInfo = deviceInfos[i];
-          console.log(deviceInfo);
-          if (deviceInfo.kind === "videoinput") {
-            // store only the data we need
-            cameras.value.push({
-              label: deviceInfo.label,
-              value: deviceInfo.deviceId,
-            });
-          }
-        }
-      });
-    })
-    .catch((error) => console.error(error));
+const showCamera = async () => {
+  videoSource.value = "Camera";
+  selectedVideoDevice.value = preferredCamera.value;
+  showVideoDialog.value = true;
 };
 
-const loadCamera = (device) => {
-  const constraints = {
-    video: {
-      deviceId: { exact: device },
-    },
-    audio: { echoCancellation: true },
-  };
-
-  // if (resolution.value) {
-  //   constraints.video.height = resolution.value.height;
-  //   constraints.video.width = resolution.value.width;
-  // }
-
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      video.value.srcObject = stream;
-    })
-    .catch((error) => console.error(error));
+const showAudio = async () => {
+  showAudioCaptureDialog.value = true;
 };
-
-const recordImage = async () => {
-  console.log(`Record image from ${videoSource.value} video`);
-
-  await drawSnapshot();
-
-  snapshot.value.toBlob(async (blob) => {
-    //await ultri.writeNuggetFile(props.nuggetId, fileName, meta, blob);
-    console.log(blob)
-  });
-};
-
-const drawSnapshot = async () => {
-  snapshot.value.width = video.value.videoWidth;
-  snapshot.value.height = video.value.videoHeight;
-
-  const ctx = snapshot.value.getContext("2d");
-  ctx.drawImage(video.value, 0, 0, snapshot.value.width, snapshot.value.height);
-};
-
-const recordVideo = async () => {
-  console.log("Record Video");
-  recordingVideo.value = true;
-};
-
-const stopRecordVideo = async () => {
-  console.log("Stop Recording video");
-  recordingVideo.value = false;
-};
-
-watch(selectedCamera, (newVal, oldVal) => {
-  if (newVal) {
-    console.log(newVal);
-    console.log(`Use camera, ${newVal}`);
-    loadCamera(newVal);
-  }
-});
 </script>
