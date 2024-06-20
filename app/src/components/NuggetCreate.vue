@@ -146,21 +146,14 @@
         <v-col cols="12" class="text-h6">Geo Location</v-col>
         <v-row>
           <v-divider></v-divider>
-          <v-col cols="12 py-1">
-            Lat/Long: {{ geoLocation.coords.latitude}}, {{ geoLocation.coords.longitude}}
-          </v-col>
-          <v-col cols="12 py-1">
-            Time: {{ new Date(geoLocation.timestamp).toLocaleString()}}
-          </v-col>
-          <v-col v-if="geoLocation.coords.altitude" cols="12">
-            Altitude: {{ geoLocation.coords.altitude}}
-          </v-col>
-          <v-col v-if="geoLocation.coords.speed" cols="12">
-            Speed: {{ geoLocation.coords.speed}}
-          </v-col>
-          <v-col v-if="geoLocation.coords.heading" cols="12">
-            Heading: {{ geoLocation.coords.heading}}
-          </v-col>
+          <GeoLocation :geoLocation="geoLocation"></GeoLocation>
+        </v-row>
+      </v-row>
+      <v-row v-if="waypoints && waypoints.length > 1">
+        <v-col cols="12" class="text-h6">Waypoints</v-col>
+        <v-row v-for="(position, ix) in waypoints" :key="ix">
+          <v-divider></v-divider>
+          <GeoLocation :geoLocation="position"></GeoLocation>
         </v-row>
       </v-row>
     </v-container>
@@ -246,7 +239,7 @@ const videoSource = ref("Video");
 
 // GEOLOCATION
 const geoLocation = ref();
-const geoCoordinates = ref([]);
+const waypoints = ref([]);
 
 // DATA FORM
 const valid = ref();
@@ -371,7 +364,7 @@ const getGeoLocation = async() => {
     navigator.geolocation.getCurrentPosition(position => {
       console.log('GEO LOCATION', position)
       geoLocation.value = position;
-      geoCoordinates.value.push(position);
+      waypoints.value.push(position);
     });
   }
 }
