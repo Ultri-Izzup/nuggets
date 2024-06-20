@@ -20,18 +20,20 @@
     />
     <v-row justify="center" class="mt-1">
       <v-btn icon="mdi-camera-iris" class="mx-1" @click="takeSnapshot"></v-btn>
-      <!-- <v-btn
-                v-if="recording"
-                icon="mdi-stop"
-                class="mx-1"
-                @click="stopRecordVideo"
-              ></v-btn>
-              <v-btn
-                v-else
-                icon="mdi-record"
-                class="mx-1"
-                @click="recordVideo"
-              ></v-btn> -->
+      <v-btn
+        v-if="!recording"
+        icon="mdi-record"
+        class="mx-1"
+        @click="startRecording"
+        color="primary"
+      ></v-btn>
+      <v-btn
+        v-if="recording"
+        icon="mdi-stop"
+        class="mx-1"
+        @click="stopRecording"
+        color="red"
+      ></v-btn>
     </v-row>
     <canvas ref="snapshot" style="overflow: auto" class="flex" hidden></canvas>
   </v-container>
@@ -43,21 +45,27 @@ import { ref, onMounted, watch } from "vue";
 const props = defineProps({
   emitAs: {
     type: String,
-    default: 'dataURL'
+    default: "dataURL",
   },
   targetSource: {
-    type: String
-  }
-})
+    type: String,
+  },
+});
 
-const emit = defineEmits(["snapshot", "deviceSelected", "chunk"]);
+const emit = defineEmits([
+  "snapshot",
+  "deviceSelected",
+  "chunk",
+  "recordedVideo",
+]);
 
 const cameras = ref([]);
 const selectedDevice = ref();
 const snapshot = ref(null);
 
 const video = ref();
-const videoChunks = ref([]);
+const chunks = ref([]);
+const mediaRecorder = ref();
 
 const videoWidth = ref("100%");
 const videoHeight = ref("auto");
@@ -85,7 +93,7 @@ const initDevices = () => {
       navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
         for (let i = 0; i !== deviceInfos.length; ++i) {
           const deviceInfo = deviceInfos[i];
-          console.log(deviceInfo);
+          // console.log(deviceInfo);
           switch (deviceInfo.kind) {
             case "videoinput":
               cameras.value.push({
@@ -111,29 +119,52 @@ const loadSource = (device) => {
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
+      // Stream video to video HTML element
       video.value.srcObject = stream;
+      enableVideoRecorder(stream);
     })
     .catch((error) => console.error(error));
 };
 
+const enableVideoRecorder = (stream) => {
+  mediaRecorder.value = new MediaRecorder(stream);
+  mediaRecorder.value.ondataavailable = (e) => {
+    chunks.value.push(e.data);
+  };
+  mediaRecorder.value.onstop = (e) => {
+    console.log("recorder stopped");
+
+    const clipName = `video-clip-${new Date().toISOString()}.webm`;
+
+    const blob = new Blob(chunks.value, { type: "video/webm" });
+    chunks.value = [];
+    const videoURL = (window.URL || window.webkitURL).createObjectURL(blob);
+    console.log("VIDEO URL", videoURL);
+    emit("recordedVideo", {
+      name: clipName,
+      videoURL: videoURL,
+    });
+  };
+};
+
 const takeSnapshot = async () => {
-  console.log('Take snapshot image from video');
+  console.log("Take snapshot image from video");
 
   await drawSnapshot();
 
-  const sourcePart = props.targetSource === 'screen' ? 'screenshot' : 'camera'
+  const sourcePart = props.targetSource === "screen" ? "screenshot" : "camera";
 
   const output = {
     name: `${sourcePart}-img-${new Date().toISOString()}.png`,
-  }
+  };
 
-  switch(props.emitAs) {
-    case 'dataURL': {
+  switch (props.emitAs) {
+    case "dataURL": {
       output.dataURL = snapshot.value.toDataURL();
     }
   }
 
-  emit('snapshot', output)
+  emit("snapshot", output);
 };
 
 const drawSnapshot = async () => {
@@ -144,34 +175,41 @@ const drawSnapshot = async () => {
   ctx.drawImage(video.value, 0, 0, snapshot.value.width, snapshot.value.height);
 };
 
-const recordVideo = async () => {
+const startRecording = async () => {
   console.log("Record Video");
   recording.value = true;
+  mediaRecorder.value.start();
+  console.log(mediaRecorder.value.state);
+  console.log("recorder started");
 };
 
-const stopRecordVideo = async () => {
+const stopRecording = async () => {
   console.log("Stop Recording video");
   recording.value = false;
+  mediaRecorder.value.stop();
+  console.log(mediaRecorder.value.state);
+  console.log("recorder stopped");
 };
 
 onMounted(() => {
-  if(props.targetSource === 'screen') {
-
+  if (props.targetSource === "screen") {
     try {
       navigator.mediaDevices
         .getDisplayMedia({ video: true, audio: true })
-        .then((stream) => streamVideo(stream, "Screenshare"));
+        .then((stream) => {
+          streamVideo(stream, "Screenshare");
+          enableVideoRecorder(stream);
+        });
     } catch (err) {
       console.error(`Error: ${err}`);
     }
-
   } else {
     initDevices();
-    if(props.targetSource){
+    if (props.targetSource) {
       selectedDevice.value = props.targetSource;
     }
   }
-})
+});
 
 watch(
   selectedDevice,
@@ -180,7 +218,7 @@ watch(
       console.log(newVal);
       console.log(`Use camera, ${newVal}`);
       loadSource(newVal);
-      emit('deviceSelected', newVal)
+      emit("deviceSelected", newVal);
     }
   },
   { immediate: true }

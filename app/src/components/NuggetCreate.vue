@@ -67,6 +67,16 @@
           icon="mdi-monitor"
           size="x-large"
         ></v-icon>
+
+        <v-spacer />
+        <v-icon
+          @click="getGeoLocation"
+          color="gray"
+          icon="mdi-map-marker"
+          size="x-large"
+        ></v-icon>
+
+
         <v-spacer />
       </v-row>
       <v-row justify="center">
@@ -108,6 +118,16 @@
         </v-col>
         </v-row>
       </v-row>
+      <v-row v-if="videoRecordings && videoRecordings.length > 0">
+        <v-col cols="12" class="text-h6">Video</v-col>
+        <v-row v-for="(file, index) in videoRecordings" :key="index">
+          <v-divider></v-divider>
+          <v-col cols="12">
+            <video :src="file.videoURL" controls width="100%" height="auto"/>
+            <span class="text-caption">{{ file.name }}</span>
+          </v-col>
+        </v-row>
+      </v-row>
       <v-row v-if="audioRecordings && audioRecordings.length > 0">
         <v-col cols="12" class="text-h6">Audio</v-col>
         <v-row v-for="(file, index) in audioRecordings" :key="index">
@@ -120,7 +140,23 @@
           </v-col>
         </v-row>
       </v-row>
+      <v-row v-if="geoLocation">
+        <v-col cols="12" class="text-h6">Geo Location</v-col>
+        <v-row>
+          <v-divider></v-divider>
+          <GeoLocation :geoLocation="geoLocation"></GeoLocation>
+        </v-row>
+      </v-row>
+      <v-row v-if="waypoints && waypoints.length > 1">
+        <v-col cols="12" class="text-h6">Waypoints</v-col>
+        <v-row v-for="(position, ix) in waypoints" :key="ix">
+          <v-divider></v-divider>
+          <GeoLocation :geoLocation="position"></GeoLocation>
+        </v-row>
+      </v-row>
     </v-container>
+
+    <!-- DIALOGS -->
 
     <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
       <template v-slot:default="{ isActive }">
@@ -132,6 +168,7 @@
               @snapshot="tempStoreSnapshot"
               @deviceSelected="saveVideoSource"
               @chunk="saveVideoChunk"
+              @recordedVideo="tempStoreVideo"
             ></VideoCapture>
           </v-card-text>
           <template v-slot:actions>
@@ -183,7 +220,15 @@ import { useNuggetStore } from "../stores/nugget";
 import { slotFlagsText } from "@vue/shared";
 const nug = useNuggetStore();
 
-// VIDEO
+// FILES
+const selectedFiles = ref(); // Filehandles from local file picker
+
+// AUDIO
+const showAudioCaptureDialog = ref(false);
+const selectedAudioDevice = ref();
+const audioRecordings = ref([]); // audio recordings from device
+
+// CAMERA / VIDEO
 const showVideoDialog = ref(false);
 const selectedVideoDevice = ref();
 const videoRecordings = ref([]);
@@ -191,17 +236,12 @@ const dataURLs = ref([]);
 const preferredCamera = ref();
 const videoSource = ref("Video");
 
-// AUDIO
-const showAudioCaptureDialog = ref(false);
-const selectedAudioDevice = ref();
-const audioRecordings = ref([]); // audio recordings from device
-
-// FILES
-const selectedFiles = ref(); // Filehandles from local file picker
+// GEOLOCATION
+const geoLocation = ref();
+const waypoints = ref([]);
 
 // DATA FORM
 const valid = ref();
-
 const name = ref();
 const nameRules = [
   (value) => {
@@ -220,7 +260,6 @@ const nameRules = [
     return "Name must be less than 50 characters.";
   },
 ];
-
 const description = ref();
 const descriptionRules = [
   (value) => {
@@ -229,7 +268,6 @@ const descriptionRules = [
     return "Description must be less than 1500 characters.";
   },
 ];
-
 const tags = ref([]);
 
 // FUNCTIONS
@@ -261,6 +299,10 @@ const tempStoreAudio = (audioCaptureObj) => {
   audioRecordings.value.push(audioCaptureObj);
 };
 
+const tempStoreVideo = (videoCaptureObj) => {
+  videoRecordings.value.push(videoCaptureObj);
+};
+
 const saveVideoSource = (newSource) => {
   selectedVideoDevice.value = newSource;
   preferredCamera.value = newSource;
@@ -286,6 +328,7 @@ const uploadFiles = async () => {
   console.log("FILE UPLOAD REQUESTED", selectedFiles.value);
 };
 
+// BUTTON ACTIONS
 const showFilePicker = async () => {
   const pickerOpts = {
     types: [
@@ -317,4 +360,15 @@ const showCamera = async () => {
 const showAudio = async () => {
   showAudioCaptureDialog.value = true;
 };
+
+const getGeoLocation = async() => {
+  console.log('Request GeoLocation')
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      console.log('GEO LOCATION', position)
+      geoLocation.value = position;
+      waypoints.value.push(position);
+    });
+  }
+}
 </script>

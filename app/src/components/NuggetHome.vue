@@ -2,7 +2,7 @@
   <v-container class="flex">
     <v-responsive class="align-centerfill-height mx-auto py-6" max-width="600">
       <div class="text-center">
-        <h1 class="text-h2 font-weight-bold">Nugget</h1>
+        <h1 class="text-h3 font-weight-bold">Nuggets</h1>
       </div>
 
       <div class="py-4" />

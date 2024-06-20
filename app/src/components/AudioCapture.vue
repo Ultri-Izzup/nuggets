@@ -25,18 +25,6 @@
         @click="stopRecording"
         color="red"
       ></v-btn>
-      <!-- <v-btn
-        :disabled="!recording"
-        icon="mdi-pause"
-        class="mx-1"
-        @click="pauseRecording"
-      ></v-btn> -->
-      <!-- <v-btn
-        :disabled="!recording"
-        icon="mdi-stop"
-        class="mx-1"
-        @click="stopRecording"
-      ></v-btn> -->
     </v-row>
     <canvas ref="snapshot" style="overflow: auto" class="flex" hidden></canvas>
   </v-container>
