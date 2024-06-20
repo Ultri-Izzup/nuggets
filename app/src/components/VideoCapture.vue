@@ -59,7 +59,8 @@ const selectedDevice = ref();
 const snapshot = ref(null);
 
 const video = ref();
-const videoChunks = ref([]);
+const chunks = ref([]);
+const mediaRecorder = ref();
 
 const videoWidth = ref("100%");
 const videoHeight = ref("auto");
@@ -87,7 +88,7 @@ const initDevices = () => {
       navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
         for (let i = 0; i !== deviceInfos.length; ++i) {
           const deviceInfo = deviceInfos[i];
-          console.log(deviceInfo);
+          // console.log(deviceInfo);
           switch (deviceInfo.kind) {
             case "videoinput":
               cameras.value.push({
@@ -113,7 +114,28 @@ const loadSource = (device) => {
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
+      // Stream video to video HTML element
       video.value.srcObject = stream;
+
+      // Setup Video Media Recorder
+      mediaRecorder.value = new MediaRecorder(stream);
+      mediaRecorder.value.ondataavailable = (e) => {
+        chunks.value.push(e.data);
+      };
+      mediaRecorder.value.onstop = (e) => {
+        console.log("recorder stopped");
+
+        const clipName = `video-clip-${new Date().toISOString()}.webm`;
+
+        const blob = new Blob(chunks.value, { type: 'video/webm' });
+        chunks.value = [];
+        const videoURL = (window.URL || window.webkitURL).createObjectURL(blob);
+        console.log('VIDEO URL', videoURL)
+        emit('recordedVideo', {
+          name: clipName,
+          videoURL: videoURL
+        })
+      };
     })
     .catch((error) => console.error(error));
 };
@@ -149,11 +171,17 @@ const drawSnapshot = async () => {
 const startRecording = async () => {
   console.log("Record Video");
   recording.value = true;
+  mediaRecorder.value.start();
+  console.log(mediaRecorder.value.state);
+  console.log("recorder started");
 };
 
 const stopRecording = async () => {
   console.log("Stop Recording video");
   recording.value = false;
+  mediaRecorder.value.stop();
+  console.log(mediaRecorder.value.state);
+  console.log("recorder stopped");
 };
 
 onMounted(() => {

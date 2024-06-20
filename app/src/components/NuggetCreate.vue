@@ -170,6 +170,7 @@
               @snapshot="tempStoreSnapshot"
               @deviceSelected="saveVideoSource"
               @chunk="saveVideoChunk"
+              @recordedVideo="tempStoreVideo"
             ></VideoCapture>
           </v-card-text>
           <template v-slot:actions>
@@ -298,6 +299,10 @@ const tempStoreSnapshot = (snapshotObj) => {
 
 const tempStoreAudio = (audioCaptureObj) => {
   audioRecordings.value.push(audioCaptureObj);
+};
+
+const tempStoreVideo = (videoCaptureObj) => {
+  videoRecordings.value.push(videoCaptureObj);
 };
 
 const saveVideoSource = (newSource) => {
