@@ -50,7 +50,7 @@ const mediaRecorder = ref();
 const devices = ref([]);
 const selectedDevice = ref();
 
-let chunks = [];
+let chunks = ref([]);
 
 const muted = ref(true);
 const recording = ref(false);
@@ -99,15 +99,15 @@ const loadSource = (device) => {
       console.log("AUDIO STREAMING", device);
       mediaRecorder.value = new MediaRecorder(stream);
       mediaRecorder.value.ondataavailable = (e) => {
-        chunks.push(e.data);
+        chunks.value.push(e.data);
       };
       mediaRecorder.value.onstop = (e) => {
         console.log("recorder stopped");
 
         const clipName = `audio-clip-${new Date().toISOString()}.mp3`;
 
-        const blob = new Blob(chunks, { type: 'audio/mp3' });
-        chunks = [];
+        const blob = new Blob(chunks.value, { type: 'audio/mp3' });
+        chunks.value = [];
         const audioURL = (window.URL || window.webkitURL).createObjectURL(blob);
         console.log('AUDIO URL', audioURL)
         emit('recordedAudio', {
