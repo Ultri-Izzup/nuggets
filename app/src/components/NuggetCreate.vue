@@ -90,27 +90,35 @@
       </v-row>
       <v-row v-if="dataURLs && dataURLs.length > 0">
         <v-col cols="12" class="text-h6">Images</v-col>
-        <v-col
+        <v-row
           v-for="(file, index) in dataURLs"
           :key="index"
           class="text-body-2"
         >
-          <img :src="file.dataURL" width="250px" />
-          <br />
-          <span class="text-caption">{{ file.name }}</span>
+        <v-col>
+          <v-row class="align-center justify-center">
+            <v-divider></v-divider>
+            <v-col>
+              <img :src="file.dataURL" width="250px" />
+            </v-col>
+            <v-col>
+              <span class="text-caption">{{ file.name }}</span>
+            </v-col>
+          </v-row>
         </v-col>
+        </v-row>
       </v-row>
       <v-row v-if="audioRecordings && audioRecordings.length > 0">
         <v-col cols="12" class="text-h6">Audio</v-col>
-        <v-col
-          v-for="(file, index) in audioRecordings"
-          :key="index"
-          class="text-body-2"
-        >
-          <audio :src="file.audioURL" controls />
-          <br />
-          <v-row class="text-caption" justify="center">{{ file.name }}</v-row>
-        </v-col>
+        <v-row v-for="(file, index) in audioRecordings" :key="index">
+          <v-divider></v-divider>
+          <v-col>
+            <audio :src="file.audioURL" controls />
+          </v-col>
+          <v-col>
+            <span class="text-caption">{{ file.name }}</span>
+          </v-col>
+        </v-row>
       </v-row>
     </v-container>
 
@@ -118,7 +126,13 @@
       <template v-slot:default="{ isActive }">
         <v-card prepend-icon="mdi-video" :title="videoSource" class="ma-0 pa-0">
           <v-card-text class="flex ma-1 pa-1">
-            <VideoCapture emitAs="dataURL" :targetSource="selectedVideoDevice" @snapshot="tempStoreSnapshot" @deviceSelected="saveVideoSource" @chunk="saveVideoChunk"></VideoCapture>
+            <VideoCapture
+              emitAs="dataURL"
+              :targetSource="selectedVideoDevice"
+              @snapshot="tempStoreSnapshot"
+              @deviceSelected="saveVideoSource"
+              @chunk="saveVideoChunk"
+            ></VideoCapture>
           </v-card-text>
           <template v-slot:actions>
             <v-btn
@@ -140,7 +154,12 @@
           class="ma-0 pa-0"
         >
           <v-card-text class="flex ma-1 pa-1">
-            <AudioCapture :targetSource="selectedAudioDevice" @recordedAudio="tempStoreAudio" @deviceSelected="saveAudioSource" @chunk="saveAudioChunk"></AudioCapture>
+            <AudioCapture
+              :targetSource="selectedAudioDevice"
+              @recordedAudio="tempStoreAudio"
+              @deviceSelected="saveAudioSource"
+              @chunk="saveAudioChunk"
+            ></AudioCapture>
           </v-card-text>
 
           <template v-slot:actions>
@@ -175,7 +194,7 @@ const videoSource = ref("Video");
 // AUDIO
 const showAudioCaptureDialog = ref(false);
 const selectedAudioDevice = ref();
-const audioRecordings = ref ([]); // audio recordings from device
+const audioRecordings = ref([]); // audio recordings from device
 
 // FILES
 const selectedFiles = ref(); // Filehandles from local file picker
@@ -235,33 +254,33 @@ const submitCreate = async () => {
 };
 
 const tempStoreSnapshot = (snapshotObj) => {
-  dataURLs.value.push(snapshotObj)
-}
+  dataURLs.value.push(snapshotObj);
+};
 
 const tempStoreAudio = (audioCaptureObj) => {
-  audioRecordings.value.push(audioCaptureObj)
-}
+  audioRecordings.value.push(audioCaptureObj);
+};
 
-const saveVideoSource = (newSource)  => {
+const saveVideoSource = (newSource) => {
   selectedVideoDevice.value = newSource;
   preferredCamera.value = newSource;
-  console.log('VIDEO SOURCE SET', newSource)
-}
+  console.log("VIDEO SOURCE SET", newSource);
+};
 
-const saveAudioSource = (newSource)  => {
+const saveAudioSource = (newSource) => {
   selectedAudioDevice.value = newSource;
-  console.log('AUDIO SOURCE SET', newSource)
-}
+  console.log("AUDIO SOURCE SET", newSource);
+};
 
-const saveVideoChunk = (chunk)  => {
+const saveVideoChunk = (chunk) => {
   videoRecordings.value.push(chunk);
-  console.log('VIDEO CHUNK ADDED', chunk)
-}
+  console.log("VIDEO CHUNK ADDED", chunk);
+};
 
-const saveAudioChunk = (chunk)  => {
+const saveAudioChunk = (chunk) => {
   audioRecordings.value.push(chunk);
-  console.log('AUDIO CHUNK ADDED', chunk)
-}
+  console.log("AUDIO CHUNK ADDED", chunk);
+};
 
 const uploadFiles = async () => {
   console.log("FILE UPLOAD REQUESTED", selectedFiles.value);
@@ -284,8 +303,8 @@ const showFilePicker = async () => {
 };
 
 const showScreenPicker = async () => {
-  videoSource.value = 'Screen'
-  selectedVideoDevice.value = 'screen';
+  videoSource.value = "Screen";
+  selectedVideoDevice.value = "screen";
   showVideoDialog.value = true;
 };
 
@@ -296,7 +315,6 @@ const showCamera = async () => {
 };
 
 const showAudio = async () => {
-    showAudioCaptureDialog.value = true;
+  showAudioCaptureDialog.value = true;
 };
-
 </script>
