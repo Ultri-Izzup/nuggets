@@ -20,18 +20,20 @@
     />
     <v-row justify="center" class="mt-1">
       <v-btn icon="mdi-camera-iris" class="mx-1" @click="takeSnapshot"></v-btn>
-      <!-- <v-btn
-                v-if="recording"
-                icon="mdi-stop"
-                class="mx-1"
-                @click="stopRecordVideo"
-              ></v-btn>
-              <v-btn
-                v-else
-                icon="mdi-record"
-                class="mx-1"
-                @click="recordVideo"
-              ></v-btn> -->
+      <v-btn
+        v-if="!recording"
+        icon="mdi-record"
+        class="mx-1"
+        @click="startRecording"
+        color="primary"
+      ></v-btn>
+      <v-btn
+        v-if="recording"
+        icon="mdi-stop"
+        class="mx-1"
+        @click="stopRecording"
+        color="red"
+      ></v-btn>
     </v-row>
     <canvas ref="snapshot" style="overflow: auto" class="flex" hidden></canvas>
   </v-container>
@@ -144,12 +146,12 @@ const drawSnapshot = async () => {
   ctx.drawImage(video.value, 0, 0, snapshot.value.width, snapshot.value.height);
 };
 
-const recordVideo = async () => {
+const startRecording = async () => {
   console.log("Record Video");
   recording.value = true;
 };
 
-const stopRecordVideo = async () => {
+const stopRecording = async () => {
   console.log("Stop Recording video");
   recording.value = false;
 };
