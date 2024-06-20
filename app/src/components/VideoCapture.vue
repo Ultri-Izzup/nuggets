@@ -15,13 +15,13 @@
       :muted="videoMuted"
       :width="videoWidth"
       :height="videoHeight"
-      :autoplay="videoAutoplay"
-      :playsinline="videoPlaysinline"
+      :autoplay="autoplay"
+      :playsinline="playsinline"
     />
     <v-row justify="center" class="mt-1">
       <v-btn icon="mdi-camera-iris" class="mx-1" @click="takeSnapshot"></v-btn>
       <!-- <v-btn
-                v-if="recordingVideo"
+                v-if="recording"
                 icon="mdi-stop"
                 class="mx-1"
                 @click="stopRecordVideo"
@@ -50,7 +50,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(["snapshot", "deviceSelected", "videoChunk"]);
+const emit = defineEmits(["snapshot", "deviceSelected", "chunk"]);
 
 const cameras = ref([]);
 const selectedDevice = ref();
@@ -61,11 +61,11 @@ const videoChunks = ref([]);
 
 const videoWidth = ref("100%");
 const videoHeight = ref("auto");
-const videoAutoplay = ref(true);
-const videoPlaysinline = ref(true);
+const autoplay = ref(true);
+const playsinline = ref(true);
 const videoMuted = ref(true);
 const videoSource = ref("Video");
-const recordingVideo = ref(false);
+const recording = ref(false);
 
 const streamVideo = (stream, srcName) => {
   videoSource.value = srcName;
@@ -146,12 +146,12 @@ const drawSnapshot = async () => {
 
 const recordVideo = async () => {
   console.log("Record Video");
-  recordingVideo.value = true;
+  recording.value = true;
 };
 
 const stopRecordVideo = async () => {
   console.log("Stop Recording video");
-  recordingVideo.value = false;
+  recording.value = false;
 };
 
 onMounted(() => {

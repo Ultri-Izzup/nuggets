@@ -89,7 +89,7 @@
         </v-col>
       </v-row>
       <v-row v-if="dataURLs && dataURLs.length > 0">
-        <v-col cols="12" class="text-h6">Media</v-col>
+        <v-col cols="12" class="text-h6">Images</v-col>
         <v-col
           v-for="(file, index) in dataURLs"
           :key="index"
@@ -100,15 +100,25 @@
           <span class="text-caption">{{ file.name }}</span>
         </v-col>
       </v-row>
+      <v-row v-if="audioRecordings && audioRecordings.length > 0">
+        <v-col cols="12" class="text-h6">Audio</v-col>
+        <v-col
+          v-for="(file, index) in audioRecordings"
+          :key="index"
+          class="text-body-2"
+        >
+          <audio :src="file.audioURL" controls />
+          <br />
+          <v-row class="text-caption" justify="center">{{ file.name }}</v-row>
+        </v-col>
+      </v-row>
     </v-container>
-
-    <!-- <canvas ref="snapshot" style="overflow: auto" class="flex" hidden></canvas> -->
 
     <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
       <template v-slot:default="{ isActive }">
         <v-card prepend-icon="mdi-video" :title="videoSource" class="ma-0 pa-0">
           <v-card-text class="flex ma-1 pa-1">
-            <VideoCapture emitAs="dataURL" :targetSource="selectedDevice" @snapshot="tempStoreSnapshot" @deviceSelected="saveSource"></VideoCapture>
+            <VideoCapture emitAs="dataURL" :targetSource="selectedVideoDevice" @snapshot="tempStoreSnapshot" @deviceSelected="saveVideoSource" @chunk="saveVideoChunk"></VideoCapture>
           </v-card-text>
           <template v-slot:actions>
             <v-btn
@@ -122,7 +132,7 @@
       </template>
     </v-dialog>
 
-    <!-- <v-dialog v-model="showAudioDialog" class="flex ma-0 pa-0">
+    <v-dialog v-model="showAudioCaptureDialog" class="flex ma-0 pa-0">
       <template v-slot:default="{ isActive }">
         <v-card
           prepend-icon="mdi-microphone"
@@ -130,7 +140,7 @@
           class="ma-0 pa-0"
         >
           <v-card-text class="flex ma-1 pa-1">
-
+            <AudioCapture :targetSource="selectedAudioDevice" @recordedAudio="tempStoreAudio" @deviceSelected="saveAudioSource" @chunk="saveAudioChunk"></AudioCapture>
           </v-card-text>
 
           <template v-slot:actions>
@@ -143,7 +153,7 @@
           </template>
         </v-card>
       </template>
-    </v-dialog> -->
+    </v-dialog>
   </v-form>
 </template>
 
@@ -154,15 +164,23 @@ import { useNuggetStore } from "../stores/nugget";
 import { slotFlagsText } from "@vue/shared";
 const nug = useNuggetStore();
 
-const selectedDevice = ref();
-const preferredCamera = ref();
-
+// VIDEO
 const showVideoDialog = ref(false);
+const selectedVideoDevice = ref();
+const videoRecordings = ref([]);
+const dataURLs = ref([]);
+const preferredCamera = ref();
 const videoSource = ref("Video");
 
-const selectedFiles = ref(); // Filehandles from local file picker
-const dataURLs = ref([]); // dataURLs captured from the device
+// AUDIO
+const showAudioCaptureDialog = ref(false);
+const selectedAudioDevice = ref();
+const audioRecordings = ref ([]); // audio recordings from device
 
+// FILES
+const selectedFiles = ref(); // Filehandles from local file picker
+
+// DATA FORM
 const valid = ref();
 
 const name = ref();
@@ -195,6 +213,7 @@ const descriptionRules = [
 
 const tags = ref([]);
 
+// FUNCTIONS
 const submitCreate = async () => {
   const nuggetData = {
     name: name.value,
@@ -219,10 +238,29 @@ const tempStoreSnapshot = (snapshotObj) => {
   dataURLs.value.push(snapshotObj)
 }
 
-const saveSource = (newSource)  => {
-  selectedDevice.value = newSource;
+const tempStoreAudio = (audioCaptureObj) => {
+  audioRecordings.value.push(audioCaptureObj)
+}
+
+const saveVideoSource = (newSource)  => {
+  selectedVideoDevice.value = newSource;
   preferredCamera.value = newSource;
-  console.log('SOURCE SET', newSource)
+  console.log('VIDEO SOURCE SET', newSource)
+}
+
+const saveAudioSource = (newSource)  => {
+  selectedAudioDevice.value = newSource;
+  console.log('AUDIO SOURCE SET', newSource)
+}
+
+const saveVideoChunk = (chunk)  => {
+  videoRecordings.value.push(chunk);
+  console.log('VIDEO CHUNK ADDED', chunk)
+}
+
+const saveAudioChunk = (chunk)  => {
+  audioRecordings.value.push(chunk);
+  console.log('AUDIO CHUNK ADDED', chunk)
 }
 
 const uploadFiles = async () => {
@@ -235,11 +273,11 @@ const showFilePicker = async () => {
       {
         description: "Images",
         accept: {
-          "image/*": [".png", ".gif", ".jpeg", ".jpg"],
+          "*/*": [".png", ".gif", ".jpeg", ".jpg"],
         },
       },
     ],
-    excludeAcceptAllOption: true,
+    excludeAcceptAllOption: false,
     multiple: true,
   };
   selectedFiles.value = await window.showOpenFilePicker(pickerOpts);
@@ -247,41 +285,18 @@ const showFilePicker = async () => {
 
 const showScreenPicker = async () => {
   videoSource.value = 'Screen'
-  selectedDevice.value = 'screen';
+  selectedVideoDevice.value = 'screen';
   showVideoDialog.value = true;
 };
 
 const showCamera = async () => {
   videoSource.value = "Camera";
-  selectedDevice.value = preferredCamera.value;
+  selectedVideoDevice.value = preferredCamera.value;
   showVideoDialog.value = true;
 };
 
 const showAudio = async () => {
-  console.log("AUDIO");
-  if (audioInputs.value.length === 0) {
-    initDevices();
-  }
-
-  const constraints = { audio: true };
-  let chunks = [];
-
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      const mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.ondataavailable = (e) => {
-        chunks.push(e.data);
-      };
-
-      audio.value = mediaRecorder;
-    })
-    .catch((err) => {
-      console.error(`The following error occurred: ${err}`);
-    });
-
-  showAudioDialog.value = true;
+    showAudioCaptureDialog.value = true;
 };
 
 </script>
