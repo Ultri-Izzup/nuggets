@@ -52,7 +52,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(["snapshot", "deviceSelected", "chunk"]);
+const emit = defineEmits(["snapshot", "deviceSelected", "chunk", "recordedVideo"]);
 
 const cameras = ref([]);
 const selectedDevice = ref();
