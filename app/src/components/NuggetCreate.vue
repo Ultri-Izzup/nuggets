@@ -86,22 +86,24 @@
           >
         </v-col>
       </v-row>
-      <v-row v-if="selectedFiles && selectedFiles.length > 0">
-        <v-col cols="12" class="text-h6">Attachments</v-col>
-        <v-col
-          cols="12"
-          md="6"
-          v-for="(file, index) in selectedFiles"
-          :key="index"
-          class="text-caption py-0"
-        >
-          {{ file.name }}
-        </v-col>
+      <v-row v-if="geoLocation">
+        <v-col cols="12" class="text-h6">Geo Location</v-col>
+        <v-row>
+          <v-divider></v-divider>
+          <GeoLocation :geoLocation="geoLocation"></GeoLocation>
+        </v-row>
       </v-row>
-      <v-row v-if="dataURLs && dataURLs.length > 0">
+      <v-row v-if="waypoints && waypoints.length > 1">
+        <v-col cols="12" class="text-h6">Waypoints</v-col>
+        <v-row v-for="(position, ix) in waypoints" :key="ix">
+          <v-divider></v-divider>
+          <GeoLocation :geoLocation="position"></GeoLocation>
+        </v-row>
+      </v-row>
+      <v-row v-if="capturedImages && capturedImages.length > 0">
         <v-col cols="12" class="text-h6">Images</v-col>
         <v-row
-          v-for="(file, index) in dataURLs"
+          v-for="(file, index) in capturedImages"
           :key="index"
           class="text-body-2"
         >
@@ -109,9 +111,7 @@
           <v-row class="align-center justify-center">
             <v-divider></v-divider>
             <v-col>
-              <img :src="file.dataURL" width="250px" />
-            </v-col>
-            <v-col>
+              <img :src="file.dataURL" width="100%" />
               <span class="text-caption">{{ file.name }}</span>
             </v-col>
           </v-row>
@@ -140,20 +140,19 @@
           </v-col>
         </v-row>
       </v-row>
-      <v-row v-if="geoLocation">
-        <v-col cols="12" class="text-h6">Geo Location</v-col>
-        <v-row>
-          <v-divider></v-divider>
-          <GeoLocation :geoLocation="geoLocation"></GeoLocation>
-        </v-row>
+      <v-row v-if="selectedFiles && selectedFiles.length > 0">
+        <v-col cols="12" class="text-h6">Attachments</v-col>
+        <v-col
+          cols="12"
+          md="6"
+          v-for="(file, index) in selectedFiles"
+          :key="index"
+          class="text-caption py-0"
+        >
+          {{ file.name }}
+        </v-col>
       </v-row>
-      <v-row v-if="waypoints && waypoints.length > 1">
-        <v-col cols="12" class="text-h6">Waypoints</v-col>
-        <v-row v-for="(position, ix) in waypoints" :key="ix">
-          <v-divider></v-divider>
-          <GeoLocation :geoLocation="position"></GeoLocation>
-        </v-row>
-      </v-row>
+
     </v-container>
 
     <!-- DIALOGS -->
@@ -232,7 +231,7 @@ const audioRecordings = ref([]); // audio recordings from device
 const showVideoDialog = ref(false);
 const selectedVideoDevice = ref();
 const videoRecordings = ref([]);
-const dataURLs = ref([]);
+const capturedImages = ref([]);
 const preferredCamera = ref();
 const videoSource = ref("Video");
 
@@ -272,27 +271,54 @@ const tags = ref([]);
 
 // FUNCTIONS
 const submitCreate = async () => {
-  const nuggetData = {
+  const data = {
     name: name.value,
     description: description.value,
     tags: tags.value,
   };
 
-  console.log("CREATING...", nuggetData);
+  if(waypoints.value && waypoints.value.length > 0) {
+    data.geoPositions = waypoints.value;
+  }
+
+  // Object to send ALL data to Nugget store.
+  // The Nugget store is responsible for sending parts to a worker.
+  const fullNugget = {
+    data: data
+  }
+
+  if(selectedFiles.value && selectedFiles.value.length > 0) {
+    fullNugget.selectedFiles = selectedFiles.value;
+  }
+
+  if(capturedImages.value && capturedImages.value.length > 0) {
+    fullNugget.capturedImages = capturedImages.value;
+  }
+
+  if(videoRecordings.value && videoRecordings.value.length > 0) {
+    fullNugget.videoRecordings = videoRecordings.value;
+  }
+
+  if(audioRecordings.value && audioRecordings.value.length > 0) {
+    fullNugget.audioRecordings = audioRecordings.value;
+  }
+
+  console.log("CREATING NUGGET...", fullNugget);
+
+  let nuggetId;
 
   try {
-    const nuggetId = await nug.createNugget(nuggetData, dataURLs.value);
+    nuggetId = await nug.createNugget(fullNugget, capturedImages.value);
   } catch (e) {
-    console.error("FAILED to create IDB record", nuggetData);
+    console.error("FAILED to create IDB record", fullNugget);
   }
 
   console.log("NEW NUGGET ID:", nuggetId);
 
-  console.log("UPLOADS", selectedFiles.value);
 };
 
 const tempStoreSnapshot = (snapshotObj) => {
-  dataURLs.value.push(snapshotObj);
+  capturedImages.value.push(snapshotObj);
 };
 
 const tempStoreAudio = (audioCaptureObj) => {
