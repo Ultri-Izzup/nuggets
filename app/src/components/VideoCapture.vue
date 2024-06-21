@@ -138,7 +138,7 @@ const enableVideoRecorder = (stream, vidSrc) => {
   mediaRecorder.value.onstop = (e) => {
     console.log("recorder stopped");
 
-    const clipName = `${vidSrc}_clip_${nug.getFilenameDate()}.webm`;
+    const clipName = `${vidSrc}_clip_${nug.newFileTimestamp()}.webm`;
 
     const blob = new Blob(chunks.value, { type: "video/webm" });
     chunks.value = [];
@@ -159,7 +159,7 @@ const takeSnapshot = async () => {
   const sourcePart = props.targetSource === "screen" ? "screenshot" : "camera";
 
   const output = {
-    name: `${sourcePart}_img_${nug.getFilenameDate()}.png`,
+    name: `${sourcePart}_img_${nug.newFileTimestamp()}.png`,
   };
 
   switch (props.emitAs) {

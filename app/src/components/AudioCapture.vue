@@ -108,7 +108,7 @@ const loadSource = (device) => {
       mediaRecorder.value.onstop = (e) => {
         console.log("recorder stopped");
 
-        const clipName = `audio_clip_${nug.getFilenameDate()}.mp3`;
+        const clipName = `audio_clip_${nug.newFileTimestamp()}.mp3`;
 
         const blob = new Blob(chunks.value, { type: 'audio/mp3' });
         chunks.value = [];
