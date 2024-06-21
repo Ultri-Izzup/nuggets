@@ -213,11 +213,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref} from "vue";
+import {useRouter} from "vue-router";
 
 import { useNuggetStore } from "../stores/nugget";
-import { slotFlagsText } from "@vue/shared";
+
 const nug = useNuggetStore();
+const router = useRouter();
 
 // FILES
 const selectedFiles = ref(); // Filehandles from local file picker
@@ -309,12 +311,11 @@ const submitCreate = async () => {
 
   try {
     nuggetId = await nug.createNugget(fullNugget);
+    console.log("NEW NUGGET ID:", nuggetId);
+    router.push(`/nuggets/${nuggetId}`)
   } catch (e) {
     console.error("FAILED to create IDB record", fullNugget);
   }
-
-  console.log("NEW NUGGET ID:", nuggetId);
-
 };
 
 const tempStoreSnapshot = (snapshotObj) => {
