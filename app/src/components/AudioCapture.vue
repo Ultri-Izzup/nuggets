@@ -33,6 +33,10 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 
+import { useNuggetStore } from "../stores/nugget";
+
+const nug = useNuggetStore();
+
 const props = defineProps({
   emitAs: {
     type: String,
@@ -104,7 +108,7 @@ const loadSource = (device) => {
       mediaRecorder.value.onstop = (e) => {
         console.log("recorder stopped");
 
-        const clipName = `audio-clip-${new Date().toISOString()}.mp3`;
+        const clipName = `audio_clip_${nug.getFilenameDate()}.mp3`;
 
         const blob = new Blob(chunks.value, { type: 'audio/mp3' });
         chunks.value = [];
