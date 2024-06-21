@@ -308,7 +308,7 @@ const submitCreate = async () => {
   let nuggetId;
 
   try {
-    nuggetId = await nug.createNugget(fullNugget, capturedImages.value);
+    nuggetId = await nug.createNugget(fullNugget);
   } catch (e) {
     console.error("FAILED to create IDB record", fullNugget);
   }
