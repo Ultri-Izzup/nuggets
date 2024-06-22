@@ -17,7 +17,9 @@ export const useNuggetStore = defineStore("nugget", () => {
   // ACTIONS / FUNCTIONS
   const createNugget = Nug.createNugget;
 
-  const resolveToJSON = Nug.resolveToJSON;
+  const getNugget = Nug.getNugget;
+
+
 
   return {
     // State
@@ -27,6 +29,6 @@ export const useNuggetStore = defineStore("nugget", () => {
 
     // Actions/Functions
     createNugget,
-    resolveToJSON
+    getNugget,
   }
 });

@@ -1,4 +1,9 @@
 <template>
+   <v-container class="flex">
+    <v-responsive class="align-centerfill-height mx-auto py-6" max-width="900">
+      <div v-if="title" class="text-center">
+        <h1 class="text-h3 font-weight-bold">{{title}}</h1>
+      </div>
   <v-form v-model="valid" @submit.prevent="submitCreate">
     <v-container>
       <v-row>
@@ -210,6 +215,8 @@
       </template>
     </v-dialog>
   </v-form>
+</v-responsive>
+</v-container>
 </template>
 
 <script setup>
@@ -217,6 +224,13 @@ import { ref} from "vue";
 import {useRouter} from "vue-router";
 
 import { useNuggetStore } from "../stores/nugget";
+const props = defineProps({
+  title: {
+    type: String,
+    default: null
+  },
+});
+
 
 const nug = useNuggetStore();
 const router = useRouter();
