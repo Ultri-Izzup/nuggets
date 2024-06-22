@@ -42,6 +42,10 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 
+import { useNuggetStore } from "../stores/nugget";
+
+const nug = useNuggetStore();
+
 const props = defineProps({
   emitAs: {
     type: String,
@@ -121,12 +125,12 @@ const loadSource = (device) => {
     .then((stream) => {
       // Stream video to video HTML element
       video.value.srcObject = stream;
-      enableVideoRecorder(stream);
+      enableVideoRecorder(stream, 'camera');
     })
     .catch((error) => console.error(error));
 };
 
-const enableVideoRecorder = (stream) => {
+const enableVideoRecorder = (stream, vidSrc) => {
   mediaRecorder.value = new MediaRecorder(stream);
   mediaRecorder.value.ondataavailable = (e) => {
     chunks.value.push(e.data);
@@ -134,7 +138,7 @@ const enableVideoRecorder = (stream) => {
   mediaRecorder.value.onstop = (e) => {
     console.log("recorder stopped");
 
-    const clipName = `video-clip-${new Date().toISOString()}.webm`;
+    const clipName = `${vidSrc}_clip_${nug.newFileTimestamp()}.webm`;
 
     const blob = new Blob(chunks.value, { type: "video/webm" });
     chunks.value = [];
@@ -155,7 +159,7 @@ const takeSnapshot = async () => {
   const sourcePart = props.targetSource === "screen" ? "screenshot" : "camera";
 
   const output = {
-    name: `${sourcePart}-img-${new Date().toISOString()}.png`,
+    name: `${sourcePart}_img_${nug.newFileTimestamp()}.png`,
   };
 
   switch (props.emitAs) {
@@ -198,7 +202,7 @@ onMounted(() => {
         .getDisplayMedia({ video: true, audio: true })
         .then((stream) => {
           streamVideo(stream, "Screenshare");
-          enableVideoRecorder(stream);
+          enableVideoRecorder(stream, 'screen');
         });
     } catch (err) {
       console.error(`Error: ${err}`);

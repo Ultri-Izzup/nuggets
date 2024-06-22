@@ -1,6 +1,6 @@
 <template>
   <v-container class="flex">
-    <v-responsive class="align-centerfill-height mx-auto py-6" max-width="600">
+    <v-responsive class="align-centerfill-height mx-auto py-6" max-width="900">
       <div class="text-center">
         <h1 class="text-h3 font-weight-bold">Nuggets</h1>
       </div>
@@ -19,11 +19,11 @@
         <v-card-text>
           <v-tabs-window v-model="tab">
             <v-tabs-window-item value="create">
-              <NuggetCreate></NuggetCreate>
+              <NuggetCreate :title="null"></NuggetCreate>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="search">
-              <NuggetSearch></NuggetSearch>
+              <NuggetSearch :title="null"></NuggetSearch>
             </v-tabs-window-item
             >
           </v-tabs-window>
