@@ -7,7 +7,7 @@
 import { newFileTimestamp, resolveToJSON } from './shared/utilityFuncs'
 
 // Access Dexie IndexedDB tables and worker
-import { createNugget } from './shared/dexieFuncs'
+import { createNugget, getNugget } from './shared/dexieFuncs'
 
 /**
  * Nugget logic is defined here.
@@ -17,6 +17,7 @@ export function useNuggets() {
 
   return {
     createNugget,
+    getNugget,
     newFileTimestamp,
     resolveToJSON
   };
