@@ -4,10 +4,13 @@
 
 
 // Pure functions with no dependencies or side effects.
-import { newFileTimestamp, resolveToJSON } from './shared/utilityFuncs'
+import { newFileTimestamp, resolveToJSON } from '@/shared/utilityFuncs'
 
 // Access Dexie IndexedDB tables and worker
-import { createNugget, getNugget } from './shared/dexieFuncs'
+import { createNugget, getNugget } from '@/shared/dexieFuncs'
+
+// Use shared data lookup lists
+import { nuggetRelationTypes } from '@/shared/lookupLists'
 
 /**
  * Nugget logic is defined here.
@@ -19,6 +22,7 @@ export function useNuggets() {
     createNugget,
     getNugget,
     newFileTimestamp,
+    nuggetRelationTypes,
     resolveToJSON
   };
 }
