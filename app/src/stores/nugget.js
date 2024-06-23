@@ -21,34 +21,6 @@ export const useNuggetStore = defineStore("nugget", () => {
 
     const nuggetId = await Nug.createNugget(fullNugget);
 
-    // console.log(nuggetId);
-
-    // if(nuggetObj.selectedFiles && nuggetObj.selectedFiles.length > 0)
-    // {
-    //   console.log('ATTACH FILES', nuggetObj.selectedFiles)
-    // }
-
-    // if(nuggetObj.capturedImages && nuggetObj.capturedImages.length > 0)
-    // {
-    //   console.log('ATTACH IMAGES', nuggetObj.capturedImages)
-    // }
-
-    // if(nuggetObj.capturedVideos && nuggetObj.capturedVideos.length > 0)
-    // {
-    //   console.log('ATTACH VIDEO', nuggetObj.capturedVideos)
-    // }
-
-    // if(nuggetObj.capturedAudio && nuggetObj.capturedAudio.length > 0)
-    // {
-    //   console.log('ATTACH AUDIO', nuggetObj.capturedAudio)
-    // }
-
-    // if(nuggetObj.capturedAudio && nuggetObj.capturedAudio.length > 0)
-    // {
-    //   console.log('ATTACH AUDIO', nuggetObj.capturedAudio)
-    // }
-
-
     return nuggetId;
   }
 

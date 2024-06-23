@@ -25,14 +25,14 @@ const createNugget = async (fullNugget) => {
       console.log('ATTACH IMAGES', fullNugget.capturedImages)
     }
 
-    if(fullNugget.capturedVideos && fullNugget.capturedVideos.length > 0)
+    if(fullNugget.videoRecordings && fullNugget.videoRecordings.length > 0)
     {
-      console.log('ATTACH VIDEO', fullNugget.capturedVideos)
+      console.log('ATTACH VIDEO', fullNugget.videoRecordings)
     }
 
-    if(fullNugget.capturedAudio && fullNugget.capturedAudio.length > 0)
+    if(fullNugget.audioRecordings && fullNugget.audioRecordings.length > 0)
     {
-      console.log('ATTACH AUDIO', fullNugget.capturedAudio)
+      console.log('ATTACH AUDIO', fullNugget.audioRecordings)
     }
 
   return nuggetId;
