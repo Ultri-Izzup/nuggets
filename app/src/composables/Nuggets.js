@@ -11,6 +11,33 @@ import { newFileTimestamp } from '@/shared/utilityFuncs'
 // Access Dexie IndexedDB tables and worker
 import { dexCreateNugget, dexGetNugget } from '@/shared/dexieFuncs'
 
+// Worker scripts
+ /**
+   * Initialize Ultri Worker
+   */
+ let fileHandleWorker = null;
+
+ if (window.Worker) {
+   // Create Ultri Dedicated OPFS Worker.
+   // Each script or tab will have it's own copy of this worker.
+   fileHandleWorker = new Worker("/workers/fileHandleWorker.js", {type: "module"});
+
+   // Define handlers for each message type
+   fileHandleWorker.onmessage = (msg) => {
+     console.log(
+       "DEDICATED WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+       msg
+     );
+    //  console.log(`USE HANDLER ${msg.data.handler}`);
+
+    //  const handler = msg.data.handler;
+
+    //  msgHandlers[handler](msg.data.responseData);
+   };
+
+   console.log("WORKER LOADED IN Nuggets Composable");
+ }
+
 /**
  * Create a new nugget from related parts.
  * @param {object} fullNugget
@@ -23,6 +50,8 @@ const createNugget = async (fullNugget) => {
     {
       console.log('ATTACH FILES', fullNugget.selectedFiles)
       // Send system fileHandles to the worker script.
+      const fhArray = Array.from(fullNugget.selectedFiles)
+      fileHandleWorker.postMessage({nuggetId: nuggetId, subPath: "files", fileHandles: fhArray});
     }
 
     if(fullNugget.capturedImages && fullNugget.capturedImages.length > 0)

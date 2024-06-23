@@ -335,7 +335,7 @@ const submitCreate = async () => {
     console.log("NEW NUGGET ID:", nuggetId);
     router.push(`/nuggets/${nuggetId}`)
   } catch (e) {
-    console.error("FAILED to create record", fullNugget);
+    console.error("FAILED to create record", e);
   }
 };
 
