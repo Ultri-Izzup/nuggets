@@ -293,6 +293,13 @@ const submitCreate = async () => {
     tags: tags.value,
   };
 
+   console.log(geoLocation.value)
+   console.log(waypoints.value)
+
+  if(geoLocation.value) {
+    data.geoLocation = geoLocation.value;
+  }
+
   if(waypoints.value && waypoints.value.length > 0) {
     data.geoPositions = waypoints.value;
   }
@@ -328,7 +335,7 @@ const submitCreate = async () => {
     console.log("NEW NUGGET ID:", nuggetId);
     router.push(`/nuggets/${nuggetId}`)
   } catch (e) {
-    console.error("FAILED to create IDB record", fullNugget);
+    console.error("FAILED to create record", e);
   }
 };
 
@@ -405,10 +412,21 @@ const showAudio = async () => {
 const getGeoLocation = async() => {
   console.log('Request GeoLocation')
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(position => {
-      console.log('GEO LOCATION', position)
-      geoLocation.value = position;
-      waypoints.value.push(position);
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log( position.coords );
+      const jsonPos = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+        timestamp: position.timestamp
+      }
+
+      if(position.coords.speed) {
+        jsonPos.speed = position.coords.speed
+      }
+
+      geoLocation.value = jsonPos;
+      waypoints.value.push(jsonPos);
     });
   }
 }
