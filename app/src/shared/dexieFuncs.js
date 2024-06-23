@@ -26,3 +26,9 @@ export async function dexGetNugget (nuggetId) {
   return nuggetData;
 }
 
+export async function dexGetNuggetFiles (nuggetId) {
+  const nuggetFiles = await db.assets.where("nuggetId").equals(Number(nuggetId)).toArray();
+  console.log(nuggetFiles)
+  return nuggetFiles;
+}
+

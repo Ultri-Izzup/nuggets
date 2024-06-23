@@ -9,7 +9,7 @@ import { nuggetRelationTypes } from '@/shared/lookupLists'
 import { newFileTimestamp } from '@/shared/utilityFuncs'
 
 // Access Dexie IndexedDB tables and worker
-import { dexCreateNugget, dexGetNugget } from '@/shared/dexieFuncs'
+import { dexCreateNugget, dexGetNugget, dexGetNuggetFiles } from '@/shared/dexieFuncs'
 
 // Worker scripts
  /**
@@ -82,6 +82,15 @@ const getNugget = async (nuggetId) => {
 }
 
 /**
+ * Get data for a given nuggetId
+ * @param {number} nuggetId
+ * @returns {object}
+ */
+const getNuggetFiles = async (nuggetId) => {
+  return dexGetNuggetFiles(nuggetId)
+}
+
+/**
  * export for use as a composable
  */
 export function useNuggets() {
@@ -89,6 +98,7 @@ export function useNuggets() {
   return {
     createNugget,
     getNugget,
+    getNuggetFiles,
     newFileTimestamp,
     nuggetRelationTypes
   };
