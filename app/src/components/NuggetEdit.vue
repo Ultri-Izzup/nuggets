@@ -39,7 +39,7 @@
         </v-row>
         <v-row>
           <v-col cols="12" class="text-h6">Images</v-col>
-          <v-row v-for="(file, index) in capturedImages" :key="index" class="text-body-2">
+          <v-row v-for="(file, index) in images" :key="index" class="text-body-2">
             <v-col>
               <v-row class="align-center justify-center">
                 <v-divider></v-divider>
@@ -67,6 +67,10 @@ const nug = useNuggetStore();
 
 const nuggetData = ref();
 const files = ref();
+const images = ref();
+const audioRecordings = ref();
+const videoRecordings = ref();
+
 
 watch(
   () => props.nuggetId,
