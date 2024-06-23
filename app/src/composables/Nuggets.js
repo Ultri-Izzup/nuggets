@@ -52,7 +52,6 @@ export function useNuggets() {
     createNugget,
     getNugget,
     newFileTimestamp,
-    nuggetRelationTypes,
-    resolveToJSON
+    nuggetRelationTypes
   };
 }

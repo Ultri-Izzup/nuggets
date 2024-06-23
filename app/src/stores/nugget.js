@@ -63,6 +63,5 @@ export const useNuggetStore = defineStore("nugget", () => {
     // Actions/Functions
     createNugget,
     getNugget,
-    resolveToJSON: Nug.resolveToJSON
   }
 });

@@ -301,7 +301,7 @@ const submitCreate = async () => {
   }
 
   if(waypoints.value && waypoints.value.length > 0) {
-    data.geoPositions =waypoints.value;
+    data.geoPositions = waypoints.value;
   }
 
   // Object to send ALL data to Nugget store.
@@ -424,7 +424,7 @@ const getGeoLocation = async() => {
       if(position.coords.speed) {
         jsonPos.speed = position.coords.speed
       }
-      console.log(jsonPos)
+
       geoLocation.value = jsonPos;
       waypoints.value.push(jsonPos);
     });
