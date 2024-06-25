@@ -2,10 +2,10 @@ import { db } from "@/dexie/db.js";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 
-import {resolveToJSON } from '@/shared/utilityFuncs'
+import { resolveToJSON } from '@/shared/utilityFuncs'
 
 // Create Nugget
-export async function dexCreateNugget (nuggetData) {
+export async function dexCreateNugget(nuggetData) {
 
   console.log(nuggetData)
 
@@ -20,9 +20,17 @@ export async function dexCreateNugget (nuggetData) {
   return newId;
 }
 
-export async function dexGetNugget (nuggetId) {
-  const nuggetData = await db.nuggets.where("id").equals(Number(nuggetId)).first();
-  console.log(nuggetData)
-  return nuggetData;
+export async function dexGetNugget(nuggetId) {
+  return await db.nuggets.where("id").equals(Number(nuggetId)).first();
 }
 
+export async function dexGetNuggetAssets(nuggetId, subDir=false) {
+  const whereClause = {
+    nuggetId: Number(nuggetId),
+  }
+
+  if(subDir) {
+    whereClause.subDir = subDir
+  }
+  return await db.assets.where(whereClause).toArray();
+}

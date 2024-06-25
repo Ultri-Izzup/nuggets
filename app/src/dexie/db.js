@@ -2,8 +2,8 @@ import Dexie from 'dexie';
 Dexie.debug = true;
 
 export const db = new Dexie('nuggetData');
-db.version(13).stores({
+db.version(20).stores({
   nuggets: '++id, name, createdAt, updatedAt, *tags',
-  assets: '[directoryPath+fileName], nuggetId',
+  assets: '[nuggetId+subDir+fileName], mimeType',
   relations: '++id, [nuggetId+relationTypeId], relatedId',
 });
