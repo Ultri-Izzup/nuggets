@@ -10,7 +10,8 @@ export const useNuggetStore = defineStore("nugget", () => {
 
   // STATE
   const recentNuggets = useStorage('recentNuggets', []);
-  const lastNugget = useStorage('lastNugget', 0)
+  const lastNugget = useStorage('lastNugget', 0);
+  const preferredCamera = useStorage('preferredCamera', null);
 
   // GETTERS / CALCULATED STATE
   const newFileTimestamp = Nug.newFileTimestamp
@@ -28,6 +29,7 @@ export const useNuggetStore = defineStore("nugget", () => {
 
   return {
     // State
+    preferredCamera,
 
     // Getters
     newFileTimestamp,

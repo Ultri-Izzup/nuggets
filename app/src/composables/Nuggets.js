@@ -16,8 +16,12 @@ import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets } from '@/shared/dexi
   * Initialize Ultri Worker
   */
 let fileHandleWorker = null;
+let dataURLWorker = null;
+let blobWorker = null;
 
 if (window.Worker) {
+
+  //////////////////
   // Create Ultri Dedicated OPFS Worker.
   // Each script or tab will have it's own copy of this worker.
   fileHandleWorker = new Worker("/workers/fileHandleWorker.js", { type: "module" });
@@ -25,17 +29,38 @@ if (window.Worker) {
   // Define handlers for each message type
   fileHandleWorker.onmessage = (msg) => {
     console.log(
-      "DEDICATED WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      "DEDICATED FileHandle WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
       msg
     );
-    //  console.log(`USE HANDLER ${msg.data.handler}`);
-
-    //  const handler = msg.data.handler;
-
-    //  msgHandlers[handler](msg.data.responseData);
   };
 
-  console.log("WORKER LOADED IN Nuggets Composable");
+  console.log("FILE WORKER LOADED IN Nuggets Composable");
+
+  //////////////////
+  dataURLWorker = new Worker("/workers/dataURLWorker.js", { type: "module" });
+
+  // Define handlers for each message type
+  dataURLWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED URLDATA WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+
+  console.log("DATA WORKER LOADED IN Nuggets Composable");
+
+  // //////////////////
+  blobWorker = new Worker("/workers/blobWorker.js", { type: "module" });
+
+  // Define handlers for each message type
+  blobWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED BLOB WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+
+  console.log("BLOB WORKER LOADED IN Nuggets Composable");
 }
 
 /**
@@ -55,6 +80,11 @@ const createNugget = async (fullNugget) => {
 
   if (fullNugget.capturedImages && fullNugget.capturedImages.length > 0) {
     console.log('ATTACH IMAGES', fullNugget.capturedImages)
+    const cleanImgObjs = [];
+    for(const imgObj of fullNugget.capturedImages) {
+      cleanImgObjs.push({ name: imgObj.name, dataURL: imgObj.dataURL})
+    }
+    dataURLWorker.postMessage({ nuggetId: nuggetId, subDir: "images", dataURLObjs: cleanImgObjs });
   }
 
   if (fullNugget.videoRecordings && fullNugget.videoRecordings.length > 0) {

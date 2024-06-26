@@ -354,6 +354,7 @@ const tempStoreVideo = (videoCaptureObj) => {
 const saveVideoSource = (newSource) => {
   selectedVideoDevice.value = newSource;
   preferredCamera.value = newSource;
+  nug.preferredCamera = newSource;
   console.log("VIDEO SOURCE SET", newSource);
 };
 
@@ -401,7 +402,7 @@ const showScreenPicker = async () => {
 
 const showCamera = async () => {
   videoSource.value = "Camera";
-  selectedVideoDevice.value = preferredCamera.value;
+  selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : nug.preferredCamera;
   showVideoDialog.value = true;
 };
 

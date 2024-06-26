@@ -87,7 +87,7 @@
               md="6"
               v-for="(file, index) in files"
               :key="index"
-              class="text-caption py-0"
+              class="text-caption py-0 pl-6"
             >
               {{ file.fileName }}
             </v-col>
