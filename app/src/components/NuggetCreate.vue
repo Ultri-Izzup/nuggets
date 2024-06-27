@@ -128,7 +128,7 @@
         <v-row v-for="(file, index) in videoRecordings" :key="index">
           <v-divider></v-divider>
           <v-col cols="12">
-            <video :src="file.videoURL" controls width="100%" height="auto"/>
+            <video :src="file.blobURL" controls width="100%" height="auto"/>
             <span class="text-caption">{{ file.name }}</span>
           </v-col>
         </v-row>

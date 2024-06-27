@@ -2,17 +2,17 @@
   <v-container class="flex">
     <v-responsive class="align-centerfill-height mx-auto py-6" max-width="900">
       <div class="text-center">
-        <h1 class="text-h4 font-weight-bold">Nugget</h1>
+        <h1 class="text-h4 font-weight-bold">{{ nuggetData ? nuggetData.name : 'Nugget' }}</h1>
       </div>
 
       <div class="py-3" />
       <v-container v-if="nuggetData" max-width="600">
-        <v-row>
+        <!-- <v-row>
           <v-col cols="12">
             <v-row class="text-body"> {{ nuggetData.name }} &nbsp; </v-row>
             <v-row class="mt-1 pt-0 text-caption text-grey"> Name </v-row>
           </v-col>
-        </v-row>
+        </v-row> -->
         <v-row>
           <v-col cols="12">
             <v-row class="text-body">
@@ -44,8 +44,8 @@
                 <v-col>
                   <OPFSImage
                     :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
-                  ></OPFSImage
-                  ><br />
+                  ></OPFSImage>
+                  <br />
                   <span class="text-caption">{{ file.fileName }}</span>
                 </v-col>
               </v-col>
@@ -54,14 +54,16 @@
         </v-row>
         <v-row>
           <v-col cols="12" class="text-h6">Video</v-col>
+          <!-- {{ videoRecordings }} -->
           <v-row v-if="videoRecordings && videoRecordings.length > 0">
             <v-row v-for="(file, index) in videoRecordings" :key="index">
               <v-divider></v-divider>
               <v-col>
-                <video :src="file.videoURL" controls />
-              </v-col>
-              <v-col>
-                <span class="text-caption">{{ file.name }}</span>
+                <OPFSVideo
+                  :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                ></OPFSVideo>
+                <br />
+                <span class="text-caption">{{ file.fileName }}</span>
               </v-col>
             </v-row>
           </v-row>
@@ -72,7 +74,9 @@
             <v-row v-for="(file, index) in audioRecordings" :key="index">
               <v-divider></v-divider>
               <v-col>
-                <audio :src="file.audioURL" controls />
+                <OPFSAudio
+                  :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                ></OPFSAudio>
               </v-col>
               <v-col>
                 <span class="text-caption">{{ file.name }}</span>
@@ -172,7 +176,7 @@ watch(
 
       videoRecordings = useObservable(
         liveQuery(async () => {
-          return await nug.getNuggetAssets(newNuggetId, "video");
+          return await nug.getNuggetAssets(newNuggetId, "videos");
         })
       );
     }

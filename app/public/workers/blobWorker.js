@@ -3,9 +3,9 @@ import { db } from "../src/dexie/db.js";
 import {fileNameRegex, getSyncFileHandle} from './shared/opfs.js';
 
 self.onmessage = async (msg) => {
-  // console.log("dataURL WORKER MESSAGE RECEIVED", msg);
-  // console.log("data", msg.data);
-  // console.log("dataURLs", msg.data.blobs);
+  console.log("blobs WORKER MESSAGE RECEIVED", msg);
+  console.log("data", msg.data);
+  console.log("blobs", msg.data.blobs);
 
   if (msg.data.nuggetId && msg.data.subDir && msg.data.blobs ) {
     for(const dataObj of msg.data.blobs) {
@@ -19,7 +19,12 @@ self.onmessage = async (msg) => {
         const fullPath = `nugget/${keyPath}`
         const opfsFH = await getSyncFileHandle(fullPath)
 
-        const contents = await blob.arrayBuffer();
+        const fetched = await fetch(dataObj.blobURL);
+
+        const cBlob = await fetched.blob();
+
+        const contents = await cBlob.arrayBuffer();
+
 
         opfsFH.write(contents, { at: 0 });
         opfsFH.flush();
@@ -30,7 +35,7 @@ self.onmessage = async (msg) => {
           nuggetId: msg.data.nuggetId,
           subDir: msg.data.subDir,
           fileName: fileName,
-          mimeType: blob.type,
+          mimeType: dataObj.type,
           dateCreated: new Date().toISOString(),
           fileSize: newSize
         };

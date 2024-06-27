@@ -92,10 +92,20 @@ const createNugget = async (fullNugget) => {
 
   if (fullNugget.videoRecordings && fullNugget.videoRecordings.length > 0) {
     console.log('ATTACH VIDEO', fullNugget.videoRecordings)
+    const cleanBlobArr= [];
+    for(const vBlob of fullNugget.videoRecordings) {
+      cleanBlobArr.push({ name: vBlob.name, blobURL: vBlob.blobURL})
+    }
+    blobWorker.postMessage({ nuggetId: nuggetId, subDir: "videos", blobs: cleanBlobArr });
   }
 
   if (fullNugget.audioRecordings && fullNugget.audioRecordings.length > 0) {
     console.log('ATTACH AUDIO', fullNugget.audioRecordings)
+    const cleanBlobArr= [];
+    for(const vBlob of fullNugget.audioRecordings) {
+      cleanBlobArr.push({ name: vBlob.name, blobURL: vBlob.blobURL})
+    }
+    blobWorker.postMessage({ nuggetId: nuggetId, subDir: "audio", blobs: cleanBlobArr });
   }
 
   return nuggetId;
