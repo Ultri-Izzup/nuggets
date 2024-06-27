@@ -33,7 +33,8 @@
         </v-row>
         <v-row>
           <v-col cols="12" class="text-h6">Images</v-col>
-          <v-row v-if="images && images.length">
+          {{images}}
+          <v-row v-if="images">
             <v-row
               v-for="(file, index) in images"
               :key="index"
@@ -44,7 +45,7 @@
                   <v-divider></v-divider>
                   <v-col>
                     <img :src="file.dataURL" width="100%" />
-                    <span class="text-caption">{{ file.name }}</span>
+                    <span class="text-caption">{{ file.fileName }}</span>
                   </v-col>
                 </v-row>
               </v-col>
@@ -123,7 +124,6 @@ import { ref, watch, computed } from "vue";
 
 import { useNuggetStore } from "@/stores/nugget";
 
-import { db } from "@/dexie/db.js";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import GeoLocation from "./GeoLocation.vue";

@@ -11,6 +11,9 @@ import { newFileTimestamp } from '@/shared/utilityFuncs'
 // Access Dexie IndexedDB tables and worker
 import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets } from '@/shared/dexieFuncs'
 
+// Access OPFS
+import { readOPFSAsDataURL } from '@/shared/opfsFuncs'
+
 // Worker scripts
 /**
   * Initialize Ultri Worker
@@ -108,15 +111,6 @@ const getNugget = async (nuggetId) => {
 }
 
 /**
- * Get attached files for a given nuggetId
- * @param {number} nuggetId
- * @returns {object}
- */
-const getNuggetFiles = async (nuggetId) => {
-  return dexGetNuggetFiles(nuggetId)
-}
-
-/**
  * Get attached assets for a given nuggetId
  * @param {number} nuggetId
  * @param {string} subDir
@@ -127,12 +121,22 @@ const getNuggetAssets = async (nuggetId, subDir) => {
 }
 
 /**
- * Get audio for a given nuggetId
- * @param {number} nuggetId
- * @returns {object}
+ * Fetch a file from OPFS
+ * @param {string} filePath
  */
-const getNuggetAudio = async (nuggetId) => {
-  return dexGetNuggetAudio(nuggetId)
+const opfsFile = async (filePath) => {
+  // const fh = await opfsFH(filePath);
+
+  // // console.log('ASYNC FILE HANDLE', fh);
+
+  // const file = await fh.getFile();
+
+  // // console.log('ASYNC FILE', file);
+
+  // const reader = new FileReader();
+  // reader.readAsDataURL(file);
+
+  return reader;
 }
 
 /**
@@ -143,9 +147,9 @@ export function useNuggets() {
   return {
     createNugget,
     getNugget,
-    getNuggetFiles,
     getNuggetAssets,
     newFileTimestamp,
-    nuggetRelationTypes
+    nuggetRelationTypes,
+    opfsFile
   };
 }

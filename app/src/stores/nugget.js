@@ -14,29 +14,22 @@ export const useNuggetStore = defineStore("nugget", () => {
   const preferredCamera = useStorage('preferredCamera', null);
 
   // GETTERS / CALCULATED STATE
-  const newFileTimestamp = Nug.newFileTimestamp
+
 
   // ACTIONS / FUNCTIONS
-  const createNugget = async (fullNugget) => {
-    console.log(fullNugget);
-
-    const nuggetId = await Nug.createNugget(fullNugget);
-
-    return nuggetId;
-  }
-
-  const getNugget = Nug.getNugget;
 
   return {
     // State
     preferredCamera,
 
     // Getters
-    newFileTimestamp,
 
     // Actions/Functions
-    createNugget,
-    getNugget,
+
+    createNugget: Nug.createNugget,
+    getNugget: Nug.getNugget,
     getNuggetAssets: Nug.getNuggetAssets,
+    newFileTimestamp: Nug.newFileTimestamp,
+    opfsFile: Nug.opfsFile
   }
 });
