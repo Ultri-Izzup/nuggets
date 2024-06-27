@@ -12,7 +12,7 @@ import { newFileTimestamp } from '@/shared/utilityFuncs'
 import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets } from '@/shared/dexieFuncs'
 
 // Access OPFS
-import { readOPFSAsDataURL } from '@/shared/opfsFuncs'
+import { opfsFile } from '@/shared/opfsFuncs'
 
 // Worker scripts
 /**
@@ -124,7 +124,14 @@ const getNuggetAssets = async (nuggetId, subDir) => {
  * Fetch a file from OPFS
  * @param {string} filePath
  */
-const opfsFile = async (filePath) => {
+const readOPFSFile = async (filePath) => {
+  const fh = await opfsFile(filePath);
+  const file = await fh.getFile();
+  console.log('FILE', file)
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  return reader;
+
   // const fh = await opfsFH(filePath);
 
   // // console.log('ASYNC FILE HANDLE', fh);
@@ -136,7 +143,7 @@ const opfsFile = async (filePath) => {
   // const reader = new FileReader();
   // reader.readAsDataURL(file);
 
-  return reader;
+  // return reader;
 }
 
 /**
@@ -150,6 +157,6 @@ export function useNuggets() {
     getNuggetAssets,
     newFileTimestamp,
     nuggetRelationTypes,
-    opfsFile
+    readOPFSFile
   };
 }

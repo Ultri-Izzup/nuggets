@@ -30,6 +30,6 @@ export const useNuggetStore = defineStore("nugget", () => {
     getNugget: Nug.getNugget,
     getNuggetAssets: Nug.getNuggetAssets,
     newFileTimestamp: Nug.newFileTimestamp,
-    opfsFile: Nug.opfsFile
+    readOPFSFile: Nug.readOPFSFile
   }
 });

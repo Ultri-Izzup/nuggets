@@ -33,21 +33,21 @@
         </v-row>
         <v-row>
           <v-col cols="12" class="text-h6">Images</v-col>
-          {{images}}
           <v-row v-if="images">
             <v-row
               v-for="(file, index) in images"
               :key="index"
-              class="text-body-2"
+              class="text-body-2 flex"
             >
               <v-col>
-                <v-row class="align-center justify-center">
-                  <v-divider></v-divider>
-                  <v-col>
-                    <img :src="file.dataURL" width="100%" />
-                    <span class="text-caption">{{ file.fileName }}</span>
-                  </v-col>
-                </v-row>
+                <v-divider></v-divider>
+                <v-col>
+                  <OPFSImage
+                    :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                  ></OPFSImage
+                  ><br />
+                  <span class="text-caption">{{ file.fileName }}</span>
+                </v-col>
               </v-col>
             </v-row>
           </v-row>
@@ -106,12 +106,18 @@
           <v-col cols="12" class="text-h6">Waypoints</v-col>
           <v-row v-if="nuggetData.geoPositions">
             <v-col cols="12" md="6" class="pl-6">
-
-            <v-row v-for="(position, index) in nuggetData.geoPositions" :key="index" cols="12">
-              <GeoLocation v-if="index !== 0" :geoLocation="position"></GeoLocation>
-              <v-divider></v-divider>
-            </v-row>
-          </v-col>
+              <v-row
+                v-for="(position, index) in nuggetData.geoPositions"
+                :key="index"
+                cols="12"
+              >
+                <GeoLocation
+                  v-if="index !== 0"
+                  :geoLocation="position"
+                ></GeoLocation>
+                <v-divider></v-divider>
+              </v-row>
+            </v-col>
           </v-row>
         </v-row>
       </v-container>

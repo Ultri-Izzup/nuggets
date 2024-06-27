@@ -27,7 +27,8 @@ const props = defineProps({
 const src = ref(null);
 
 onMounted(async () => {
-  const imgSrc = await nug.opfsFile(props.filePath);
+  console.log('LOADING FILE FROM OPFS', props.filePath)
+  const imgSrc = await nug.readOPFSFile(props.filePath);
   imgSrc.onload = () => {
     src.value = imgSrc.result;
   }
