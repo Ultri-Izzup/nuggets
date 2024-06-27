@@ -1,5 +1,8 @@
 const opfsRoot = await navigator.storage.getDirectory();
 
+const dirHandles = new Map();
+const fileHandles = new Map();
+
 export async function readOPFSFile (filePath) {
   const fh = await opfsFile(filePath);
   const file = await fh.getFile();
@@ -22,11 +25,18 @@ async function _getDH (dirSegments) {
 
   for (const segment of dirSegments) {
     currDirName = `${currDirName}${segment}/`;
-    console.log(`RECURSED TO ${currDirName}`);
-    console.log("LOADING DIRHANDLE", currDirName);
-    currDirHandle = await currDirHandle.getDirectoryHandle(segment, {
-      create: true
-    });
+    if(dirHandles.has(currDirName)) {
+      console.log('USE CACHED DIR HANDLE')
+      currDirHandle = dirHandles.get(currDirName)
+    } else {
+      console.log(dirHandles)
+      console.log(`RECURSED TO ${currDirName}`);
+      console.log("LOADING DIRHANDLE", currDirName);
+      currDirHandle = await currDirHandle.getDirectoryHandle(segment, {
+        create: true
+      });
+      dirHandles.set(currDirName, currDirHandle)
+    }
   }
 
   return currDirHandle;
