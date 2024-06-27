@@ -1,19 +1,200 @@
 <template>
   <v-container class="flex">
-    <v-responsive class="align-centerfill-height mx-auto py-6" max-width="900">
-      <div class="text-center">
-        <h1 class="text-h4 font-weight-bold">{{ nuggetData ? nuggetData.name : 'Nugget' }}</h1>
-      </div>
+    <v-responsive class="align-centerfill-height mx-auto py-3" max-width="1600">
+      <v-row>
+        <v-col cols="12" class="text-center">
+          <h1 class="text-h4 font-weight-bold">
+            {{ nuggetData ? nuggetData.name : "Nugget" }}
+          </h1>
+        </v-col>
+      </v-row>
 
-      <div class="py-3" />
-      <v-container v-if="nuggetData" max-width="600">
-        <!-- <v-row>
+      <v-container v-if="nuggetData">
+        <v-row>
+          <v-col cols="12" class="text-body-1 mb-0 pb-0">
+            {{ nuggetData.description }}
+          </v-col>
+          <v-col cols="12" class="mt-0 pt-0 text-caption text-grey">
+            Description
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" class="text-body-1 mb-0 pb-0">
+            {{ nuggetData.tags.join(",") }}
+          </v-col>
+          <v-col cols="12" class="mt-0 pt-0 text-caption text-grey">
+            Tags
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <v-divider></v-divider>
+
+      <v-row  class="my-5" >
+        <v-col cols="12" class="pb-3">
+          <h2 class="text-h5 font-weight-bold">Images</h2>
+        </v-col>
+        <v-col v-if="images && images.length > 0" cols="12">
+          <v-row>
+            <v-col
+              v-for="(file, index) in images"
+              :key="index"
+              class="text-body-2"
+            >
+              <v-row>
+                <v-col cols="12" class="pb-0">
+                  <v-card>
+                    <v-card-text>
+                      <OPFSImage
+                        :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                        width="100%"
+                      ></OPFSImage>
+                      {{ file.fileName }}
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+
+      <v-divider></v-divider>
+
+      <v-row class="my-5" >
+        <v-col cols="12" class="pb-3">
+          <h2 class="text-h5 font-weight-bold">Videos</h2>
+        </v-col>
+        <v-col v-if="videoRecordings && videoRecordings.length > 0" cols="12">
+          <v-row >
+            <v-col
+              v-for="(file, index) in videoRecordings"
+              :key="index"
+              class="text-body-2"
+            >
+              <v-row>
+                <v-col cols="12" class="pb-0">
+                  <v-card>
+                    <v-card-text>
+                  <OPFSVideo
+                    :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                    width="100%"
+                  ></OPFSVideo>
+                       {{ file.fileName }}
+                      </v-card-text>
+                </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+
+      <v-divider></v-divider>
+
+      <v-row class="my-5">
+        <v-col cols="12" class="pb-3">
+          <h2 class="text-h5 font-weight-bold">Audio</h2>
+        </v-col>
+        <v-col v-if="audioRecordings && audioRecordings.length > 0" cols="12">
+          <v-row >
+            <v-col
+              v-for="(file, index) in audioRecordings"
+              :key="index"
+              class="text-body-2"
+            >
+              <v-row>
+                <v-col cols="12" class="pb-0">
+                  <v-card>
+                    <v-card-text class="text-center">
+                  <OPFSAudio
+                    :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                    width="100%"
+                  ></OPFSAudio>
+                       {{ file.fileName }}
+                      </v-card-text>
+                </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+
+      <v-divider></v-divider>
+
+      <v-row class="my-5">
+        <v-col cols="12" class="pb-3">
+          <h2 class="text-h5 font-weight-bold">Files</h2>
+        </v-col>
+        <v-col v-if="files && files.length > 0" cols="12">
+          <v-row >
+            <v-col
+              v-for="(file, index) in files"
+              :key="index"
+              class="text-body-2"
+            >
+              <v-row>
+                <v-col cols="12" class="pb-0">
+                  <v-card>
+                    <v-card-text>
+
+                       {{ file.fileName }}
+                      </v-card-text>
+                </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+
+      <v-divider></v-divider>
+
+      <v-row class="my-5">
+        <v-col cols="12" class="pb-3">
+          <h2 class="text-h5 font-weight-bold">Geolocation</h2>
+        </v-col>
+
+
+
+        <v-col v-if="videoRecordings && videoRecordings.length > 0" cols="12">
+          <v-row >
+            <v-col
+              v-for="(file, index) in videoRecordings"
+              :key="index"
+              class="text-body-2"
+            >
+              <v-row>
+                <v-col cols="12" class="pb-0">
+                  <v-card>
+                    <v-card-text>
+                  <OPFSVideo
+                    :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                    width="100%"
+                  ></OPFSVideo>
+                       {{ file.fileName }}
+                      </v-card-text>
+                </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-col>
+
+
+
+      </v-row>
+    </v-responsive>
+  </v-container>
+</template>
+<!-- <v-row>
           <v-col cols="12">
             <v-row class="text-body"> {{ nuggetData.name }} &nbsp; </v-row>
             <v-row class="mt-1 pt-0 text-caption text-grey"> Name </v-row>
           </v-col>
         </v-row> -->
-        <v-row>
+<!-- <v-row>
           <v-col cols="12">
             <v-row class="text-body">
               {{ nuggetData.description }} &nbsp;
@@ -31,41 +212,48 @@
             <v-row class="mt-1 pt-0 text-caption text-grey"> Tags </v-row>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col cols="12" class="text-h6">Images</v-col>
-          <v-row v-if="images">
-            <v-row
-              v-for="(file, index) in images"
-              :key="index"
-              class="text-body-2 flex"
-            >
-              <v-col>
+        <v-row class="bg-green">
+          <v-row>
+            <v-col cols="12" class="text-h6 bg-blue">Images</v-col>
+          </v-row>
+          <v-row class="bg-pink">
+            <v-col v-if="images" class="ma-0 pa-0" cols="12">
+              <v-row
+                v-for="(file, index) in images"
+                :key="index"
+                class="text-body-2"
+              >
                 <v-divider></v-divider>
                 <v-col>
-                  <OPFSImage
-                    :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
-                  ></OPFSImage>
-                  <br />
-                  <span class="text-caption">{{ file.fileName }}</span>
+                  <v-col>
+                    <OPFSImage
+                      :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                      width="100%"
+                    ></OPFSImage>
+                    <br />
+                    <span class="text-caption text-center">{{
+                      file.fileName
+                    }}</span>
+                  </v-col>
                 </v-col>
-              </v-col>
-            </v-row>
+              </v-row>
+            </v-col>
           </v-row>
         </v-row>
         <v-row>
           <v-col cols="12" class="text-h6">Video</v-col>
-          <!-- {{ videoRecordings }} -->
           <v-row v-if="videoRecordings && videoRecordings.length > 0">
-            <v-row v-for="(file, index) in videoRecordings" :key="index">
+            <v-col v-for="(file, index) in videoRecordings" :key="index">
               <v-divider></v-divider>
               <v-col>
                 <OPFSVideo
                   :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                  width="100%"
                 ></OPFSVideo>
                 <br />
                 <span class="text-caption">{{ file.fileName }}</span>
               </v-col>
-            </v-row>
+            </v-col>
           </v-row>
         </v-row>
         <v-row>
@@ -123,11 +311,7 @@
               </v-row>
             </v-col>
           </v-row>
-        </v-row>
-      </v-container>
-    </v-responsive>
-  </v-container>
-</template>
+        </v-row> -->
 
 <script setup>
 import { ref, watch, computed } from "vue";
