@@ -1,11 +1,11 @@
 <template>
   <v-container>
-    <v-row class="text-body2">
-      <v-col cols="12 py-1">
+    <v-row>
+      <v-col cols="12 py-0" class="text-body-1">
         Lat/Long: {{ geoLocation.latitude }},
         {{ geoLocation.longitude }}
       </v-col>
-      <v-col cols="12 py-1">
+      <v-col cols="12 py-1" class="text-body-2">
         Time: {{ new Date(geoLocation.timestamp).toLocaleString() }}
       </v-col>
       <v-col v-if="geoLocation.altitude" cols="12">
