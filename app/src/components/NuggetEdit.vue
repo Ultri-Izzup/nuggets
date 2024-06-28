@@ -9,6 +9,7 @@
         </v-col>
       </v-row>
 
+      <!-- DATA -->
       <v-container v-if="nuggetData">
         <v-row>
           <v-col cols="12" class="text-body-1 mb-0 pb-0">
@@ -29,10 +30,10 @@
       </v-container>
 
       <v-divider></v-divider>
-
+      <!--IMAGES -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold">Images</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-image-multiple" /> Images</h2>
         </v-col>
         <v-col v-if="images && images.length > 0" cols="12">
           <v-row>
@@ -60,10 +61,10 @@
       </v-row>
 
       <v-divider></v-divider>
-
+      <!-- VIDEO -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold">Videos</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-video" /> Videos</h2>
         </v-col>
         <v-col v-if="videoRecordings && videoRecordings.length > 0" cols="12">
           <v-row>
@@ -91,10 +92,10 @@
       </v-row>
 
       <v-divider></v-divider>
-
+      <!-- AUDIO -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold">Audio</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-speaker"> </v-icon> Audio</h2>
         </v-col>
         <v-col v-if="audioRecordings && audioRecordings.length > 0" cols="12">
           <v-row>
@@ -112,6 +113,7 @@
                         width="100%"
                       ></OPFSAudio>
                       {{ file.fileName }}
+                      <v-icon icon="mdi-dots-vertical" size="x-large"></v-icon>
                     </v-card-text>
                   </v-card>
                 </v-col>
@@ -122,10 +124,10 @@
       </v-row>
 
       <v-divider></v-divider>
-
+      <!-- FILES -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold">Files</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-file-multiple" /> Files</h2>
         </v-col>
         <v-col v-if="files && files.length > 0" cols="12">
           <v-row>
@@ -137,9 +139,10 @@
               <v-row>
                 <v-col cols="12" class="pb-0">
                   <v-card>
-                    <v-card-text>
-                      {{ file.fileName }}
-                    </v-card-text>
+                    <v-card-actions>
+                        {{ file.fileName }}
+                        <v-icon icon="mdi-dots-vertical" size="x-large"></v-icon>
+                    </v-card-actions>
                   </v-card>
                 </v-col>
               </v-row>
@@ -149,10 +152,10 @@
       </v-row>
 
       <v-divider></v-divider>
-
+      <!-- GEOLOCATION -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold">Geolocation</h2>
+          <h2 class="text-h5 font-weight-bold"> <v-icon icon="mdi-map-marker" /> Location</h2>
         </v-col>
         <v-col v-if="nuggetData && nuggetData.geoLocation" cols="12">
           <v-row>
@@ -164,10 +167,10 @@
       </v-row>
 
       <v-divider></v-divider>
-
+      <!-- GEOPOSITIONS -->
       <v-row v-if="nuggetData && nuggetData.geoPositions" class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold">Waypoints</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-map" /> Waypoints</h2>
         </v-col>
 
         <v-col cols="12">
@@ -187,7 +190,7 @@
         </v-col>
       </v-row>
 
-      <v-divider v-if="!nuggetData || ! nuggetData.geoPositions"></v-divider>
+      <v-divider v-if="!nuggetData || !nuggetData.geoPositions"></v-divider>
     </v-responsive>
   </v-container>
 </template>
