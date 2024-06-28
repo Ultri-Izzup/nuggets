@@ -1,5 +1,4 @@
-import { db } from "../src/dexie/db.js";
-
+import { putAssetRecord } from './shared/dexie.js';
 import {fileNameRegex, getSyncFileHandle} from './shared/opfs.js';
 
 self.onmessage = async (msg) => {
@@ -42,7 +41,7 @@ self.onmessage = async (msg) => {
 
         console.log('META', assetMeta)
 
-        const newId = await db.assets.put(assetMeta);
+        const newId = await putAssetRecord(assetMeta);
         console.log("NEW FILE", newId);
 
         const response = {
