@@ -9,7 +9,7 @@ import { nuggetRelationTypes } from '@/shared/lookupLists'
 import { newFileTimestamp } from '@/shared/utilityFuncs'
 
 // Access Dexie IndexedDB tables and worker
-import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets } from '@/shared/dexieFuncs'
+import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets, dexCreateExportRecord } from '@/shared/dexieFuncs'
 
 // Access OPFS
 import { readOPFSFile } from '@/shared/opfsFuncs'
@@ -18,52 +18,48 @@ import { readOPFSFile } from '@/shared/opfsFuncs'
 /**
   * Initialize Ultri Worker
   */
-let fileHandleWorker = null;
-let dataURLWorker = null;
-let blobWorker = null;
+let fileHandleWorker = null;  // Used for local file attachments
+let dataURLWorker = null;     // Used for images
+let blobWorker = null;        // Used for audio and video
+let exportWorker = null;      // Used for exporting Nuggets
 
 if (window.Worker) {
 
-  //////////////////
-  // Create Ultri Dedicated OPFS Worker.
-  // Each script or tab will have it's own copy of this worker.
   fileHandleWorker = new Worker("/workers/fileHandleWorker.js", { type: "module" });
-
-  // Define handlers for each message type
   fileHandleWorker.onmessage = (msg) => {
     console.log(
       "DEDICATED FileHandle WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
       msg
     );
   };
-
   console.log("FILE WORKER LOADED IN Nuggets Composable");
 
-  //////////////////
   dataURLWorker = new Worker("/workers/dataURLWorker.js", { type: "module" });
-
-  // Define handlers for each message type
   dataURLWorker.onmessage = (msg) => {
     console.log(
       "DEDICATED URLDATA WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
       msg
     );
   };
+  console.log("DATAURL WORKER LOADED IN Nuggets Composable");
 
-  console.log("DATA WORKER LOADED IN Nuggets Composable");
-
-  // //////////////////
   blobWorker = new Worker("/workers/blobWorker.js", { type: "module" });
-
-  // Define handlers for each message type
   blobWorker.onmessage = (msg) => {
     console.log(
       "DEDICATED BLOB WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
       msg
     );
   };
-
   console.log("BLOB WORKER LOADED IN Nuggets Composable");
+
+  exportWorker = new Worker("/workers/exportWorker.js", { type: "module" });
+  exportWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED EXPORT WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+  console.log("EXPORT WORKER LOADED IN Nuggets Composable");
 }
 
 /**
@@ -130,17 +126,16 @@ const getNuggetAssets = async (nuggetId, subDir) => {
   return dexGetNuggetAssets(nuggetId, subDir)
 }
 
-/**
- * Fetch a file from OPFS
- * @param {string} filePath
- */
-// const readOPFSFile = async (filePath) => {
-//   const fh = await opfsFile(filePath);
-//   const file = await fh.getFile();
-//   const reader = new FileReader();
-//   reader.readAsDataURL(file);
-//   return reader;
-// }
+const startExport = async (nuggetId) => {
+  console.log('NUGGET START EXPORT', nuggetId)
+  // Create Dexie/IndexedDB record for job.
+  const exportId = await dexCreateExportRecord(nuggetId);
+
+  // The remainder of the export takes place in the Worker.
+  exportWorker.postMessage({ nuggetId: nuggetId, exportId: exportId });
+
+  return exportId;
+}
 
 /**
  * export for use as a composable
@@ -153,6 +148,7 @@ export function useNuggets() {
     getNuggetAssets,
     newFileTimestamp,
     nuggetRelationTypes,
-    readOPFSFile
+    readOPFSFile,
+    startExport
   };
 }

@@ -108,10 +108,10 @@
                 <v-col cols="12" class="pb-0">
                   <v-card>
                     <v-card-text class="text-center">
-                      <OPFSAudio
+                      <!-- <OPFSAudio
                         :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
                         width="100%"
-                      ></OPFSAudio>
+                      ></OPFSAudio> -->
                       {{ file.fileName }}
                       <v-icon icon="mdi-dots-vertical" size="x-large"></v-icon>
                     </v-card-text>
