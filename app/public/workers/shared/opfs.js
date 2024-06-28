@@ -1,5 +1,8 @@
 const opfsRoot = await navigator.storage.getDirectory();
 
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
 const fileNameRegex = /[^a-zA-Z0-9\-\_\.]/g;
 
 const fileHandles = new Map();
@@ -74,4 +77,22 @@ const _createDH = async (dirSegments) => {
   return currDirHandle;
 }
 
-export { opfsRoot, fileNameRegex, getSyncFileHandle}
+const writeJSONtoOPFS = async (json, filePath) => {
+
+  const writeHandle = await getSyncFileHandle(filePath);
+
+  const contents = textEncoder.encode(JSON.stringify(json));
+
+  writeHandle.write(contents, { at: 0 });
+  writeHandle.flush();
+  const newSize = writeHandle.getSize();
+  writeHandle.close();
+
+  return { filePath: filePath, fileSize: newSize}
+}
+
+const getOPFSDirHandle = async (dirPath) => {
+  return await _resolveDirHandle(dirPath.split('/'))
+}
+
+export { opfsRoot, fileNameRegex, getOPFSDirHandle, getSyncFileHandle, writeJSONtoOPFS}
