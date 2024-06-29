@@ -128,7 +128,7 @@
         <v-row v-for="(file, index) in videoRecordings" :key="index">
           <v-divider></v-divider>
           <v-col cols="12">
-            <video :src="file.videoURL" controls width="100%" height="auto"/>
+            <video :src="file.blobURL" controls width="100%" height="auto"/>
             <span class="text-caption">{{ file.name }}</span>
           </v-col>
         </v-row>
@@ -354,6 +354,7 @@ const tempStoreVideo = (videoCaptureObj) => {
 const saveVideoSource = (newSource) => {
   selectedVideoDevice.value = newSource;
   preferredCamera.value = newSource;
+  nug.preferredCamera = newSource;
   console.log("VIDEO SOURCE SET", newSource);
 };
 
@@ -401,7 +402,7 @@ const showScreenPicker = async () => {
 
 const showCamera = async () => {
   videoSource.value = "Camera";
-  selectedVideoDevice.value = preferredCamera.value;
+  selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : nug.preferredCamera;
   showVideoDialog.value = true;
 };
 

@@ -9,33 +9,57 @@ import { nuggetRelationTypes } from '@/shared/lookupLists'
 import { newFileTimestamp } from '@/shared/utilityFuncs'
 
 // Access Dexie IndexedDB tables and worker
-import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets } from '@/shared/dexieFuncs'
+import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets, dexCreateExportRecord } from '@/shared/dexieFuncs'
+
+// Access OPFS
+import { readOPFSFile } from '@/shared/opfsFuncs'
 
 // Worker scripts
 /**
   * Initialize Ultri Worker
   */
-let fileHandleWorker = null;
+let fileHandleWorker = null;  // Used for local file attachments
+let dataURLWorker = null;     // Used for images
+let blobWorker = null;        // Used for audio and video
+let exportWorker = null;      // Used for exporting Nuggets
 
 if (window.Worker) {
-  // Create Ultri Dedicated OPFS Worker.
-  // Each script or tab will have it's own copy of this worker.
-  fileHandleWorker = new Worker("/workers/fileHandleWorker.js", { type: "module" });
 
-  // Define handlers for each message type
+  fileHandleWorker = new Worker("/workers/fileHandleWorker.js", { type: "module" });
   fileHandleWorker.onmessage = (msg) => {
     console.log(
-      "DEDICATED WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      "DEDICATED FileHandle WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
       msg
     );
-    //  console.log(`USE HANDLER ${msg.data.handler}`);
-
-    //  const handler = msg.data.handler;
-
-    //  msgHandlers[handler](msg.data.responseData);
   };
+  console.log("FILE WORKER LOADED IN Nuggets Composable");
 
-  console.log("WORKER LOADED IN Nuggets Composable");
+  dataURLWorker = new Worker("/workers/dataURLWorker.js", { type: "module" });
+  dataURLWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED URLDATA WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+  console.log("DATAURL WORKER LOADED IN Nuggets Composable");
+
+  blobWorker = new Worker("/workers/blobWorker.js", { type: "module" });
+  blobWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED BLOB WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+  console.log("BLOB WORKER LOADED IN Nuggets Composable");
+
+  exportWorker = new Worker("/workers/exportWorker.js", { type: "module" });
+  exportWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED EXPORT WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+  console.log("EXPORT WORKER LOADED IN Nuggets Composable");
 }
 
 /**
@@ -55,14 +79,29 @@ const createNugget = async (fullNugget) => {
 
   if (fullNugget.capturedImages && fullNugget.capturedImages.length > 0) {
     console.log('ATTACH IMAGES', fullNugget.capturedImages)
+    const cleanImgObjs = [];
+    for(const imgObj of fullNugget.capturedImages) {
+      cleanImgObjs.push({ name: imgObj.name, dataURL: imgObj.dataURL})
+    }
+    dataURLWorker.postMessage({ nuggetId: nuggetId, subDir: "images", dataURLObjs: cleanImgObjs });
   }
 
   if (fullNugget.videoRecordings && fullNugget.videoRecordings.length > 0) {
     console.log('ATTACH VIDEO', fullNugget.videoRecordings)
+    const cleanBlobArr= [];
+    for(const vBlob of fullNugget.videoRecordings) {
+      cleanBlobArr.push({ name: vBlob.name, blobURL: vBlob.blobURL})
+    }
+    blobWorker.postMessage({ nuggetId: nuggetId, subDir: "videos", blobs: cleanBlobArr });
   }
 
   if (fullNugget.audioRecordings && fullNugget.audioRecordings.length > 0) {
     console.log('ATTACH AUDIO', fullNugget.audioRecordings)
+    const cleanBlobArr= [];
+    for(const vBlob of fullNugget.audioRecordings) {
+      cleanBlobArr.push({ name: vBlob.name, blobURL: vBlob.blobURL})
+    }
+    blobWorker.postMessage({ nuggetId: nuggetId, subDir: "audio", blobs: cleanBlobArr });
   }
 
   return nuggetId;
@@ -78,15 +117,6 @@ const getNugget = async (nuggetId) => {
 }
 
 /**
- * Get attached files for a given nuggetId
- * @param {number} nuggetId
- * @returns {object}
- */
-const getNuggetFiles = async (nuggetId) => {
-  return dexGetNuggetFiles(nuggetId)
-}
-
-/**
  * Get attached assets for a given nuggetId
  * @param {number} nuggetId
  * @param {string} subDir
@@ -96,13 +126,15 @@ const getNuggetAssets = async (nuggetId, subDir) => {
   return dexGetNuggetAssets(nuggetId, subDir)
 }
 
-/**
- * Get audio for a given nuggetId
- * @param {number} nuggetId
- * @returns {object}
- */
-const getNuggetAudio = async (nuggetId) => {
-  return dexGetNuggetAudio(nuggetId)
+const startExport = async (nuggetId) => {
+  console.log('NUGGET START EXPORT', nuggetId)
+  // Create Dexie/IndexedDB record for job.
+  const exportId = await dexCreateExportRecord(nuggetId);
+
+  // The remainder of the export takes place in the Worker.
+  exportWorker.postMessage({ nuggetId: nuggetId, exportId: exportId });
+
+  return exportId;
 }
 
 /**
@@ -113,9 +145,10 @@ export function useNuggets() {
   return {
     createNugget,
     getNugget,
-    getNuggetFiles,
     getNuggetAssets,
     newFileTimestamp,
-    nuggetRelationTypes
+    nuggetRelationTypes,
+    readOPFSFile,
+    startExport
   };
 }

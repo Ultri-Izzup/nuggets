@@ -34,3 +34,10 @@ export async function dexGetNuggetAssets(nuggetId, subDir=false) {
   }
   return await db.assets.where(whereClause).toArray();
 }
+
+export async function dexCreateExportRecord(nuggetId) {
+  const exportRecord = {
+    nuggetId: nuggetId, createdAt: new Date().toISOString()
+  }
+  return await db.exports.add(exportRecord);
+}

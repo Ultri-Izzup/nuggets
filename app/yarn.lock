@@ -476,6 +476,11 @@
   dependencies:
     vue-demi ">=0.14.8"
 
+"@zip.js/zip.js@^2.7.45":
+  version "2.7.45"
+  resolved "https://registry.yarnpkg.com/@zip.js/zip.js/-/zip.js-2.7.45.tgz#823fe2789401d8c1d836ce866578379ec1bd6f0b"
+  integrity sha512-Mm2EXF33DJQ/3GWWEWeP1UCqzpQ5+fiMvT3QWspsXY05DyqqxWu7a9awSzU4/spHMHVFrTjani1PR0vprgZpow==
+
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"

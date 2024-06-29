@@ -142,11 +142,11 @@ const enableVideoRecorder = (stream, vidSrc) => {
 
     const blob = new Blob(chunks.value, { type: "video/webm" });
     chunks.value = [];
-    const videoURL = (window.URL || window.webkitURL).createObjectURL(blob);
-    console.log("VIDEO URL", videoURL);
+    const blobURL = (window.URL || window.webkitURL).createObjectURL(blob);
+    console.log("VIDEO URL", blobURL);
     emit("recordedVideo", {
       name: clipName,
-      videoURL: videoURL,
+      blobURL: blobURL,
     });
   };
 };
