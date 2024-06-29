@@ -4,7 +4,7 @@ export async function putAssetRecord (record) {
   return await db.assets.put(record);
 }
 
-export async function marlExportComplete (exportId) {
+export async function markExportComplete (exportId) {
   const record = {
     exportId: exportId,
     completedAt: new Date().toISOString()
