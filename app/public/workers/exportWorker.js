@@ -1,6 +1,10 @@
 import { markExportComplete, getNuggetData, getNuggetAssets, getNuggetRelations } from './shared/dexie.js';
-import { writeJSONtoOPFS, getOPFSDirHandle } from './shared/opfs.js';
+import { writeJSONtoOPFS, opfsSyncRead } from './shared/opfs.js';
 import { getZipWriter } from './shared/zip.js';
+
+import {
+  TextReader
+} from "../../../node_modules/@zip.js/zip.js/index.js";
 
 self.onmessage = async (msg) => {
   console.log("export WORKER MESSAGE RECEIVED", msg);
@@ -8,42 +12,101 @@ self.onmessage = async (msg) => {
   const nuggetId = msg.data.nuggetId;
   const exportId = msg.data.exportId;
 
-  await copyDataToOPFS(nuggetId);
+  if(nuggetId && exportId) {
 
-  const zipResult = await zipExportNugget(nuggetId);
+    const zipWriter = await getZipWriter();
 
-  markExportComplete(exportId);
+    const dataFiles = await copyDataToOPFS(nuggetId);
+
+    // Add files we just wrote to zipWriter
+    for(const dataFile of dataFiles) {
+      const filePath = dataFile.filePath;
+      const fileBlob = await opfsSyncRead(filePath);
+      await zipWriter.add(filePath, new TextReader(textDecoder.decode(fileBlob)))
+    }
+
+    const zipped = await zipWriter.close();
+
+    console.log(zipped)
+
+    // Write the zipped content to OPFS /exports
+
+
+
+  //
+  // const filePath = `nugget/${nuggetId}/nuggetData.json`;
+  // const fileBlob = await  opfsSyncRead(filePath);
+  // console.log(fileBlob)
+  // console.log(textDecoder.decode(fileBlob));
+
+  // await zipWriter.add(filePath, new TextReader(textDecoder.decode(fileBlob)))
+
+  // const zipped = await zipWriter.close();
+
+  // console.log(zipped)
+
+    // const zipResult = await zipExportNugget(nuggetId, dataFiles);
+
+    // markExportComplete(exportId);
+
+  }
+
 
 }
 
+const textDecoder = new TextDecoder();
+
 const zipExportNugget = async (nuggetId) => {
 
-  // Get the Nugget's root OPFS directory handle
-  const rootDH = await getOPFSDirHandle(`nugget/${nuggetId}`);
-
   const zipWriter = await getZipWriter();
+  console.log(zipWriter)
 
-  console.log(zipWriter, rootDH)
+  // Add known files to zip
+  // nuggetData.json
+  // nuggetRelations.json
+  const filePath = `nugget/${nuggetId}/nuggetData.json`;
+  const fileBlob = await  opfsSyncRead(filePath);
+  console.log(fileBlob)
+  console.log(textDecoder.decode(fileBlob));
+
+  await zipWriter.add(filePath, new TextReader(textDecoder.decode(fileBlob)))
+
+  const zipped = await zipWriter.close();
+
+console.log(zipped)
+
+  // Read in assets manifest
+  // Loop through assets, adding each file to zip
+  // Add assets manifest JSON to zip
+
 }
 
 const copyDataToOPFS = async (nuggetId) => {
 
+  const dataFiles = [];
+
   // * Export Dexie Nugget data to json in OPFS /nugget/:nuggetId/nuggetData.json
   const nuggetData = await getNuggetData(nuggetId);
-  await (writeJSONtoOPFS(nuggetData, `nugget/${nuggetId}/nuggetData.json`))
+  if(nuggetData) {
+    const writeResult = await (writeJSONtoOPFS(nuggetData, `nugget/${nuggetId}/nuggetData.json`));
+    dataFiles.push(writeResult);
+  }
 
   // * Export Dexie assets data to json in OPFS /nugget/:nuggetId/assetManifest.json
   const nuggetAssets = await getNuggetAssets(nuggetId);
   if (nuggetAssets && nuggetAssets.length > 0) {
-    await (writeJSONtoOPFS(nuggetAssets, `nugget/${nuggetId}/assetManifest.json`))
+    const writeResult = await (writeJSONtoOPFS(nuggetAssets, `nugget/${nuggetId}/assetManifest.json`));
+    dataFiles.push(writeResult);
   }
 
   // * Export Dexie relations data to json in OPFS /nugget/:nuggetId/relatedNuggets.json
   const nuggetRelations = await getNuggetRelations(nuggetId);
   if (nuggetRelations && nuggetRelations.length > 0) {
-    await (writeJSONtoOPFS(nuggetRelations, `nugget/${nuggetId}/relatedNuggets.json`))
+    const writeResult = await (writeJSONtoOPFS(nuggetRelations, `nugget/${nuggetId}/relatedNuggets.json`));
+    dataFiles.push(writeResult);
   }
 
+  return dataFiles;
 }
 
 // * Export Dexie Nugget data to json in OPFS /nuggets/:nuggetId/nugget.json

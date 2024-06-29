@@ -83,16 +83,42 @@ const writeJSONtoOPFS = async (json, filePath) => {
 
   const contents = textEncoder.encode(JSON.stringify(json));
 
-  writeHandle.write(contents, { at: 0 });
+  const newSize = writeHandle.write(contents, { at: 0 });
   writeHandle.flush();
-  const newSize = writeHandle.getSize();
   writeHandle.close();
 
   return { filePath: filePath, fileSize: newSize}
+}
+
+const writeFiletoOPFS = async (content, filePath) => {
+
+  const writeHandle = await getSyncFileHandle(filePath);
+
+  console.log('WRITE CONTENT', content)
+
+  // const contents = textEncoder.encode(JSON.stringify(json));
+
+  // const newSize = writeHandle.write(contents, { at: 0 });
+  // writeHandle.flush();
+  // writeHandle.close();
+
+  // return { filePath: filePath, fileSize: newSize}
 }
 
 const getOPFSDirHandle = async (dirPath) => {
   return await _resolveDirHandle(dirPath.split('/'))
 }
 
-export { opfsRoot, fileNameRegex, getOPFSDirHandle, getSyncFileHandle, writeJSONtoOPFS}
+const opfsSyncRead = async (filePath) => {
+  const pathParts = filePath.split('/');
+  const fileName = pathParts.pop();
+  const dirHandle = await _resolveDirHandle(pathParts);
+  const fileHandle = await dirHandle.getFileHandle(fileName);
+  const accessHandle = await fileHandle.createSyncAccessHandle();
+  const size = accessHandle.getSize();
+  console.log(size)
+  const dataView = new DataView(new ArrayBuffer(size));
+  accessHandle.read(dataView);
+  return dataView;
+}
+export { opfsRoot, fileNameRegex, opfsSyncRead, getSyncFileHandle, writeFiletoOPFS, writeJSONtoOPFS}
