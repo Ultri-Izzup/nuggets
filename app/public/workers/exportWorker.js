@@ -3,7 +3,8 @@ import { writeJSONtoOPFS, writeFiletoOPFS, opfsSyncRead, newFileTimestamp } from
 import { getZipWriter } from './shared/zip.js';
 
 import {
-  TextReader
+  TextReader,
+  BlobReader
 } from "../../../node_modules/@zip.js/zip.js/index.js";
 
 const textDecoder = new TextDecoder();
@@ -36,16 +37,19 @@ self.onmessage = async (msg) => {
 
       // Atempt to write the specified file to the zipWriter.
       // // Add sucessful records to the
-      // for(const asset of nuggetAssets) {
-      //   try {
-      //     const filePath = `nugget/${asset.nuggetId}/${asset.subDir}/${asset.fileName}`;
-      //     const fileBlob = await opfsSyncRead(filePath);
-      //     await zipWriter.add(filePath, fileBlob);
-      //     validAssets.push(asset);
-      //   } catch (error) {
+      for(const asset of nuggetAssets) {
+        try {
+          const filePath = `nugget/${asset.nuggetId}/${asset.subDir}/${asset.fileName}`;
+          const fileView = await opfsSyncRead(filePath);
+          console.log(fileView)
+          const fileBlob = new Blob([fileView]);
+          const zipBlob = new BlobReader(fileBlob);
+          await zipWriter.add(filePath, zipBlob);
+          validAssets.push(asset);
+        } catch (error) {
 
-      //   }
-      // }
+        }
+      }
 
       // Write the validAssets to to zipWriter as assetManifest.json
       // const manifestResult = await zipWriter.add(`nugget/${nuggetId}/assetManifest.json`, fileBlob);
