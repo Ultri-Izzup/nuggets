@@ -1,5 +1,5 @@
 import { markExportComplete, getNuggetData, getNuggetAssets, getNuggetRelations } from './shared/dexie.js';
-import { writeJSONtoOPFS, writeFiletoOPFS, opfsSyncRead } from './shared/opfs.js';
+import { writeJSONtoOPFS, writeFiletoOPFS, opfsSyncRead, newFileTimestamp } from './shared/opfs.js';
 import { getZipWriter } from './shared/zip.js';
 
 import {
@@ -27,13 +27,42 @@ self.onmessage = async (msg) => {
       await zipWriter.add(filePath, new TextReader(textDecoder.decode(fileBlob)))
     }
 
+    // Export Assets data from Dexie, as well as the corresponding file.
+    // Only valid exports end up in the assetsManifest.json
+    const nuggetAssets = await getNuggetAssets(nuggetId);
+
+    if (nuggetAssets && nuggetAssets.length > 0) {
+      const validAssets = [];
+
+      // Atempt to write the specified file to the zipWriter.
+      // // Add sucessful records to the
+      // for(const asset of nuggetAssets) {
+      //   try {
+      //     const filePath = `nugget/${asset.nuggetId}/${asset.subDir}/${asset.fileName}`;
+      //     const fileBlob = await opfsSyncRead(filePath);
+      //     await zipWriter.add(filePath, fileBlob);
+      //     validAssets.push(asset);
+      //   } catch (error) {
+
+      //   }
+      // }
+
+      // Write the validAssets to to zipWriter as assetManifest.json
+      // const manifestResult = await zipWriter.add(`nugget/${nuggetId}/assetManifest.json`, fileBlob);
+
+    }
+
     const zipped = await zipWriter.close();
 
     console.log(zipped)
 
     // Write the zipped content to OPFS /exports
+    const zipFileName = `nugget_${nuggetId}_${exportId}_${newFileTimestamp(true)}`
+    const writtenZip = await writeFiletoOPFS(zipped, `nugget/${nuggetId}/exports/${zipFileName}.zip`)
 
-    // markExportComplete(exportId);
+    markExportComplete(exportId);
+
+    self.postMessage(writtenZip);
 
   }
 }
@@ -49,10 +78,10 @@ const exportDexieToFiles = async (nuggetId) => {
     dataFiles.push(writeResult);
   }
 
-  // * Export Dexie assets data to json in OPFS /nugget/:nuggetId/assetManifest.json
+  // * Export Dexie relations data to json in OPFS /nugget/:nuggetId/relatedNuggets.json
   const nuggetAssets = await getNuggetAssets(nuggetId);
   if (nuggetAssets && nuggetAssets.length > 0) {
-    const writeResult = await (writeJSONtoOPFS(nuggetAssets, `nugget/${nuggetId}/assetManifest.json`));
+    const writeResult = await (writeJSONtoOPFS(nuggetAssets, `nugget/${nuggetId}/nuggetAssets.json`));
     dataFiles.push(writeResult);
   }
 
@@ -65,66 +94,3 @@ const exportDexieToFiles = async (nuggetId) => {
 
   return dataFiles;
 }
-
-// * Export Dexie Nugget data to json in OPFS /nuggets/:nuggetId/nugget.json
-// * Export Dexie assets data to json in OPFS /nuggets/:nuggetId/assetManifest.json
-// * Export Dexie relations data to json in OPFS /nuggets/:nuggetId/relatedNuggets.json
-
-// * IF sysDirHandle is provided, sync the Nugget specific subdir of it with OPFS.
-// * OPFS `nugget/:nuggetId/*` gets written to `sysDirHandle/:nuggetId`
-
-// * IF sysDirHandle was not provided, zip the contents into the OPFS /exports directory
-// * Zip contents of /nuggets/:nuggetId into OPFS /exports/
-
-// * Update Dexie export record completedAt time
-// * Send completion message to calling script
-
-//
-
-// if (msg.data.nuggetId && msg.data.subDir && msg.data.export ) {
-//   for(const dataObj of msg.data.export) {
-//     console.log('dataObj', dataObj);
-
-//       const fileName = dataObj.name.replace(fileNameRegex, "-");
-
-//       // Matches Dexie/IndexedDB key value
-//       const keyPath = `${msg.data.nuggetId}/${msg.data.subDir}/${fileName}`;
-
-//       const fullPath = `nugget/${keyPath}`
-//       const opfsFH = await getSyncFileHandle(fullPath)
-
-//       const fetched = await fetch(dataObj.blobURL);
-
-//       const cBlob = await fetched.blob();
-
-//       const contents = await cBlob.arrayBuffer();
-
-
-//       opfsFH.write(contents, { at: 0 });
-//       opfsFH.flush();
-//       const newSize = opfsFH.getSize();
-//       opfsFH.close();
-
-//       const assetMeta = {
-//         nuggetId: msg.data.nuggetId,
-//         subDir: msg.data.subDir,
-//         fileName: fileName,
-//         mimeType: dataObj.type,
-//         dateCreated: new Date().toISOString(),
-//         fileSize: newSize
-//       };
-
-//       console.log('META', assetMeta)
-
-//       const newId = await db.assets.put(assetMeta);
-//       console.log("NEW FILE", newId);
-
-//       const response = {
-//         fileId: newId,
-//         meta: assetMeta
-//       };
-
-//       self.postMessage({ responseData: response });
-//   }
-
-

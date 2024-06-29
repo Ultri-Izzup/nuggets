@@ -5,12 +5,10 @@ export async function putAssetRecord (record) {
 }
 
 export async function markExportComplete (exportId) {
-  const record = {
-    exportId: exportId,
+  const updateData = {
     completedAt: new Date().toISOString()
-
   }
-  return await db.exports.put(record);
+  return await db.exports.update(exportId, updateData);
 }
 
 export async function getNuggetData (nuggetId) {
