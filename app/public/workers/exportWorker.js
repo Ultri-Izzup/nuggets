@@ -1,10 +1,12 @@
 import { markExportComplete, getNuggetData, getNuggetAssets, getNuggetRelations } from './shared/dexie.js';
-import { writeJSONtoOPFS, opfsSyncRead } from './shared/opfs.js';
+import { writeJSONtoOPFS, writeFiletoOPFS, opfsSyncRead } from './shared/opfs.js';
 import { getZipWriter } from './shared/zip.js';
 
 import {
   TextReader
 } from "../../../node_modules/@zip.js/zip.js/index.js";
+
+const textDecoder = new TextDecoder();
 
 self.onmessage = async (msg) => {
   console.log("export WORKER MESSAGE RECEIVED", msg);
@@ -16,7 +18,7 @@ self.onmessage = async (msg) => {
 
     const zipWriter = await getZipWriter();
 
-    const dataFiles = await copyDataToOPFS(nuggetId);
+    const dataFiles = await exportDexieToFiles(nuggetId);
 
     // Add files we just wrote to zipWriter
     for(const dataFile of dataFiles) {
@@ -31,57 +33,12 @@ self.onmessage = async (msg) => {
 
     // Write the zipped content to OPFS /exports
 
-
-
-  //
-  // const filePath = `nugget/${nuggetId}/nuggetData.json`;
-  // const fileBlob = await  opfsSyncRead(filePath);
-  // console.log(fileBlob)
-  // console.log(textDecoder.decode(fileBlob));
-
-  // await zipWriter.add(filePath, new TextReader(textDecoder.decode(fileBlob)))
-
-  // const zipped = await zipWriter.close();
-
-  // console.log(zipped)
-
-    // const zipResult = await zipExportNugget(nuggetId, dataFiles);
-
     // markExportComplete(exportId);
 
   }
-
-
 }
 
-const textDecoder = new TextDecoder();
-
-const zipExportNugget = async (nuggetId) => {
-
-  const zipWriter = await getZipWriter();
-  console.log(zipWriter)
-
-  // Add known files to zip
-  // nuggetData.json
-  // nuggetRelations.json
-  const filePath = `nugget/${nuggetId}/nuggetData.json`;
-  const fileBlob = await  opfsSyncRead(filePath);
-  console.log(fileBlob)
-  console.log(textDecoder.decode(fileBlob));
-
-  await zipWriter.add(filePath, new TextReader(textDecoder.decode(fileBlob)))
-
-  const zipped = await zipWriter.close();
-
-console.log(zipped)
-
-  // Read in assets manifest
-  // Loop through assets, adding each file to zip
-  // Add assets manifest JSON to zip
-
-}
-
-const copyDataToOPFS = async (nuggetId) => {
+const exportDexieToFiles = async (nuggetId) => {
 
   const dataFiles = [];
 
