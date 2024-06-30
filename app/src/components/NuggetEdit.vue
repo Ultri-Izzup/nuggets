@@ -314,7 +314,7 @@ const props = defineProps(["nuggetId"]);
 
 const nug = useNuggetStore();
 
-const nuggetData = ref();
+// const nuggetData = ref();
 
 // FILES
 const tmpFiles = ref(); // Filehandles from local file picker
@@ -368,6 +368,7 @@ const tags = ref([]);
 
 
 // These become reactive through the Dexie liveQuery observable
+let nuggetData;
 let savedFiles;
 let savedImages;
 let savedAudio;
@@ -485,7 +486,12 @@ watch(
   () => props.nuggetId,
   async (newNuggetId, oldVal) => {
     if (newNuggetId) {
-      nuggetData.value = await nug.getNugget(newNuggetId);
+      // nuggetData.value = await nug.getNugget(newNuggetId);
+      nuggetData = useObservable(
+        liveQuery(async () => {
+          return await nug.getNugget(newNuggetId);
+        })
+      );
 
       savedFiles = useObservable(
         liveQuery(async () => {
