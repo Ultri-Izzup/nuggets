@@ -8,7 +8,6 @@
           </h1>
         </v-col>
       </v-row>
-{{tmpFiles}}
       <v-row justify="center">
 
         <v-spacer />
