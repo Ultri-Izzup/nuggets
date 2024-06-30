@@ -49,6 +49,7 @@ export const useNuggetStore = defineStore("nugget", () => {
     getNuggetAssets: Nug.getNuggetAssets,
     newFileTimestamp: Nug.newFileTimestamp,
     readOPFSFile: Nug.readOPFSFile,
-    startNuggetExport
+    startNuggetExport,
+    setGeoLocation: Nug.setGeoLocation
   }
 });

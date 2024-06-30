@@ -41,3 +41,15 @@ export async function dexCreateExportRecord(nuggetId) {
   }
   return await db.exports.add(exportRecord);
 }
+
+export async function dexUpdateNugget(nuggetId, updateObj) {
+
+  updateObj.updatedAt = new Date().toISOString();
+
+  const result = await db.nuggets.update(Number(nuggetId), updateObj);
+
+  if(result) {
+    return updateObj;
+  }
+
+}

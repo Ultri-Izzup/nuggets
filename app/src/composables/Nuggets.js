@@ -9,7 +9,7 @@ import { nuggetRelationTypes } from '@/shared/lookupLists'
 import { newFileTimestamp } from '@/shared/utilityFuncs'
 
 // Access Dexie IndexedDB tables and worker
-import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets, dexCreateExportRecord } from '@/shared/dexieFuncs'
+import { dexCreateNugget, dexGetNugget, dexGetNuggetAssets, dexCreateExportRecord, dexUpdateNugget } from '@/shared/dexieFuncs'
 
 // Access OPFS
 import { readOPFSFile } from '@/shared/opfsFuncs'
@@ -137,6 +137,18 @@ const getNuggetAssets = async (nuggetId, subDir) => {
   return dexGetNuggetAssets(nuggetId, subDir)
 }
 
+const setGeoLocation = async (nuggetId, geoLocation) => {
+  const updateObj = {
+    geoLocation: geoLocation
+  }
+
+  const updated = await dexUpdateNugget(nuggetId, updateObj);
+
+  console.log(updated);
+
+  return updateObj;
+}
+
 const startExport = async (nuggetId) => {
   console.log('NUGGET START EXPORT', nuggetId)
   // Create Dexie/IndexedDB record for job.
@@ -162,6 +174,7 @@ export function useNuggets() {
     newFileTimestamp,
     nuggetRelationTypes,
     readOPFSFile,
+    setGeoLocation,
     startExport
   };
 }
