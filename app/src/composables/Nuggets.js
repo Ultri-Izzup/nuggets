@@ -113,9 +113,9 @@ const addNuggetAttachments = async (nuggetId, selectedFiles) => {
   fileHandleWorker.postMessage({ nuggetId: nuggetId, subDir: "files", fileHandles: fhArray });
 }
 
-const addNuggetAssets = async (nuggetId, subDir, assets) => {
-  console.log(assets)
-  blobWorker.postMessage({ nuggetId: Number(nuggetId), subDir: subDir, assets: assets });
+const addNuggetAsset = async (nuggetId, subDir, asset) => {
+  console.log(asset)
+  blobWorker.postMessage({ nuggetId: Number(nuggetId), subDir: subDir, blobs: [asset] });
 }
 
 /**
@@ -155,7 +155,7 @@ export function useNuggets() {
 
   return {
     addNuggetAttachments,
-    addNuggetAssets,
+    addNuggetAsset,
     createNugget,
     getNugget,
     getNuggetAssets,

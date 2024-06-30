@@ -382,7 +382,7 @@ const tempStoreAudio = (audioCaptureObj) => {
 };
 
 const storeAudio = async (audioCaptureObj) => {
-  await nug.addNuggetAssets(props.nuggetId, 'audio', audioCaptureObj)
+  await nug.addNuggetAsset(props.nuggetId, 'audio', audioCaptureObj)
 };
 
 const tempStoreVideo = (videoCaptureObj) => {
