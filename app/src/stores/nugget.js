@@ -42,6 +42,7 @@ export const useNuggetStore = defineStore("nugget", () => {
 
     // Actions/Functions
 
+    addNuggetAttachments: Nug.addNuggetAttachments,
     createNugget: Nug.createNugget,
     getNugget: Nug.getNugget,
     getNuggetAssets: Nug.getNuggetAssets,

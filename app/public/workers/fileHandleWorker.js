@@ -1,28 +1,49 @@
 import { putAssetRecord } from './shared/dexie.js';
 
-import {fileNameRegex, getSyncFileHandle} from './shared/opfs.js';
+import { fileNameRegex, getSyncFileHandle } from './shared/opfs.js';
 
 self.onmessage = async (msg) => {
   console.log("WORKER MESSAGE RECEIVED", msg);
 
-  if (msg.data.nuggetId && msg.data.subDir && msg.data.fileHandles ) {
-    for(const sysFH of msg.data.fileHandles) {
+  if (msg.data.nuggetId && msg.data.subDir && msg.data.fileHandles) {
+    for (const sysFH of msg.data.fileHandles) {
       console.log('SYSFH', sysFH);
 
-      if(sysFH.kind === 'file') {
+      const fileName = sysFH.name.replace(fileNameRegex, "-");
 
-        //const opfsDirPath = `/nugget/${msg.data.nuggetId}/${msg.data.subDir}`;
-        const fileName = sysFH.name.replace(fileNameRegex, "-");
+      // Matches Dexie/IndexedDB key value
+      const keyPath = `${msg.data.nuggetId}/${msg.data.subDir}/${fileName}`;
 
-        // Matches Dexie/IndexedDB key value
-        const keyPath = `${msg.data.nuggetId}/${msg.data.subDir}/${fileName}`;
+      const fullPath = `nugget/${keyPath}`
+      const opfsFH = await getSyncFileHandle(fullPath)
 
-        const fullPath = `nugget/${keyPath}`
-        const opfsFH = await getSyncFileHandle(fullPath)
-        const fileData = await sysFH.getFile();
-        const contents = await fileData.arrayBuffer();
+      let fileData;
+      let contents = false;
+      let response;
+      let fileType;
 
+      const fileProvider = sysFH.toString();
+      switch (fileProvider) {
+        case '[object FileSystemFileHandle]':
+
+          fileData = await sysFH.getFile();
+          contents = await fileData.arrayBuffer();
+          fileType = fileData.type;
+
+          break;
+
+        case '[object File]':
+
+          console.log('File input file found', )
+          contents = new Uint8Array(await sysFH.arrayBuffer())
+          fileType = sysFH.type;
+          break;
+      }
+
+      if(contents) {
         opfsFH.write(contents, { at: 0 });
+        console.log('OPFS FILE RAESLT')
+        console.log(opfsFH)
         opfsFH.flush();
         const newSize = opfsFH.getSize();
         opfsFH.close();
@@ -31,7 +52,7 @@ self.onmessage = async (msg) => {
           nuggetId: msg.data.nuggetId,
           subDir: msg.data.subDir,
           fileName: fileName,
-          mimeType: fileData.type,
+          mimeType: fileType,
           dateCreated: new Date().toISOString(),
           fileSize: newSize
         };
@@ -41,7 +62,7 @@ self.onmessage = async (msg) => {
         const newId = await putAssetRecord(assetMeta);
         console.log("NEW FILE", newId);
 
-        const response = {
+        response = {
           fileId: newId,
           meta: assetMeta
         };
@@ -50,10 +71,4 @@ self.onmessage = async (msg) => {
       }
     }
   }
-
-  // const handler = msg.data.targetHandler;
-
-  // console.log("USE HANDLER", handler, msgHandlers);
-
-  // await msgHandlers[handler](msg.data.targetData, msg.data.responseHandler);
 };
