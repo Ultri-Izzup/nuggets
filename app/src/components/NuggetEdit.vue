@@ -255,7 +255,7 @@
               @snapshot="tempStoreSnapshot"
               @deviceSelected="saveVideoSource"
               @chunk="saveVideoChunk"
-              @recordedVideo="tempStoreVideo"
+              @recordedVideo="storeVideo"
             ></VideoCapture>
           </v-card-text>
           <template v-slot:actions>
@@ -387,6 +387,10 @@ const storeAudio = async (audioCaptureObj) => {
 
 const tempStoreVideo = (videoCaptureObj) => {
   tmpVideo.value.push(videoCaptureObj);
+};
+
+const storeVideo = async (audioCaptureObj) => {
+  await nug.addNuggetAsset(props.nuggetId, 'videos', audioCaptureObj)
 };
 
 const saveVideoSource = (newSource) => {
