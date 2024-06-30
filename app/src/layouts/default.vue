@@ -17,9 +17,9 @@
           </template>
           <v-list>
             <v-list-item>
-              <!-- <v-list-item-title @click="route.params.id ? exportCurrentNugget() : ''" :class="route.params.id ? '' : 'text-grey'">
+              <v-list-item-title @click="route.params.id ? exportCurrentNugget() : ''" :class="route.params.id ? '' : 'text-grey'">
                 <v-icon icon="mdi-export"></v-icon> Export Nugget
-              </v-list-item-title> -->
+              </v-list-item-title>
                <v-list-item-title @click="exportCurrentNugget">
                 <v-icon icon="mdi-export"></v-icon> Export ALL Nuggets
               </v-list-item-title>
