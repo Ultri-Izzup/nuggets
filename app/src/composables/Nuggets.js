@@ -107,6 +107,12 @@ const createNugget = async (fullNugget) => {
   return nuggetId;
 }
 
+
+const addNuggetAttachments = async (nuggetId, selectedFiles) => {
+  const fhArray = Array.from(selectedFiles)
+  fileHandleWorker.postMessage({ nuggetId: nuggetId, subDir: "files", fileHandles: fhArray });
+}
+
 /**
  * Get data for a given nuggetId
  * @param {number} nuggetId
@@ -143,6 +149,7 @@ const startExport = async (nuggetId) => {
 export function useNuggets() {
 
   return {
+    addNuggetAttachments,
     createNugget,
     getNugget,
     getNuggetAssets,

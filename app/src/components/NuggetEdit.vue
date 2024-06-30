@@ -8,6 +8,60 @@
           </h1>
         </v-col>
       </v-row>
+{{tmpFiles}}
+      <v-row justify="center">
+
+        <v-spacer />
+        <v-icon
+          @click="showCamera"
+          color="gray"
+          icon="mdi-link"
+          size="x-large"
+        ></v-icon>
+
+        <v-spacer />
+        <v-icon
+          color="gray"
+          icon="mdi-paperclip"
+          size="x-large"
+          @click="showFilePicker"
+        ></v-icon>
+
+        <v-spacer />
+        <v-icon
+          @click="showAudio"
+          color="gray"
+          icon="mdi-microphone"
+          size="x-large"
+        ></v-icon>
+
+        <v-spacer />
+        <v-icon
+          @click="showCamera"
+          color="gray"
+          icon="mdi-camera"
+          size="x-large"
+        ></v-icon>
+
+        <v-spacer />
+        <v-icon
+          @click="showScreenPicker"
+          color="gray"
+          icon="mdi-monitor"
+          size="x-large"
+        ></v-icon>
+
+        <v-spacer />
+        <v-icon
+          @click="getGeoLocation"
+          color="gray"
+          icon="mdi-map-marker"
+          size="x-large"
+        ></v-icon>
+
+
+        <v-spacer />
+      </v-row>
 
       <!-- DATA -->
       <v-container v-if="nuggetData">
@@ -35,10 +89,10 @@
         <v-col cols="12" class="pb-3">
           <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-image-multiple" /> Images</h2>
         </v-col>
-        <v-col v-if="images && images.length > 0" cols="12">
+        <v-col v-if="savedImages && savedImages.length > 0" cols="12">
           <v-row>
             <v-col
-              v-for="(file, index) in images"
+              v-for="(file, index) in savedImages"
               :key="index"
               class="text-body-2"
             >
@@ -66,10 +120,10 @@
         <v-col cols="12" class="pb-3">
           <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-video" /> Videos</h2>
         </v-col>
-        <v-col v-if="videoRecordings && videoRecordings.length > 0" cols="12">
+        <v-col v-if="savedVideo && savedVideo.length > 0" cols="12">
           <v-row>
             <v-col
-              v-for="(file, index) in videoRecordings"
+              v-for="(file, index) in savedVideo"
               :key="index"
               class="text-body-2"
             >
@@ -97,10 +151,10 @@
         <v-col cols="12" class="pb-3">
           <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-speaker"> </v-icon> Audio</h2>
         </v-col>
-        <v-col v-if="audioRecordings && audioRecordings.length > 0" cols="12">
+        <v-col v-if="savedAudio && savedAudio.length > 0" cols="12">
           <v-row>
             <v-col
-              v-for="(file, index) in audioRecordings"
+              v-for="(file, index) in savedAudio"
               :key="index"
               class="text-body-2"
             >
@@ -129,10 +183,10 @@
         <v-col cols="12" class="pb-3">
           <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-file-multiple" /> Files</h2>
         </v-col>
-        <v-col v-if="files && files.length > 0" cols="12">
+        <v-col v-if="savedFiles && savedFiles.length > 0" cols="12">
           <v-row>
             <v-col
-              v-for="(file, index) in files"
+              v-for="(file, index) in savedFiles"
               :key="index"
               class="text-body-2"
             >
@@ -191,6 +245,59 @@
       </v-row>
 
       <v-divider v-if="!nuggetData || !nuggetData.geoPositions"></v-divider>
+
+      <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
+      <template v-slot:default="{ isActive }">
+        <v-card prepend-icon="mdi-video" :title="videoSource" class="ma-0 pa-0">
+          <v-card-text class="flex ma-1 pa-1">
+            <VideoCapture
+              emitAs="dataURL"
+              :targetSource="selectedVideoDevice"
+              @snapshot="tempStoreSnapshot"
+              @deviceSelected="saveVideoSource"
+              @chunk="saveVideoChunk"
+              @recordedVideo="tempStoreVideo"
+            ></VideoCapture>
+          </v-card-text>
+          <template v-slot:actions>
+            <v-btn
+              prepend-icon="mdi-close"
+              size="xl"
+              color="grey"
+              @click="isActive.value = false"
+            ></v-btn>
+          </template>
+        </v-card>
+      </template>
+    </v-dialog>
+
+    <v-dialog v-model="showAudioCaptureDialog" class="flex ma-0 pa-0">
+      <template v-slot:default="{ isActive }">
+        <v-card
+          prepend-icon="mdi-microphone"
+          title="Audio Recorder"
+          class="ma-0 pa-0"
+        >
+          <v-card-text class="flex ma-1 pa-1">
+            <AudioCapture
+              :targetSource="selectedAudioDevice"
+              @recordedAudio="tempStoreAudio"
+              @deviceSelected="saveAudioSource"
+              @chunk="saveAudioChunk"
+            ></AudioCapture>
+          </v-card-text>
+
+          <template v-slot:actions>
+            <v-btn
+              prepend-icon="mdi-close"
+              size="xl"
+              color="grey"
+              @click="isActive.value = false"
+            ></v-btn>
+          </template>
+        </v-card>
+      </template>
+    </v-dialog>
     </v-responsive>
   </v-container>
 </template>
@@ -210,11 +317,157 @@ const nug = useNuggetStore();
 
 const nuggetData = ref();
 
+// FILES
+const tmpFiles = ref(); // Filehandles from local file picker
+
+// AUDIO
+const showAudioCaptureDialog = ref(false);
+const selectedAudioDevice = ref();
+const tmpAudio = ref([]); // audio recordings from device
+
+// CAMERA / VIDEO
+const showVideoDialog = ref(false);
+const selectedVideoDevice = ref();
+const tmpVideo = ref([]);
+const tmpImages = ref([]);
+const preferredCamera = ref();
+const videoSource = ref("Video");
+
+// GEOLOCATION
+const geoLocation = ref();
+const waypoints = ref([]);
+
+// DATA FORM
+const valid = ref();
+const name = ref();
+const nameRules = [
+  (value) => {
+    if (value) return true;
+
+    return "Name is required.";
+  },
+  (value) => {
+    if (value?.length >= 2) return true;
+
+    return "Name must be at least 2 characters.";
+  },
+  (value) => {
+    if (value?.length <= 50) return true;
+
+    return "Name must be less than 50 characters.";
+  },
+];
+const description = ref();
+const descriptionRules = [
+  (value) => {
+    if (!value || value?.length <= 1500) return true;
+
+    return "Description must be less than 1500 characters.";
+  },
+];
+const tags = ref([]);
+
+
 // These become reactive through the Dexie liveQuery observable
-let files;
-let images;
-let audioRecordings;
-let videoRecordings;
+let savedFiles;
+let savedImages;
+let savedAudio;
+let savedVideo;
+
+const tempStoreSnapshot = (snapshotObj) => {
+  tmpImages.value.push(snapshotObj);
+};
+
+const tempStoreAudio = (audioCaptureObj) => {
+  tmpAudio.value.push(audioCaptureObj);
+};
+
+const tempStoreVideo = (videoCaptureObj) => {
+  tmpVideo.value.push(videoCaptureObj);
+};
+
+const saveVideoSource = (newSource) => {
+  selectedVideoDevice.value = newSource;
+  preferredCamera.value = newSource;
+  nug.preferredCamera = newSource;
+  console.log("VIDEO SOURCE SET", newSource);
+};
+
+const saveAudioSource = (newSource) => {
+  selectedAudioDevice.value = newSource;
+  console.log("AUDIO SOURCE SET", newSource);
+};
+
+const saveVideoChunk = (chunk) => {
+  savedVideo.value.push(chunk);
+  console.log("VIDEO CHUNK ADDED", chunk);
+};
+
+const saveAudioChunk = (chunk) => {
+  savedAudio.value.push(chunk);
+  console.log("AUDIO CHUNK ADDED", chunk);
+};
+
+const uploadFiles = async () => {
+  console.log("FILE UPLOAD REQUESTED", tmpFiles.value);
+};
+
+// BUTTON ACTIONS
+const showFilePicker = async () => {
+  const pickerOpts = {
+    types: [
+      {
+        description: "Images",
+        accept: {
+          "*/*": [".png", ".gif", ".jpeg", ".jpg"],
+        },
+      },
+    ],
+    excludeAcceptAllOption: false,
+    multiple: true,
+  };
+  tmpFiles.value = await window.showOpenFilePicker(pickerOpts);
+  // Auto save to OPFS
+  await nug.addNuggetAttachments(props.nuggetId, tmpFiles.value)
+};
+
+const showScreenPicker = async () => {
+  videoSource.value = "Screen";
+  selectedVideoDevice.value = "screen";
+  showVideoDialog.value = true;
+};
+
+const showCamera = async () => {
+  videoSource.value = "Camera";
+  selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : nug.preferredCamera;
+  showVideoDialog.value = true;
+};
+
+const showAudio = async () => {
+  showAudioCaptureDialog.value = true;
+};
+
+const getGeoLocation = async() => {
+  console.log('Request GeoLocation')
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log( position.coords );
+      const jsonPos = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+        timestamp: position.timestamp
+      }
+
+      if(position.coords.speed) {
+        jsonPos.speed = position.coords.speed
+      }
+
+      geoLocation.value = jsonPos;
+      waypoints.value.push(jsonPos);
+    });
+  }
+}
 
 watch(
   () => props.nuggetId,
@@ -222,25 +475,25 @@ watch(
     if (newNuggetId) {
       nuggetData.value = await nug.getNugget(newNuggetId);
 
-      files = useObservable(
+      savedFiles = useObservable(
         liveQuery(async () => {
           return await nug.getNuggetAssets(newNuggetId, "files");
         })
       );
 
-      images = useObservable(
+      savedImages = useObservable(
         liveQuery(async () => {
           return await nug.getNuggetAssets(newNuggetId, "images");
         })
       );
 
-      audioRecordings = useObservable(
+      savedAudio = useObservable(
         liveQuery(async () => {
           return await nug.getNuggetAssets(newNuggetId, "audio");
         })
       );
 
-      videoRecordings = useObservable(
+      savedVideo = useObservable(
         liveQuery(async () => {
           return await nug.getNuggetAssets(newNuggetId, "videos");
         })
