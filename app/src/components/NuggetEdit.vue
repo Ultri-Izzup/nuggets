@@ -252,7 +252,7 @@
             <VideoCapture
               emitAs="dataURL"
               :targetSource="selectedVideoDevice"
-              @snapshot="tempStoreSnapshot"
+              @snapshot="storeSnapshot"
               @deviceSelected="saveVideoSource"
               @chunk="saveVideoChunk"
               @recordedVideo="storeVideo"
@@ -375,6 +375,10 @@ let savedVideo;
 
 const tempStoreSnapshot = (snapshotObj) => {
   tmpImages.value.push(snapshotObj);
+};
+
+const storeSnapshot = async (snapshotObj) => {
+  await nug.addNuggetAsset(props.nuggetId, 'images', snapshotObj)
 };
 
 const tempStoreAudio = (audioCaptureObj) => {

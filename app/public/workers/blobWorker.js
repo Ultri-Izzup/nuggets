@@ -25,7 +25,13 @@ self.onmessage = async (msg) => {
         const fullPath = `nugget/${keyPath}`
         const opfsFH = await getSyncFileHandle(fullPath)
 
-        const fetched = await fetch(dataObj.blobURL);
+        let fetched;
+
+        if(dataObj.blobURL) {
+          fetched = await fetch(dataObj.blobURL);
+        } else if (dataObj.dataURL) {
+          fetched = await fetch(dataObj.dataURL);
+        }
 
         const cBlob = await fetched.blob();
 
