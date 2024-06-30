@@ -8,7 +8,6 @@
           </h1>
         </v-col>
       </v-row>
-{{tmpFiles}}
       <v-row justify="center">
 
         <v-spacer />
@@ -162,10 +161,10 @@
                 <v-col cols="12" class="pb-0">
                   <v-card>
                     <v-card-text class="text-center">
-                      <!-- <OPFSAudio
+                      <OPFSAudio
                         :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
                         width="100%"
-                      ></OPFSAudio> -->
+                      ></OPFSAudio>
                       {{ file.fileName }}
                       <v-icon icon="mdi-dots-vertical" size="x-large"></v-icon>
                     </v-card-text>
@@ -253,10 +252,10 @@
             <VideoCapture
               emitAs="dataURL"
               :targetSource="selectedVideoDevice"
-              @snapshot="tempStoreSnapshot"
+              @snapshot="storeSnapshot"
               @deviceSelected="saveVideoSource"
               @chunk="saveVideoChunk"
-              @recordedVideo="tempStoreVideo"
+              @recordedVideo="storeVideo"
             ></VideoCapture>
           </v-card-text>
           <template v-slot:actions>
@@ -281,7 +280,7 @@
           <v-card-text class="flex ma-1 pa-1">
             <AudioCapture
               :targetSource="selectedAudioDevice"
-              @recordedAudio="tempStoreAudio"
+              @recordedAudio="storeAudio"
               @deviceSelected="saveAudioSource"
               @chunk="saveAudioChunk"
             ></AudioCapture>
@@ -378,12 +377,24 @@ const tempStoreSnapshot = (snapshotObj) => {
   tmpImages.value.push(snapshotObj);
 };
 
+const storeSnapshot = async (snapshotObj) => {
+  await nug.addNuggetAsset(props.nuggetId, 'images', snapshotObj)
+};
+
 const tempStoreAudio = (audioCaptureObj) => {
   tmpAudio.value.push(audioCaptureObj);
 };
 
+const storeAudio = async (audioCaptureObj) => {
+  await nug.addNuggetAsset(props.nuggetId, 'audio', audioCaptureObj)
+};
+
 const tempStoreVideo = (videoCaptureObj) => {
   tmpVideo.value.push(videoCaptureObj);
+};
+
+const storeVideo = async (audioCaptureObj) => {
+  await nug.addNuggetAsset(props.nuggetId, 'videos', audioCaptureObj)
 };
 
 const saveVideoSource = (newSource) => {

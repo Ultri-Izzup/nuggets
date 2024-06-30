@@ -49,7 +49,7 @@ self.onmessage = async (msg) => {
         opfsFH.close();
 
         const assetMeta = {
-          nuggetId: msg.data.nuggetId,
+          nuggetId: Number(msg.data.nuggetId),
           subDir: msg.data.subDir,
           fileName: fileName,
           mimeType: fileType,

@@ -6,8 +6,15 @@ self.onmessage = async (msg) => {
   console.log("data", msg.data);
   console.log("blobs", msg.data.blobs);
 
-  if (msg.data.nuggetId && msg.data.subDir && msg.data.blobs ) {
-    for(const dataObj of msg.data.blobs) {
+  if (msg.data.nuggetId && msg.data.subDir ) {
+
+    let blobs;
+
+    if(msg.data.blobs) {
+      blobs = msg.data.blobs
+    }
+
+    for(const dataObj of blobs) {
       console.log('dataObj', dataObj);
 
         const fileName = dataObj.name.replace(fileNameRegex, "-");
@@ -18,7 +25,13 @@ self.onmessage = async (msg) => {
         const fullPath = `nugget/${keyPath}`
         const opfsFH = await getSyncFileHandle(fullPath)
 
-        const fetched = await fetch(dataObj.blobURL);
+        let fetched;
+
+        if(dataObj.blobURL) {
+          fetched = await fetch(dataObj.blobURL);
+        } else if (dataObj.dataURL) {
+          fetched = await fetch(dataObj.dataURL);
+        }
 
         const cBlob = await fetched.blob();
 

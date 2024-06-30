@@ -139,10 +139,11 @@
           </v-row>
           <v-row v-if="audioRecordings && audioRecordings.length > 0">
             <v-col cols="12" class="text-h6">Audio</v-col>
+            {{audioRecordings}}
             <v-row v-for="(file, index) in audioRecordings" :key="index">
               <v-divider></v-divider>
               <v-col>
-                <audio :src="file.audioURL" controls />
+                <audio :src="file.blobURL" controls />
               </v-col>
               <v-col>
                 <span class="text-caption">{{ file.name }}</span>
@@ -230,7 +231,7 @@
               class="ma-0 py-0 px-5"
             >
               <v-card-text class="flex ma-1 pa-1 text-center">
-                <v-file-input v-model="selectedFiles" multiple label="Select files"></v-file-input>
+                <v-file-input v-model="selectedFiles" multiple label="Select files" @change="showFileSelectDialog = false"></v-file-input>
               </v-card-text>
 
               <template v-slot:actions>
