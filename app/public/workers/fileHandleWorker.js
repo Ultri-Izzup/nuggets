@@ -7,63 +7,68 @@ self.onmessage = async (msg) => {
 
   if (msg.data.nuggetId && msg.data.subDir && msg.data.fileHandles) {
     for (const sysFH of msg.data.fileHandles) {
-      console.log('SYSFH', sysFH.toString());
+      console.log('SYSFH', sysFH);
+
+      const fileName = sysFH.name.replace(fileNameRegex, "-");
+
+      // Matches Dexie/IndexedDB key value
+      const keyPath = `${msg.data.nuggetId}/${msg.data.subDir}/${fileName}`;
+
+      const fullPath = `nugget/${keyPath}`
+      const opfsFH = await getSyncFileHandle(fullPath)
+
+      let fileData;
+      let contents = false;
+      let response;
+      let fileType;
 
       const fileProvider = sysFH.toString();
-
       switch (fileProvider) {
         case '[object FileSystemFileHandle]':
 
-          const fileName = sysFH.name.replace(fileNameRegex, "-");
+          fileData = await sysFH.getFile();
+          contents = await fileData.arrayBuffer();
+          fileType = fileData.type;
 
-          // Matches Dexie/IndexedDB key value
-          const keyPath = `${msg.data.nuggetId}/${msg.data.subDir}/${fileName}`;
-
-          const fullPath = `nugget/${keyPath}`
-          const opfsFH = await getSyncFileHandle(fullPath)
-          const fileData = await sysFH.getFile();
-          const contents = await fileData.arrayBuffer();
-
-          opfsFH.write(contents, { at: 0 });
-          opfsFH.flush();
-          const newSize = opfsFH.getSize();
-          opfsFH.close();
-
-          const assetMeta = {
-            nuggetId: msg.data.nuggetId,
-            subDir: msg.data.subDir,
-            fileName: fileName,
-            mimeType: fileData.type,
-            dateCreated: new Date().toISOString(),
-            fileSize: newSize
-          };
-
-          console.log('META', assetMeta)
-
-          const newId = await putAssetRecord(assetMeta);
-          console.log("NEW FILE", newId);
-
-          const response = {
-            fileId: newId,
-            meta: assetMeta
-          };
-
-          self.postMessage({ responseData: response });
           break;
 
         case '[object File]':
 
-          console.log('File input file found')
-
+          console.log('File input file found', )
+          contents = new Uint8Array(await sysFH.arrayBuffer())
+          fileType = sysFH.type;
           break;
       }
 
+      if(contents) {
+        opfsFH.write(contents, { at: 0 });
+        console.log('OPFS FILE RAESLT')
+        console.log(opfsFH)
+        opfsFH.flush();
+        const newSize = opfsFH.getSize();
+        opfsFH.close();
+
+        const assetMeta = {
+          nuggetId: msg.data.nuggetId,
+          subDir: msg.data.subDir,
+          fileName: fileName,
+          mimeType: fileType,
+          dateCreated: new Date().toISOString(),
+          fileSize: newSize
+        };
+
+        console.log('META', assetMeta)
+
+        const newId = await putAssetRecord(assetMeta);
+        console.log("NEW FILE", newId);
+
+        response = {
+          fileId: newId,
+          meta: assetMeta
+        };
+
+        self.postMessage({ responseData: response });
+      }
     }
   }
-
-  // const handler = msg.data.targetHandler;
-
-  // console.log("USE HANDLER", handler, msgHandlers);
-
-  // await msgHandlers[handler](msg.data.targetData, msg.data.responseHandler);
 };
