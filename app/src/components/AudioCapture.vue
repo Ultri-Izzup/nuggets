@@ -40,7 +40,7 @@ const nug = useNuggetStore();
 const props = defineProps({
   emitAs: {
     type: String,
-    default: "dataURL",
+    default: "blobURL",
   },
   targetSource: {
     type: String,
@@ -112,11 +112,11 @@ const loadSource = (device) => {
 
         const blob = new Blob(chunks.value, { type: 'audio/mp3' });
         chunks.value = [];
-        const audioURL = (window.URL || window.webkitURL).createObjectURL(blob);
-        console.log('AUDIO URL', audioURL)
+        const blobURL = (window.URL || window.webkitURL).createObjectURL(blob);
+        console.log('AUDIO URL', blobURL)
         emit('recordedAudio', {
           name: clipName,
-          audioURL: audioURL
+          blobURL: blobURL
         })
       };
     })

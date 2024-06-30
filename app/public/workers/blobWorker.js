@@ -6,8 +6,15 @@ self.onmessage = async (msg) => {
   console.log("data", msg.data);
   console.log("blobs", msg.data.blobs);
 
-  if (msg.data.nuggetId && msg.data.subDir && msg.data.blobs ) {
-    for(const dataObj of msg.data.blobs) {
+  if (msg.data.nuggetId && msg.data.subDir ) {
+
+    let blobs;
+
+    if(msg.data.blobs) {
+      blobs = msg.data.blobs
+    }
+
+    for(const dataObj of blobs) {
       console.log('dataObj', dataObj);
 
         const fileName = dataObj.name.replace(fileNameRegex, "-");
