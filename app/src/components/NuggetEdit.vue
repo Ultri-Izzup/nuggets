@@ -5,6 +5,8 @@
         <v-col cols="12" class="text-center">
           <h1 class="text-h4 font-weight-bold">
             {{ nuggetData ? nuggetData.name : "Nugget" }}
+            <!-- <v-btn icon="mdi-microphone" color="grey-darken-4" @click="voiceType('name')"></v-btn> -->
+            <!-- <v-btn icon="mdi-headphones" color="grey-darken-4" @click="outLoud(nuggetData.name)" size="small"></v-btn> -->
           </h1>
         </v-col>
       </v-row>
@@ -297,12 +299,72 @@
         </v-card>
       </template>
     </v-dialog>
+
+    <v-dialog v-model="showTextToSpeechDialog" class="flex ma-0 pa-0">
+      <template v-slot:default="{ isActive }">
+        <v-card
+          prepend-icon="mdi-account-voice"
+          title="Text Reader"
+          class="ma-0 pa-0"
+        >
+          <v-card-text class="flex ma-1 pa-1">
+            {{textToRead}} {{nug.supportedVoices}}
+
+
+
+          {{selectedVoice}}
+          </v-card-text>
+
+          <template v-slot:actions>
+            <v-btn
+              prepend-icon="mdi-close"
+              size="xl"
+              color="grey"
+              @click="isActive.value = false"
+            ></v-btn>
+          </template>
+        </v-card>
+      </template>
+    </v-dialog>
+
+    <v-dialog v-model="showLinkNewNuggetDialog" class="flex ma-0 pa-0">
+      <template v-slot:default="{ isActive }">
+        <v-card
+          prepend-icon="mdi-link"
+          title="Link New Nugget"
+          class="ma-0 pa-0"
+        >
+          <v-card-text class="flex ma-1 pa-1">
+            <v-select
+              v-model="newRelationType"
+              label="Relation"
+              :items="relationTypes"
+              item-title="label"
+              item-value="value"
+            ></v-select>
+            <NuggetCreate :nuggetId="nuggetId" :relationType="newRelationType"></NuggetCreate>
+          </v-card-text>
+
+          <template v-slot:actions>
+            <v-btn
+              prepend-icon="mdi-close"
+              size="xl"
+              color="grey"
+              @click="isActive.value = false"
+            ></v-btn>
+          </template>
+        </v-card>
+      </template>
+    </v-dialog>
+
     </v-responsive>
   </v-container>
 </template>
 
 <script setup>
 import { ref, watch, computed } from "vue";
+
+import { useStorage } from "@vueuse/core";
 
 import { useNuggetStore } from "@/stores/nugget";
 
@@ -315,6 +377,24 @@ const props = defineProps(["nuggetId"]);
 const nug = useNuggetStore();
 
 // const nuggetData = ref();
+
+// LINKED NUGGET
+const showLinkNewNuggetDialog = ref(false);
+const newRelationType = ref();
+
+// TEXT TO SPEECH
+const showTextToSpeechDialog = ref(false);
+const textToRead = ref();
+const selectedVoice = useStorage('selectedVoice', null);
+const voicePitch = ref(1);
+const voiceRate = ref(1);
+const voices = ref();
+
+if(voices.value === null) {
+  voices.value = speechSynthesis.getVoices();
+}
+
+console.log(voices.value)
 
 // FILES
 const tmpFiles = ref(); // Filehandles from local file picker
@@ -365,6 +445,16 @@ const descriptionRules = [
   },
 ];
 const tags = ref([]);
+
+const outLoud = async (txt) => {
+  console.log("READ OUT LOUD", txt)
+  textToRead.value = txt;
+
+  showTextToSpeechDialog.value = true;
+
+
+
+}
 
 
 // These become reactive through the Dexie liveQuery observable
@@ -481,6 +571,16 @@ const getGeoLocation = async() => {
     });
   }
 }
+
+// watch(
+//   () => textToRead.value,
+//   async (newText, oldText) => {
+//     console.log('raead_text', newText)
+//     if(newText) {
+
+//       showTextToSpeechDialog.value = true;
+//     }
+//   },{immediate: true})
 
 watch(
   () => props.nuggetId,

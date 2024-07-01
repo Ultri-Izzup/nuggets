@@ -3,16 +3,19 @@
     <v-responsive class="align-centerfill-height mx-auto py-6" max-width="900">
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
+        {{ $t('message.hello') }}
       </div>
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
-          <v-row>
+          <v-row class="align-center">
             <v-text-field
               v-model="name"
               label="Name"
               :rules="nameRules"
               required
             ></v-text-field>
+            <!-- <v-btn icon="mdi-microphone" color="grey-darken-4" @click="voiceType('name')"></v-btn>
+            <v-btn icon="mdi-speaker" color="grey-darken-4" @click="voiceType('name')"></v-btn> -->
           </v-row>
           <v-row>
             <v-textarea
@@ -256,11 +259,18 @@ import { useRouter } from "vue-router";
 
 import { useNuggetStore } from "../stores/nugget";
 const props = defineProps({
-  title: {
-    type: String,
-    default: null,
+  originNuggetId: {
+    type: Number
   },
+  relationType: {
+    type: String
+  },
+  title: {
+    type: String
+  }
 });
+
+console.log('PROPS', props)
 
 const nug = useNuggetStore();
 const router = useRouter();
@@ -404,9 +414,11 @@ const saveAudioChunk = (chunk) => {
   console.log("AUDIO CHUNK ADDED", chunk);
 };
 
-const uploadFiles = async () => {
-  console.log("FILE UPLOAD REQUESTED", selectedFiles.value);
-};
+// Convert speech to text and
+const voiceType = async (refName) => {
+  console.log(`Capture voice for ${refName}`)
+
+}
 
 // BUTTON ACTIONS
 const showFilePicker = async () => {
@@ -470,4 +482,8 @@ const getGeoLocation = async () => {
     });
   }
 };
+
 </script>
+
+
+

@@ -7,6 +7,9 @@ import Vue from '@vitejs/plugin-vue'
 import VueRouter from 'unplugin-vue-router/vite'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
+import { resolve, dirname } from 'node:path'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
+
 // Utilities
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
@@ -44,6 +47,13 @@ export default defineConfig({
         enabled: true,
       },
       vueTemplate: true,
+    }),
+    VueI18nPlugin({
+      /* options */
+      // locale messages resource pre-compile option
+      include: resolve(dirname(fileURLToPath(import.meta.url)), './src/locales/**'),
+      runtimeOnly: false,
+      strictMessage: false
     }),
   ],
   define: { 'process.env': {} },
