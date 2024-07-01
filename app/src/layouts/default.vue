@@ -40,19 +40,32 @@
         <v-list-item
           prepend-icon="mdi-home"
           title="Home"
+          to="/"
         ></v-list-item>
 
         <v-divider></v-divider>
-
         <v-list-item
-          prepend-icon="mdi-plus"
-          title="Create Linked"
+          prepend-icon="mdi-brain"
+          title="Nuggets"
+          to="/nuggets"
         ></v-list-item>
-        <v-list-item prepend-icon="mdi-image-multiple" title="Assets"></v-list-item>
-        <v-list-item prepend-icon="mdi-link" title="Relations"></v-list-item>
-        <v-list-item prepend-icon="mdi-export" title="Export"></v-list-item>
+
+        <!-- <v-list-item
+          prepend-icon="mdi-mastodon"
+          title="Fediverse"
+          to="/fediverse"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-phone"
+          title="VoIP"
+          to="/voip"
+        ></v-list-item> -->
 
         <v-divider></v-divider>
+        <v-list-item prepend-icon="mdi-export" title="Export / Import" to="/exports"></v-list-item>
+        <v-list-item prepend-icon="mdi-file-multiple" title="File Browser" to="/files"></v-list-item>
+        <v-list-item prepend-icon="mdi-database" title="Data Browser" to="/data"></v-list-item>
+
       </v-list>
 
       </v-navigation-drawer>

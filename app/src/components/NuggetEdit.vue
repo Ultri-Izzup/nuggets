@@ -86,7 +86,7 @@
       <!--IMAGES -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-image-multiple" /> Images</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-image-multiple"  size="x-small" /> Images</h2>
         </v-col>
         <v-col v-if="savedImages && savedImages.length > 0" cols="12">
           <v-row>
@@ -117,7 +117,7 @@
       <!-- VIDEO -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-video" /> Videos</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-video"  size="small" /> Videos</h2>
         </v-col>
         <v-col v-if="savedVideo && savedVideo.length > 0" cols="12">
           <v-row>
@@ -148,7 +148,7 @@
       <!-- AUDIO -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-speaker"> </v-icon> Audio</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-speaker"  size="sx-mall"> </v-icon> Audio</h2>
         </v-col>
         <v-col v-if="savedAudio && savedAudio.length > 0" cols="12">
           <v-row>
@@ -180,7 +180,7 @@
       <!-- FILES -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-file-multiple" /> Files</h2>
+          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-file-multiple"  size="x-small" /> Files</h2>
         </v-col>
         <v-col v-if="savedFiles && savedFiles.length > 0" cols="12">
           <v-row>
@@ -208,7 +208,7 @@
       <!-- GEOLOCATION -->
       <v-row class="my-5">
         <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"> <v-icon icon="mdi-map-marker" /> Location</h2>
+          <h2 class="text-h5 font-weight-bold"> <v-icon icon="mdi-map-marker" size="small"/> Location</h2>
         </v-col>
         <v-col v-if="nuggetData && nuggetData.geoLocation" cols="12">
           <v-row>
@@ -314,7 +314,7 @@ const props = defineProps(["nuggetId"]);
 
 const nug = useNuggetStore();
 
-const nuggetData = ref();
+// const nuggetData = ref();
 
 // FILES
 const tmpFiles = ref(); // Filehandles from local file picker
@@ -368,6 +368,7 @@ const tags = ref([]);
 
 
 // These become reactive through the Dexie liveQuery observable
+let nuggetData;
 let savedFiles;
 let savedImages;
 let savedAudio;
@@ -461,7 +462,7 @@ const showAudio = async () => {
 const getGeoLocation = async() => {
   console.log('Request GeoLocation')
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
+    navigator.geolocation.getCurrentPosition(async (position) => {
       console.log( position.coords );
       const jsonPos = {
         latitude: position.coords.latitude,
@@ -474,8 +475,9 @@ const getGeoLocation = async() => {
         jsonPos.speed = position.coords.speed
       }
 
-      geoLocation.value = jsonPos;
-      waypoints.value.push(jsonPos);
+      await nug.setGeoLocation(props.nuggetId, jsonPos)
+      // geoLocation.value = jsonPos;
+      // waypoints.value.push(jsonPos);
     });
   }
 }
@@ -484,7 +486,12 @@ watch(
   () => props.nuggetId,
   async (newNuggetId, oldVal) => {
     if (newNuggetId) {
-      nuggetData.value = await nug.getNugget(newNuggetId);
+      // nuggetData.value = await nug.getNugget(newNuggetId);
+      nuggetData = useObservable(
+        liveQuery(async () => {
+          return await nug.getNugget(newNuggetId);
+        })
+      );
 
       savedFiles = useObservable(
         liveQuery(async () => {
