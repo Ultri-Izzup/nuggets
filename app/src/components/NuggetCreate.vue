@@ -6,13 +6,15 @@
       </div>
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
-          <v-row>
+          <v-row class="align-center">
             <v-text-field
               v-model="name"
               label="Name"
               :rules="nameRules"
               required
             ></v-text-field>
+            <v-btn icon="mdi-microphone" color="grey-darken-4" @click="voiceType('name')"></v-btn>
+            <v-btn icon="mdi-speaker" color="grey-darken-4" @click="voiceType('name')"></v-btn>
           </v-row>
           <v-row>
             <v-textarea
@@ -404,9 +406,11 @@ const saveAudioChunk = (chunk) => {
   console.log("AUDIO CHUNK ADDED", chunk);
 };
 
-const uploadFiles = async () => {
-  console.log("FILE UPLOAD REQUESTED", selectedFiles.value);
-};
+// Convert speech to text and
+const voiceType = async (refName) => {
+  console.log(`Capture voice for ${refName}`)
+
+}
 
 // BUTTON ACTIONS
 const showFilePicker = async () => {
