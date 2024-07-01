@@ -1,4 +1,4 @@
-export async function textToSpeech(inputTxt, voice, pitch=1, rate=1) {
+export async function text2Speech(inputTxt, voice, pitch=1, rate=1) {
   console.log('Converting text to speech', inputTxt);
 
   const synth = window.speechSynthesis;
