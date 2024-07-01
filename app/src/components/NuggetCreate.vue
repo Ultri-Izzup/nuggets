@@ -3,6 +3,7 @@
     <v-responsive class="align-centerfill-height mx-auto py-6" max-width="900">
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
+        {{ $t('message.hello') }}
       </div>
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
@@ -13,8 +14,8 @@
               :rules="nameRules"
               required
             ></v-text-field>
-            <v-btn icon="mdi-microphone" color="grey-darken-4" @click="voiceType('name')"></v-btn>
-            <v-btn icon="mdi-speaker" color="grey-darken-4" @click="voiceType('name')"></v-btn>
+            <!-- <v-btn icon="mdi-microphone" color="grey-darken-4" @click="voiceType('name')"></v-btn>
+            <v-btn icon="mdi-speaker" color="grey-darken-4" @click="voiceType('name')"></v-btn> -->
           </v-row>
           <v-row>
             <v-textarea
@@ -258,11 +259,18 @@ import { useRouter } from "vue-router";
 
 import { useNuggetStore } from "../stores/nugget";
 const props = defineProps({
-  title: {
-    type: String,
-    default: null,
+  originNuggetId: {
+    type: Number
   },
+  relationType: {
+    type: String
+  },
+  title: {
+    type: String
+  }
 });
+
+console.log('PROPS', props)
 
 const nug = useNuggetStore();
 const router = useRouter();
@@ -474,4 +482,8 @@ const getGeoLocation = async () => {
     });
   }
 };
+
 </script>
+
+
+
