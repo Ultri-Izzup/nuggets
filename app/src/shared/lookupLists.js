@@ -15,3 +15,5 @@ export const platformMimeTypes = {
   text: ['css', 'csv', 'html', 'calendar', 'javascript', 'plain'],
   video: ['mp4', 'mpeg', 'ogg', 'webm']
 }
+
+export const allPlatformMimeTypes = [...platformMimeTypes.application, ...platformMimeTypes.audio, ...platformMimeTypes.image, platformMimeTypes.font, platformMimeTypes.text, platformMimeTypes.video]

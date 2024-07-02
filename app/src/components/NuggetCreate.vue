@@ -3,7 +3,6 @@
     <v-responsive class="align-centerfill-height mx-auto py-6" max-width="900">
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
-        {{ $t('message.hello') }}
       </div>
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
