@@ -10,7 +10,7 @@
           </h1>
         </v-col>
       </v-row>
-      <v-row justify="center">
+      <!-- <v-row justify="center">
 
         <v-spacer />
         <v-icon
@@ -56,13 +56,13 @@
         <v-icon
           @click="getGeoLocation"
           color="gray"
-          icon="mdi-map-marker"
+          icon="mdi-pin"
           size="x-large"
         ></v-icon>
 
 
         <v-spacer />
-      </v-row>
+      </v-row> -->
 
       <!-- DATA -->
       <v-container v-if="nuggetData">

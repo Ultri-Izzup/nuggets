@@ -79,7 +79,7 @@
             <v-icon
               @click="getGeoLocation"
               color="gray"
-              icon="mdi-map-marker"
+              icon="mdi-pin"
               size="x-large"
             ></v-icon>
 

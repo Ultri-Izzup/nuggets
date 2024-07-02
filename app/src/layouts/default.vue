@@ -2,46 +2,83 @@
   <v-app>
     <v-app-bar :elevation="1">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon  @click="toggleLeftDrawer"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="toggleLeftDrawer"></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title>Ultri Space</v-app-bar-title>
+      <v-app-bar-title>Ultri.Space</v-app-bar-title>
 
       <template v-slot:append>
         <v-btn icon="mdi-plus" to="/nuggets/create"></v-btn>
 
         <v-btn icon="mdi-magnify" to="/nuggets/search"></v-btn>
+
         <v-menu>
-          <template v-slot:activator="{props}">
+          <template v-slot:activator="{ props }">
             <v-btn icon="mdi-dots-vertical" v-bind="props"></v-btn>
           </template>
-          <v-list>
-            <v-list-item>
-              <v-list-item-title @click="route.params.id ? exportCurrentNugget() : ''" :class="route.params.id ? '' : 'text-grey'">
-                <v-icon icon="mdi-export"></v-icon> Export Nugget
-              </v-list-item-title>
-               <v-list-item-title @click="exportCurrentNugget">
-                <v-icon icon="mdi-export"></v-icon> Export ALL Nuggets
-              </v-list-item-title>
-              <v-list-item-title @click="router.push('/exports')">
-                <v-icon icon="mdi-download-multiple"></v-icon> Download Exports
-              </v-list-item-title>
+          <v-list v-if="appMenu === 'nugget'" density="compact">
+            <v-list-item
+              @click="route.params.id ? exportCurrentNugget() : ''"
+              append-icon="mdi-link"
+
+            >Linked Nugget
+            </v-list-item>
+
+            <v-divider></v-divider>
+
+            <v-list-item
+              @click="route.params.id ? exportCurrentNugget() : ''"
+              append-icon="mdi-camera"
+
+            >Camera
+            </v-list-item>
+
+            <v-list-item
+              @click="route.params.id ? exportCurrentNugget() : ''"
+              append-icon="mdi-microphone"
+
+            >Record Audio
+            </v-list-item>
+
+            <v-list-item
+              @click="route.params.id ? exportCurrentNugget() : ''"
+              append-icon="mdi-pin"
+
+            >Geo Location
+            </v-list-item>
+
+            <v-list-item
+              @click="route.params.id ? exportCurrentNugget() : ''"
+              append-icon="mdi-monitor"
+
+            >Screenshare
+            </v-list-item>
+
+            <v-list-item
+              @click="route.params.id ? exportCurrentNugget() : ''"
+              append-icon="mdi-paperclip"
+
+            >Attach Files
+            </v-list-item>
+
+            <v-divider></v-divider>
+
+            <v-list-item
+              @click="route.params.id ? exportCurrentNugget() : ''"
+              append-icon="mdi-export"
+
+            >Export Nugget
+            </v-list-item>
+            <v-list-item @click="router.push('/exports')" append-icon="mdi-download" >
+              Downloads
             </v-list-item>
           </v-list>
         </v-menu>
-
       </template>
     </v-app-bar>
-    <v-navigation-drawer
-        v-model="leftDrawer"
-        temporary
-      >
+    <v-navigation-drawer v-model="leftDrawer" temporary>
       <v-list density="compact" nav>
-        <v-list-item
-          prepend-icon="mdi-home"
-          title="Home"
-          to="/"
-        ></v-list-item>
+        <v-list-item prepend-icon="mdi-home" title="Home" to="/"></v-list-item>
 
         <v-divider></v-divider>
         <v-list-item
@@ -59,16 +96,31 @@
           prepend-icon="mdi-phone"
           title="VoIP"
           to="/voip"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-circle"
+          title="Spheres"
+          to="/spheres"
         ></v-list-item> -->
 
         <v-divider></v-divider>
-        <v-list-item prepend-icon="mdi-export" title="Export / Import" to="/exports"></v-list-item>
-        <v-list-item prepend-icon="mdi-file-multiple" title="File Browser" to="/files"></v-list-item>
-        <v-list-item prepend-icon="mdi-database" title="Data Browser" to="/data"></v-list-item>
-
+        <v-list-item
+          prepend-icon="mdi-export"
+          title="Export / Import"
+          to="/exports"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-file-multiple"
+          title="File Browser"
+          to="/files"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-database"
+          title="Data Browser"
+          to="/data"
+        ></v-list-item>
       </v-list>
-
-      </v-navigation-drawer>
+    </v-navigation-drawer>
     <v-main>
       <router-view />
     </v-main>
@@ -79,21 +131,22 @@
 
 <script setup>
 import { ref } from "vue";
-import {useRoute, useRouter} from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
-import {useNuggetStore} from "@/stores/nugget";
+import { useNuggetStore } from "@/stores/nugget";
 const route = useRoute();
 const router = useRouter();
 const nug = useNuggetStore();
 const leftDrawer = ref(false);
+const appMenu = ref("nugget");
 
 const toggleLeftDrawer = () => {
   leftDrawer.value = !leftDrawer.value;
-}
+};
 
 const exportCurrentNugget = async () => {
-  console.log(`START EXPORT for ${route.params.id}`)
+  console.log(`START EXPORT for ${route.params.id}`);
   const exportObj = await nug.startNuggetExport(route.params.id);
-  console.log('STARTED EXPORT', exportObj)
-}
+  console.log("STARTED EXPORT", exportObj);
+};
 </script>
