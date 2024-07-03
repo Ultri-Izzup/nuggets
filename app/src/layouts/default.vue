@@ -18,7 +18,7 @@
           </template>
           <v-list v-if="appMenu === 'nugget'" density="compact">
             <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
+              @click="route.params.nuggetId ? exportCurrentNugget() : ''"
               append-icon="mdi-link"
 
             >Linked Nugget
