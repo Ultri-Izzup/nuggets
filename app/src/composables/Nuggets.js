@@ -107,7 +107,6 @@ const createNugget = async (fullNugget) => {
   return nuggetId;
 }
 
-
 const addNuggetAttachments = async (nuggetId, selectedFiles) => {
   const fhArray = Array.from(selectedFiles)
   fileHandleWorker.postMessage({ nuggetId: nuggetId, subDir: "files", fileHandles: fhArray });
