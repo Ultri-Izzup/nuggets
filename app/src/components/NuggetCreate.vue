@@ -106,10 +106,10 @@
               <GeoLocation :geoLocation="position"></GeoLocation>
             </v-row>
           </v-row>
-          <v-row v-if="capturedImages && capturedImages.length > 0">
+          <v-row v-if="tmpImages && tmpImages.length > 0">
             <v-col cols="12" class="text-h6">Images</v-col>
             <v-row
-              v-for="(file, index) in capturedImages"
+              v-for="(file, index) in tmpImages"
               :key="index"
               class="text-body-2"
             >
@@ -139,9 +139,9 @@
               </v-col>
             </v-row>
           </v-row>
-          <v-row v-if="audioRecordings && audioRecordings.length > 0">
+          <v-row v-if="tmpAudioRecordings && tmpAudioRecordings.length > 0">
             <v-col cols="12" class="text-h6">Audio</v-col>
-            <v-row v-for="(file, index) in audioRecordings" :key="index">
+            <v-row v-for="(file, index) in tmpAudioRecordings" :key="index">
               <v-divider></v-divider>
               <v-col>
                 <audio :src="file.blobURL" controls />
@@ -167,7 +167,7 @@
 
         <!-- DIALOGS -->
 
-        <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
+        <v-dialog v-model="showCameraDialog" class="flex ma-0 pa-0">
           <template v-slot:default="{ isActive }">
             <v-card
               prepend-icon="mdi-video"
@@ -206,7 +206,7 @@
               <v-card-text class="flex ma-1 pa-1">
                 <AudioCapture
                   :targetSource="selectedAudioDevice"
-                  @recordedAudio="tempStoreAudio"
+                  @recordedAudio="tmpStoreAudio"
                   @deviceSelected="saveAudioSource"
                   @chunk="saveAudioChunk"
                 ></AudioCapture>
@@ -280,13 +280,13 @@ const selectedFiles = ref(); // Filehandles from local file picker
 // AUDIO
 const showAudioCaptureDialog = ref(false);
 const selectedAudioDevice = ref();
-const audioRecordings = ref([]); // audio recordings from device
+const tmpAudioRecordings = ref([]); // audio recordings from device
 
 // CAMERA / VIDEO
-const showVideoDialog = ref(false);
+const showCameraDialog = ref(false);
 const selectedVideoDevice = ref();
 const videoRecordings = ref([]);
-const capturedImages = ref([]);
+const tmpImages = ref([]);
 const preferredCamera = ref();
 const videoSource = ref("Video");
 
@@ -353,16 +353,16 @@ const submitCreate = async () => {
     fullNugget.selectedFiles = selectedFiles.value;
   }
 
-  if (capturedImages.value && capturedImages.value.length > 0) {
-    fullNugget.capturedImages = capturedImages.value;
+  if (tmpImages.value && tmpImages.value.length > 0) {
+    fullNugget.capturedImages = tmpImages.value;
   }
 
   if (videoRecordings.value && videoRecordings.value.length > 0) {
     fullNugget.videoRecordings = videoRecordings.value;
   }
 
-  if (audioRecordings.value && audioRecordings.value.length > 0) {
-    fullNugget.audioRecordings = audioRecordings.value;
+  if (tmpAudioRecordings.value && tmpAudioRecordings.value.length > 0) {
+    fullNugget.audioRecordings = tmpAudioRecordings.value;
   }
 
   console.log("CREATING NUGGET...", fullNugget);
@@ -379,11 +379,11 @@ const submitCreate = async () => {
 };
 
 const tempStoreSnapshot = (snapshotObj) => {
-  capturedImages.value.push(snapshotObj);
+  tmpImages.value.push(snapshotObj);
 };
 
-const tempStoreAudio = (audioCaptureObj) => {
-  audioRecordings.value.push(audioCaptureObj);
+const tmpStoreAudio = (audioCaptureObj) => {
+  tmpAudioRecordings.value.push(audioCaptureObj);
 };
 
 const tempStoreVideo = (videoCaptureObj) => {
@@ -408,7 +408,7 @@ const saveVideoChunk = (chunk) => {
 };
 
 const saveAudioChunk = (chunk) => {
-  audioRecordings.value.push(chunk);
+  tmpAudioRecordings.value.push(chunk);
   console.log("AUDIO CHUNK ADDED", chunk);
 };
 
@@ -444,7 +444,7 @@ const showFilePicker = async () => {
 const showScreenPicker = async () => {
   videoSource.value = "Screen";
   selectedVideoDevice.value = "screen";
-  showVideoDialog.value = true;
+  showCameraDialog.value = true;
 };
 
 const showCamera = async () => {
@@ -452,7 +452,7 @@ const showCamera = async () => {
   selectedVideoDevice.value = preferredCamera.value
     ? preferredCamera.value
     : nug.preferredCamera;
-  showVideoDialog.value = true;
+  showCameraDialog.value = true;
 };
 
 const showAudio = async () => {
