@@ -46,7 +46,7 @@ const writeJSONtoOPFS = async (json, filePath) => {
 
   const contents = textEncoder.encode(JSON.stringify(json));
 
-  const newSize = writeHandle.write(contents, { at: 0 });
+  const newSize = await writeHandle.write(contents, { at: 0 });
   writeHandle.flush();
   writeHandle.close();
 
