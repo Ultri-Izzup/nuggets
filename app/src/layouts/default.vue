@@ -25,7 +25,14 @@ const {
   saveAudioSource,
 
   // SCREEN
-  showScreenPicker
+  showScreenPicker,
+
+  // GEOLOCATION
+  geoLocation,
+  waypoints,
+
+  // FILES
+  showFilePicker,
 
 } = useMulticorder();
 
@@ -81,19 +88,19 @@ const exportCurrentNugget = async () => {
             </v-list-item>
 
             <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
+              @click="getGeoLocation()"
               append-icon="mdi-pin"
               >Geo Location
             </v-list-item>
 
             <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
+              @click="showScreenPicker()"
               append-icon="mdi-monitor"
               >Screenshare
             </v-list-item>
 
             <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
+              @click="showFilePicker()"
               append-icon="mdi-paperclip"
               >Attach Files
             </v-list-item>
@@ -101,7 +108,7 @@ const exportCurrentNugget = async () => {
             <v-divider></v-divider>
 
             <v-list-item
-              @click="showScreenPicker()"
+              @click="route.params.id ? exportCurrentNugget() : ''"
               append-icon="mdi-export"
               >Export Nugget
             </v-list-item>

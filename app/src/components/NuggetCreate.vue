@@ -20,7 +20,8 @@ console.log("PROPS", props);
 
 const nug = useNuggetStore();
 const {
-  createNugget,
+  //createNugget,
+  makeNugget,
   resetMulticorder,
   tmpStore,
   showAudio,
@@ -31,28 +32,16 @@ const {
   showCamera,
   showCameraDialog,
   showAudioCaptureDailog,
-  showScreenPicker
+  showScreenPicker,
+  getGeoLocation,
+  geoLocation,
+  waypoints,
+  showFilePicker,
+  tmpFiles,
+  showFileSelectDialog,
 } = useNuggetStore();
 
 const router = useRouter();
-
-// FILES
-const showFileSelectDialog = ref(false);
-const selectedFiles = ref(); // Filehandles from local file picker
-
-// const tmpAudioRecordings = ref([]); // audio recordings from device
-
-// CAMERA / VIDEO
-// const showCameraDialog = ref(false);
-// const selectedVideoDevice = ref();
-// const videoRecordings = ref([]);
-// const tmpImages = ref([]);
-// const preferredCamera = ref();
-// const videoSource = ref("Video");
-
-// GEOLOCATION
-const geoLocation = ref();
-const waypoints = ref([]);
 
 // DATA FORM
 const valid = ref();
@@ -91,7 +80,7 @@ const submitCreate = async () => {
     description: description.value,
     tags: tags.value,
   };
-  if (geoLocation.value) {
+  if (geoLocation && geoLocation.value) {
     data.geoLocation = geoLocation.value;
   }
 
@@ -105,8 +94,8 @@ const submitCreate = async () => {
     data: data,
   };
 
-  if (selectedFiles.value && selectedFiles.value.length > 0) {
-    fullNugget.selectedFiles = selectedFiles.value;
+  if (tmpFiles && tmpFiles.length > 0) {
+    fullNugget.selectedFiles = tmpFiles;
   }
 
   if (tmpImages && tmpImages.length > 0) {
@@ -126,114 +115,18 @@ const submitCreate = async () => {
   let nuggetId;
 
   try {
-    nuggetId = await createNugget(fullNugget);
+    nuggetId = await makeNugget(fullNugget);
     console.log("NEW NUGGET ID:", nuggetId);
     router.push(`/nuggets/${nuggetId}`);
+    await resetMulticorder();
   } catch (e) {
     console.error("FAILED to create record", e);
   }
 };
 
-// const tempStoreSnapshot = (assetObj) => {
-//   tmpStore('image', assetObj);
-// };
-
-// const tmpStoreAudio = (audioCaptureObj) => {
-//   tmpAudioRecordings.value.push(audioCaptureObj);
-// };
-
-// const tempStoreVideo = (videoCaptureObj) => {
-//   videoRecordings.value.push(videoCaptureObj);
-// };
-
-// const saveVideoSource = (newSource) => {
-//   selectedVideoDevice.value = newSource;
-//   preferredCamera.value = newSource;
-//   nug.preferredCamera = newSource;
-//   console.log("VIDEO SOURCE SET", newSource);
-// };
-
-// const saveAudioSource = (newSource) => {
-//   selectedAudioDevice.value = newSource;
-//   console.log("AUDIO SOURCE SET", newSource);
-// };
-
-// const saveVideoChunk = (chunk) => {
-//   videoRecordings.value.push(chunk);
-//   console.log("VIDEO CHUNK ADDED", chunk);
-// };
-
-// const saveAudioChunk = (chunk) => {
-//   tmpAudioRecordings.value.push(chunk);
-//   console.log("AUDIO CHUNK ADDED", chunk);
-// };
-
 // Convert speech to text and
 const voiceType = async (refName) => {
   console.log(`Capture voice for ${refName}`);
-};
-
-// BUTTON ACTIONS
-const showFilePicker = async () => {
-  if (window.showOpenFilePicker) {
-    const pickerOpts = {
-      types: [
-        {
-          description: "Images",
-          accept: {
-            "*/*": [".png", ".gif", ".jpeg", ".jpg"],
-          },
-        },
-      ],
-      excludeAcceptAllOption: false,
-      multiple: true,
-    };
-    selectedFiles.value = await window.showOpenFilePicker(pickerOpts);
-  } else {
-    console.log("firefix sucks");
-    showFileSelectDialog.value = true;
-    // Show dialog with file input field
-  }
-};
-
-// const showScreenPicker = async () => {
-//   videoSource.value = "Screen";
-//   selectedVideoDevice.value = "screen";
-//   showCameraDialog.value = true;
-// };
-
-// const showCamera = async () => {
-//   videoSource.value = "Camera";
-//   selectedVideoDevice.value = preferredCamera.value
-//     ? preferredCamera.value
-//     : nug.preferredCamera;
-//   showCameraDialog.value = true;
-// };
-
-// const showAudio = async () => {
-//   showAudioCaptureDialog.value = true;
-// };
-
-const getGeoLocation = async () => {
-  console.log("Request GeoLocation");
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      console.log(position.coords);
-      const jsonPos = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        accuracy: position.coords.accuracy,
-        timestamp: position.timestamp,
-      };
-
-      if (position.coords.speed) {
-        jsonPos.speed = position.coords.speed;
-      }
-
-      geoLocation.value = jsonPos;
-      waypoints.value.push(jsonPos);
-    });
-  }
 };
 </script>
 
@@ -243,7 +136,7 @@ const getGeoLocation = async () => {
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
       </div>
-      {{tmpImages}}{{tmpVideos}}{{tmpAudios}}
+      {{tmpFiles}}
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
           <v-row class="align-center">
@@ -391,12 +284,12 @@ const getGeoLocation = async () => {
               </v-col>
             </v-row>
           </v-row>
-          <v-row v-if="selectedFiles && selectedFiles.length > 0">
+          <v-row v-if="tmpFiles && tmpFiles.length > 0">
             <v-col cols="12" class="text-h6">Attachments</v-col>
             <v-col
               cols="12"
               md="6"
-              v-for="(file, index) in selectedFiles"
+              v-for="(file, index) in tmpFiles"
               :key="index"
               class="text-caption py-0"
             >
@@ -406,63 +299,6 @@ const getGeoLocation = async () => {
         </v-container>
 
         <!-- DIALOGS -->
-        <!--
-        <v-dialog v-model="showCameraDialog" class="flex ma-0 pa-0">
-          <template v-slot:default="{ isActive }">
-            <v-card
-              prepend-icon="mdi-video"
-              :title="videoSource"
-              class="ma-0 pa-0"
-            >
-              <v-card-text class="flex ma-1 pa-1">
-                <VideoCapture
-                  emitAs="dataURL"
-                  :targetSource="selectedVideoDevice"
-                  @snapshot="tempStoreSnapshot"
-                  @deviceSelected="saveVideoSource"
-                  @chunk="saveVideoChunk"
-                  @recordedVideo="tempStoreVideo"
-                ></VideoCapture>
-              </v-card-text>
-              <template v-slot:actions>
-                <v-btn
-                  prepend-icon="mdi-close"
-                  size="xl"
-                  color="grey"
-                  @click="isActive.value = false"
-                ></v-btn>
-              </template>
-            </v-card>
-          </template>
-        </v-dialog>
-
-        <v-dialog v-model="showAudioCaptureDialog" class="flex ma-0 pa-0">
-          <template v-slot:default="{ isActive }">
-            <v-card
-              prepend-icon="mdi-microphone"
-              title="Audio Recorder"
-              class="ma-0 pa-0"
-            >
-              <v-card-text class="flex ma-1 pa-1">
-                <AudioCapture
-                  :targetSource="selectedAudioDevice"
-                  @recordedAudio="tmpStoreAudio"
-                  @deviceSelected="saveAudioSource"
-                  @chunk="saveAudioChunk"
-                ></AudioCapture>
-              </v-card-text>
-
-              <template v-slot:actions>
-                <v-btn
-                  prepend-icon="mdi-close"
-                  size="xl"
-                  color="grey"
-                  @click="isActive.value = false"
-                ></v-btn>
-              </template>
-            </v-card>
-          </template>
-        </v-dialog> -->
 
         <v-dialog v-model="showFileSelectDialog" class="flex ma-0 pa-0">
           <template v-slot:default="{ isActive }">

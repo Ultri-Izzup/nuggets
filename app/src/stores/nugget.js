@@ -23,7 +23,19 @@ const {
   tmpAudios,
 
   // SCREEN
-  showScreenPicker
+  showScreenPicker,
+
+  // GEO LOCATION
+  getGeoLocation,
+  geoLocation,
+  waypoints,
+
+  // FILES
+  showFilePicker,
+  tmpFiles,
+  showFileSelectDialog,
+
+  mcReset: $reset
 
 } = useMulticorder();
 
@@ -66,8 +78,18 @@ export const useNuggetStore = defineStore("nugget", () => {
     //}
   }
 
-  const resetMulticorder = () => {
-    mc.$reset();
+  const makeNugget = async (fullNugget) => {
+
+    const nuggetId =  createNugget(fullNugget);
+
+    await resetMulticorder();
+
+    return nuggetId;
+
+  }
+
+  const resetMulticorder = async () => {
+
   }
 
   return {
@@ -85,17 +107,29 @@ export const useNuggetStore = defineStore("nugget", () => {
     showCamera,
     tmpStore,
     showScreenPicker,
+    getGeoLocation,
+    geoLocation,
+    waypoints,
+    showFilePicker,
+    tmpFiles,
+    showFileSelectDialog,
+    resetMulticorder,
+
 
 
     // NUGGETS
     addNuggetAttachments,
     addNuggetAsset,
-    createNugget,
+    // createNugget,
     getNugget,
     getNuggetAssets,
     newFileTimestamp,
     readOPFSFile,
     setGeoLocation,
     startNuggetExport,
+
+    // LOCAL FUNCTIONS
+    makeNugget,
+    resetMulticorder,
   }
 });

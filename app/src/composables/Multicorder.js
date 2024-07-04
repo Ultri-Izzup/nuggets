@@ -3,8 +3,7 @@
  */
 import { ref, readonly } from "vue";
 
-// SHARED temporary assest storage, AVAILABLE TO ALL COMPONENTS
-// MICROPHONE
+// SHARED AUDIO / MICROPHONE
 const showAudioCaptureDialog = ref(false);
 const selectedAudioDevice = ref();
 const tmpAudios = ref([]);
@@ -17,10 +16,13 @@ const selectedVideoDevice = ref();
 const preferredCamera = ref();
 const showCameraDialog = ref(false);
 
-// SHARED File or FileSystem handles from the browser OS
-const selectedFiles = ref();
+// GEOLOCATION
+const geoLocation = ref();
+const waypoints = ref([]);
 
-
+// FILES
+const tmpFiles = ref([]);
+const showFileSelectDialog = ref(false);
 
 const $reset = () => {
   tmpAudios.value=[];
@@ -33,6 +35,11 @@ const $reset = () => {
   preferredCamera.value = ref();
   showCameraDialog.value = ref(false);
   selectedFiles.value = null;
+  geoLocation.value = null;
+  waypoints.value = [];
+
+  tmpFiles.value = [];
+  showFileSelectDialog.value = false;
 }
 
 // Add to the temporary assets
@@ -77,11 +84,55 @@ const showCamera = async () => {
 };
 
 const showScreenPicker = async () => {
-  console.log("showinf screen picjer")
   videoSource.value = "Screen";
   selectedVideoDevice.value = "screen";
   showCameraDialog.value = true;
 }
+
+const showFilePicker = async (description="File Assets", accept={'*/*': ['.png', '.gif', '.jpeg', '.jpg']}) => {
+  if (window.showOpenFilePicker) {
+    const pickerOpts = {
+      types: [
+        {
+          description: description,
+          accept: accept,
+        },
+      ],
+      excludeAcceptAllOption: false,
+      multiple: true,
+    };
+    tmpFiles.value = await window.showOpenFilePicker(pickerOpts);
+    console.log('MFNFILES', tmpFiles.value)
+  } else {
+    showFileSelectDialog.value = true;
+    // Show dialog with file input field
+  }
+};
+
+const getGeoLocation = async () => {
+  console.log("Request GeoLocation");
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log(position.coords);
+      const jsonPos = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+        timestamp: position.timestamp,
+      };
+
+      if (position.coords.speed) {
+        jsonPos.speed = position.coords.speed;
+      }
+
+      geoLocation.value = jsonPos;
+      waypoints.value.push(jsonPos);
+    });
+  }
+};
+
+
+
 
 
 
@@ -92,8 +143,10 @@ export function useMulticorder() {
 
   return {
 
+    // SCREEN
     showScreenPicker,
 
+    // IMAGES / VIDEO / CAMERA
     tmpImages: readonly(tmpImages),
     tmpVideos: readonly(tmpVideos),
     saveVideoSource,
@@ -104,13 +157,26 @@ export function useMulticorder() {
     showCameraDialog,
     videoSource,
 
+    // AUDIO
     tmpAudios: readonly(tmpAudios),
     showAudio,
     showAudioCaptureDialog,
     selectedAudioDevice,
 
+    // FUNCTION TO STORE IMAGES, VIDEO, AUDIO IN MEMORY
     tmpStore,
 
+    // GEOLOCATION
+    getGeoLocation,
+    geoLocation,
+    waypoints,
+
+    // FILES
+    showFilePicker,
+    tmpFiles: readonly(tmpFiles),
+    showFileSelectDialog,
+
+    // CLEAR CHANGES, BACK TO DEFAULT
     $reset
   };
 }

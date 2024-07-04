@@ -61,54 +61,6 @@ if (window.Worker) {
   console.log("EXPORT WORKER LOADED IN Nuggets Composable");
 }
 
-// const {
-//   // Temporarily store images, video or audio
-//   tmpStore,
-
-//   // CAMERA / VIDEO / IMAGES
-//   saveVideoSource,
-//   showCamera,
-//   showCameraDialog,
-//   videoSource,
-//   selectedVideoDevice,
-//   tmpImages,
-//   tmpVideos,
-
-//   // MICROPHONE / AUDIO RECORDINGS
-//   selectedAudioDevice,
-//   showAudio,
-//   showAudioCaptureDialog,
-//   saveAudioSource,
-//   tmpAudios,
-
-//  } = useMulticorder();
-
-
-// // SHARED temporary assest storage, AVAILABLE TO ALL COMPONENTS
-// // MICROPHONE
-// const showAudioCaptureDialog = ref(false);
-// const selectedAudioDevice = ref();
-// const tmpAudios = ref([]);
-
-// // VIDEO AND IMAGES
-// const tmpVideos = ref([]);
-// const tmpImages = ref([]);
-// const videoSource = ref("Video");
-// const selectedVideoDevice = ref();
-// const preferredCamera = ref();
-// const showCameraDialog = ref(false);
-
-// // SHARED File or FileSystem handles from the browser OS
-// const selectedFiles = ref();
-
-
-
-// const $reset = () => {
-//   tmpAudios.value=[];
-//   tmpVideos.value=[];
-//   tmpImages.value=[];
-//   selectedFiles.value = null;
-// }
 
 /**
  * Create a new nugget from related parts.
@@ -116,6 +68,7 @@ if (window.Worker) {
  * @returns {number}
  */
 const createNugget = async (fullNugget) => {
+
   const nuggetId = await dexCreateNugget(fullNugget.data);
 
   if (fullNugget.selectedFiles && fullNugget.selectedFiles.length > 0) {
@@ -154,41 +107,6 @@ const createNugget = async (fullNugget) => {
 
   return nuggetId;
 }
-
-// // Add to the temporary assets
-// const tmpStore = (assetType, assetObj) => {
-
-//   console.log("WTF", assetType, assetObj)
-//   switch(assetType) {
-//     case 'image':
-//       tmpImages.value.push(assetObj);
-//       break;
-
-//     case 'video':
-//       tmpVideos.value.push(assetObj);
-//       break;
-
-//     case 'audio':
-//       tmpAudios.value.push(assetObj);
-//       break;
-//   }
-// };
-
-// const saveVideoSource = (newSource) => {
-//   selectedVideoDevice.value = newSource;
-//   preferredCamera.value = newSource;
-//   console.log("VIDEO SOURCE SET", newSource);
-// };
-
-const saveVideoChunk = (chunk) => {
-  tmpVideos.value.push(chunk);
-  console.log("VIDEO CHUNK ADDED", chunk);
-};
-
-
-// const showAudio = async () => {
-//   showAudioCaptureDialog.value = true;
-// };
 
 /**
  *
@@ -236,12 +154,6 @@ const setGeoLocation = async (nuggetId, geoLocation) => {
   return updateObj;
 }
 
-// const showCamera = async () => {
-//   videoSource.value = "Camera";
-//   selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : '';
-//   showCameraDialog.value = true;
-// };
-
 const startExport = async (nuggetId) => {
   console.log('NUGGET START EXPORT', nuggetId)
   // Create Dexie/IndexedDB record for job.
@@ -259,22 +171,6 @@ const startExport = async (nuggetId) => {
 export function useNuggets() {
 
   return {
-    // tmpImages,
-    // tmpVideos,
-    // saveVideoSource,
-    // saveVideoChunk,
-    // selectedVideoDevice,
-    // preferredCamera,
-    // showCamera,
-    // showCameraDialog,
-    // videoSource,
-
-    // tmpAudios,
-    // showAudio,
-    // showAudioCaptureDialog,
-    // selectedAudioDevice,
-
-
     addNuggetAttachments,
     addNuggetAsset,
     createNugget,
@@ -285,6 +181,5 @@ export function useNuggets() {
     readOPFSFile,
     setGeoLocation,
     startExport,
-    // tmpStore
   };
 }
