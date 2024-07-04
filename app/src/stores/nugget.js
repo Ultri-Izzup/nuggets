@@ -39,8 +39,10 @@ export const useNuggetStore = defineStore("nugget", () => {
     preferredCamera,
 
     // Getters
+    tmpImages: Nug.tmpImages,
 
     // Actions/Functions
+
 
     addNuggetAttachments: Nug.addNuggetAttachments,
     addNuggetAsset: Nug.addNuggetAsset,
@@ -51,6 +53,7 @@ export const useNuggetStore = defineStore("nugget", () => {
     readOPFSFile: Nug.readOPFSFile,
     startNuggetExport,
     setGeoLocation: Nug.setGeoLocation,
-    supportedVoices: Nug.supportedVoices
+    supportedVoices: Nug.supportedVoices,
+    tmpStore: Nug.tmpStore
   }
 });

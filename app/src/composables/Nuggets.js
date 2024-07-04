@@ -1,6 +1,7 @@
 /**
  * NUGGETS LOGIC AND FUNCTIONALITY
  */
+import { ref, readonly } from "vue";
 
 // Use shared data lookup lists
 import { nuggetRelationTypes } from '@/shared/lookupLists'
@@ -62,6 +63,20 @@ if (window.Worker) {
   console.log("EXPORT WORKER LOADED IN Nuggets Composable");
 }
 
+// SHARED temporary assest storage, AVAILABLE TO ALL COMPONENTS
+const tmpAudios = ref([]);
+const tmpVideos = ref([]);
+const tmpImages = ref([]);
+// SHARED File or FileSystem handles from the browser OS
+const selectedFiles = ref();
+
+const $reset = () => {
+  tmpAudios.value=[];
+  tmpVideos.value=[];
+  tmpImages.value=[];
+  selectedFiles.value = null;
+}
+
 /**
  * Create a new nugget from related parts.
  * @param {object} fullNugget
@@ -104,9 +119,33 @@ const createNugget = async (fullNugget) => {
     blobWorker.postMessage({ nuggetId: nuggetId, subDir: "audio", blobs: cleanBlobArr });
   }
 
+  $reset()
+
   return nuggetId;
 }
 
+// Add to the temporary assets
+const tmpStore = (assetType, assetObj) => {
+  switch(assetType) {
+    case 'image':
+      tmpImages.value.push(assetObj);
+      break;
+
+    case 'video':
+      tmpVideos.value.push(assetObj);
+      break;
+
+    case 'audio':
+      tmpAudios.value.push(assetObj);
+      break;
+  }
+};
+
+/**
+ *
+ * @param {number} nuggetId
+ * @param {array} selectedFiles
+ */
 const addNuggetAttachments = async (nuggetId, selectedFiles) => {
   const fhArray = Array.from(selectedFiles)
   fileHandleWorker.postMessage({ nuggetId: nuggetId, subDir: "files", fileHandles: fhArray });
@@ -165,6 +204,8 @@ const startExport = async (nuggetId) => {
 export function useNuggets() {
 
   return {
+    tmpImages: readonly(tmpImages),
+
     addNuggetAttachments,
     addNuggetAsset,
     createNugget,
@@ -174,6 +215,7 @@ export function useNuggets() {
     nuggetRelationTypes,
     readOPFSFile,
     setGeoLocation,
-    startExport
+    startExport,
+    tmpStore
   };
 }

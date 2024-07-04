@@ -271,6 +271,7 @@ const props = defineProps({
 console.log('PROPS', props)
 
 const nug = useNuggetStore();
+const {tmpStore, tmpImages} = useNuggetStore();
 const router = useRouter();
 
 // FILES
@@ -286,7 +287,7 @@ const tmpAudioRecordings = ref([]); // audio recordings from device
 const showCameraDialog = ref(false);
 const selectedVideoDevice = ref();
 const videoRecordings = ref([]);
-const tmpImages = ref([]);
+// const tmpImages = ref([]);
 const preferredCamera = ref();
 const videoSource = ref("Video");
 
@@ -331,10 +332,6 @@ const submitCreate = async () => {
     description: description.value,
     tags: tags.value,
   };
-
-  console.log(geoLocation.value);
-  console.log(waypoints.value);
-
   if (geoLocation.value) {
     data.geoLocation = geoLocation.value;
   }
@@ -353,8 +350,8 @@ const submitCreate = async () => {
     fullNugget.selectedFiles = selectedFiles.value;
   }
 
-  if (tmpImages.value && tmpImages.value.length > 0) {
-    fullNugget.capturedImages = tmpImages.value;
+  if (tmpImages && tmpImages.length > 0) {
+    fullNugget.capturedImages = tmpImages
   }
 
   if (videoRecordings.value && videoRecordings.value.length > 0) {
@@ -378,8 +375,8 @@ const submitCreate = async () => {
   }
 };
 
-const tempStoreSnapshot = (snapshotObj) => {
-  tmpImages.value.push(snapshotObj);
+const tempStoreSnapshot = (assetObj) => {
+  tmpStore('image', assetObj);
 };
 
 const tmpStoreAudio = (audioCaptureObj) => {
