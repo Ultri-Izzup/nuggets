@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { useNuggetStore } from "../stores/nugget";
+
 const props = defineProps({
   originNuggetId: {
     type: Number,
@@ -19,6 +20,8 @@ console.log("PROPS", props);
 
 const nug = useNuggetStore();
 const {
+  createNugget,
+  resetMulticorder,
   tmpStore,
   showAudio,
   showAudioCaptureDialog,
@@ -29,6 +32,7 @@ const {
   showCameraDialog,
   showAudioCaptureDailog,
 } = useNuggetStore();
+
 const router = useRouter();
 
 // FILES
@@ -121,7 +125,7 @@ const submitCreate = async () => {
   let nuggetId;
 
   try {
-    nuggetId = await nug.createNugget(fullNugget);
+    nuggetId = await createNugget(fullNugget);
     console.log("NEW NUGGET ID:", nuggetId);
     router.push(`/nuggets/${nuggetId}`);
   } catch (e) {
@@ -238,6 +242,7 @@ const getGeoLocation = async () => {
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
       </div>
+      {{tmpImages}}{{tmpVideos}}{{tmpAudios}}
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
           <v-row class="align-center">

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { useNuggets } from "@/composables/Nuggets";
+import { useMulticorder } from "@/composables/Multicorder";
 const route = useRoute();
 const router = useRouter();
 
@@ -24,7 +24,7 @@ const {
   showAudioCaptureDialog,
   saveAudioSource,
 
-} = useNuggets();
+} = useMulticorder();
 
 const leftDrawer = ref(false);
 const appMenu = ref("nugget");

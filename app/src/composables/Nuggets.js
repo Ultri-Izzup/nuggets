@@ -1,8 +1,6 @@
 /**
  * NUGGETS LOGIC AND FUNCTIONALITY
  */
-import { ref, readonly } from "vue";
-
 // Use shared data lookup lists
 import { nuggetRelationTypes } from '@/shared/lookupLists'
 
@@ -63,31 +61,54 @@ if (window.Worker) {
   console.log("EXPORT WORKER LOADED IN Nuggets Composable");
 }
 
-// SHARED temporary assest storage, AVAILABLE TO ALL COMPONENTS
-// MICROPHONE
-const showAudioCaptureDialog = ref(false);
-const selectedAudioDevice = ref();
-const tmpAudios = ref([]);
+// const {
+//   // Temporarily store images, video or audio
+//   tmpStore,
 
-// VIDEO AND IMAGES
-const tmpVideos = ref([]);
-const tmpImages = ref([]);
-const videoSource = ref("Video");
-const selectedVideoDevice = ref();
-const preferredCamera = ref();
-const showCameraDialog = ref(false);
+//   // CAMERA / VIDEO / IMAGES
+//   saveVideoSource,
+//   showCamera,
+//   showCameraDialog,
+//   videoSource,
+//   selectedVideoDevice,
+//   tmpImages,
+//   tmpVideos,
 
-// SHARED File or FileSystem handles from the browser OS
-const selectedFiles = ref();
+//   // MICROPHONE / AUDIO RECORDINGS
+//   selectedAudioDevice,
+//   showAudio,
+//   showAudioCaptureDialog,
+//   saveAudioSource,
+//   tmpAudios,
+
+//  } = useMulticorder();
+
+
+// // SHARED temporary assest storage, AVAILABLE TO ALL COMPONENTS
+// // MICROPHONE
+// const showAudioCaptureDialog = ref(false);
+// const selectedAudioDevice = ref();
+// const tmpAudios = ref([]);
+
+// // VIDEO AND IMAGES
+// const tmpVideos = ref([]);
+// const tmpImages = ref([]);
+// const videoSource = ref("Video");
+// const selectedVideoDevice = ref();
+// const preferredCamera = ref();
+// const showCameraDialog = ref(false);
+
+// // SHARED File or FileSystem handles from the browser OS
+// const selectedFiles = ref();
 
 
 
-const $reset = () => {
-  tmpAudios.value=[];
-  tmpVideos.value=[];
-  tmpImages.value=[];
-  selectedFiles.value = null;
-}
+// const $reset = () => {
+//   tmpAudios.value=[];
+//   tmpVideos.value=[];
+//   tmpImages.value=[];
+//   selectedFiles.value = null;
+// }
 
 /**
  * Create a new nugget from related parts.
@@ -131,35 +152,33 @@ const createNugget = async (fullNugget) => {
     blobWorker.postMessage({ nuggetId: nuggetId, subDir: "audio", blobs: cleanBlobArr });
   }
 
-  $reset()
-
   return nuggetId;
 }
 
-// Add to the temporary assets
-const tmpStore = (assetType, assetObj) => {
+// // Add to the temporary assets
+// const tmpStore = (assetType, assetObj) => {
 
-  console.log("WTF", assetType, assetObj)
-  switch(assetType) {
-    case 'image':
-      tmpImages.value.push(assetObj);
-      break;
+//   console.log("WTF", assetType, assetObj)
+//   switch(assetType) {
+//     case 'image':
+//       tmpImages.value.push(assetObj);
+//       break;
 
-    case 'video':
-      tmpVideos.value.push(assetObj);
-      break;
+//     case 'video':
+//       tmpVideos.value.push(assetObj);
+//       break;
 
-    case 'audio':
-      tmpAudios.value.push(assetObj);
-      break;
-  }
-};
+//     case 'audio':
+//       tmpAudios.value.push(assetObj);
+//       break;
+//   }
+// };
 
-const saveVideoSource = (newSource) => {
-  selectedVideoDevice.value = newSource;
-  preferredCamera.value = newSource;
-  console.log("VIDEO SOURCE SET", newSource);
-};
+// const saveVideoSource = (newSource) => {
+//   selectedVideoDevice.value = newSource;
+//   preferredCamera.value = newSource;
+//   console.log("VIDEO SOURCE SET", newSource);
+// };
 
 const saveVideoChunk = (chunk) => {
   tmpVideos.value.push(chunk);
@@ -167,9 +186,9 @@ const saveVideoChunk = (chunk) => {
 };
 
 
-const showAudio = async () => {
-  showAudioCaptureDialog.value = true;
-};
+// const showAudio = async () => {
+//   showAudioCaptureDialog.value = true;
+// };
 
 /**
  *
@@ -217,11 +236,11 @@ const setGeoLocation = async (nuggetId, geoLocation) => {
   return updateObj;
 }
 
-const showCamera = async () => {
-  videoSource.value = "Camera";
-  selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : '';
-  showCameraDialog.value = true;
-};
+// const showCamera = async () => {
+//   videoSource.value = "Camera";
+//   selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : '';
+//   showCameraDialog.value = true;
+// };
 
 const startExport = async (nuggetId) => {
   console.log('NUGGET START EXPORT', nuggetId)
@@ -240,20 +259,20 @@ const startExport = async (nuggetId) => {
 export function useNuggets() {
 
   return {
-    tmpImages: readonly(tmpImages),
-    tmpVideos: readonly(tmpVideos),
-    saveVideoSource,
-    saveVideoChunk,
-    selectedVideoDevice,
-    preferredCamera,
-    showCamera,
-    showCameraDialog,
-    videoSource,
+    // tmpImages,
+    // tmpVideos,
+    // saveVideoSource,
+    // saveVideoChunk,
+    // selectedVideoDevice,
+    // preferredCamera,
+    // showCamera,
+    // showCameraDialog,
+    // videoSource,
 
-    tmpAudios: readonly(tmpAudios),
-    showAudio,
-    showAudioCaptureDialog,
-    selectedAudioDevice,
+    // tmpAudios,
+    // showAudio,
+    // showAudioCaptureDialog,
+    // selectedAudioDevice,
 
 
     addNuggetAttachments,
@@ -266,6 +285,6 @@ export function useNuggets() {
     readOPFSFile,
     setGeoLocation,
     startExport,
-    tmpStore
+    // tmpStore
   };
 }
