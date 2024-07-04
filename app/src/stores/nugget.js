@@ -4,14 +4,38 @@ import { useStorage } from "@vueuse/core";
 
 import { useNuggets } from "@/composables/Nuggets";
 
-const Nug = useNuggets();
+const {
+  addNuggetAttachments,
+    addNuggetAsset,
+    createNugget,
+    getNugget,
+    getNuggetAssets,
+    newFileTimestamp,
+    readOPFSFile,
+    setGeoLocation,
+    tmpStore,
+
+    // VIDEO / IMAGES
+    showCamera,
+    showCameraDialog,
+    saveVideoSource,
+    videoSource,
+    selectedVideoDevice,
+    preferredCamera,
+    saveVideoChunk,
+    tmpImages,
+    tmpVideos,
+
+    //AUDIO
+    tmpAudios,
+} = useNuggets();
 
 export const useNuggetStore = defineStore("nugget", () => {
 
   // STATE
   const recentNuggets = useStorage('recentNuggets', []);
   const lastNugget = useStorage('lastNugget', 0);
-  const preferredCamera = useStorage('preferredCamera', null);
+  // const preferredCamera = useStorage('preferredCamera', null);
   const pendingExports = useStorage('pendingExports', new Map());
   const dowloadedExports = useStorage('downloadedExports', []);
 
@@ -36,24 +60,37 @@ export const useNuggetStore = defineStore("nugget", () => {
 
   return {
     // State
-    preferredCamera,
 
     // Getters
-    tmpImages: Nug.tmpImages,
+    tmpImages,
+    tmpVideos,
+    selectedVideoDevice,
+    preferredCamera,
+    showCameraDialog,
+    saveVideoSource,
+    showCamera,
+    videoSource,
+
+    tmpAudios,
+
+
 
     // Actions/Functions
 
 
-    addNuggetAttachments: Nug.addNuggetAttachments,
-    addNuggetAsset: Nug.addNuggetAsset,
-    createNugget: Nug.createNugget,
-    getNugget: Nug.getNugget,
-    getNuggetAssets: Nug.getNuggetAssets,
-    newFileTimestamp: Nug.newFileTimestamp,
-    readOPFSFile: Nug.readOPFSFile,
+    addNuggetAttachments,
+    addNuggetAsset,
+    createNugget,
+    getNugget,
+    getNuggetAssets,
+    newFileTimestamp,
+    readOPFSFile,
+
+    setGeoLocation,
+
+    tmpStore,
+
+
     startNuggetExport,
-    setGeoLocation: Nug.setGeoLocation,
-    supportedVoices: Nug.supportedVoices,
-    tmpStore: Nug.tmpStore
   }
 });

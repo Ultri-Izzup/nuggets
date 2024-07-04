@@ -64,11 +64,23 @@ if (window.Worker) {
 }
 
 // SHARED temporary assest storage, AVAILABLE TO ALL COMPONENTS
+// MICROPHONE
+const showAudioCaptureDialog = ref(false);
+const selectedAudioDevice = ref();
 const tmpAudios = ref([]);
+
+// VIDEO AND IMAGES
 const tmpVideos = ref([]);
 const tmpImages = ref([]);
+const videoSource = ref("Video");
+const selectedVideoDevice = ref();
+const preferredCamera = ref();
+const showCameraDialog = ref(false);
+
 // SHARED File or FileSystem handles from the browser OS
 const selectedFiles = ref();
+
+
 
 const $reset = () => {
   tmpAudios.value=[];
@@ -126,6 +138,8 @@ const createNugget = async (fullNugget) => {
 
 // Add to the temporary assets
 const tmpStore = (assetType, assetObj) => {
+
+  console.log("WTF", assetType, assetObj)
   switch(assetType) {
     case 'image':
       tmpImages.value.push(assetObj);
@@ -139,6 +153,17 @@ const tmpStore = (assetType, assetObj) => {
       tmpAudios.value.push(assetObj);
       break;
   }
+};
+
+const saveVideoSource = (newSource) => {
+  selectedVideoDevice.value = newSource;
+  preferredCamera.value = newSource;
+  console.log("VIDEO SOURCE SET", newSource);
+};
+
+const saveVideoChunk = (chunk) => {
+  tmpVideos.value.push(chunk);
+  console.log("VIDEO CHUNK ADDED", chunk);
 };
 
 /**
@@ -187,6 +212,12 @@ const setGeoLocation = async (nuggetId, geoLocation) => {
   return updateObj;
 }
 
+const showCamera = async () => {
+  videoSource.value = "Camera";
+  selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : '';
+  showCameraDialog.value = true;
+};
+
 const startExport = async (nuggetId) => {
   console.log('NUGGET START EXPORT', nuggetId)
   // Create Dexie/IndexedDB record for job.
@@ -205,6 +236,16 @@ export function useNuggets() {
 
   return {
     tmpImages: readonly(tmpImages),
+    tmpVideos: readonly(tmpVideos),
+    tmpAudios: readonly(tmpAudios),
+    saveVideoSource,
+    saveVideoChunk,
+    selectedVideoDevice,
+    preferredCamera,
+    showCamera,
+    showCameraDialog,
+    videoSource,
+
 
     addNuggetAttachments,
     addNuggetAsset,

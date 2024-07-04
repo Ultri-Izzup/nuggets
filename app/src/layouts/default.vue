@@ -1,3 +1,37 @@
+<script setup>
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+import { useNuggets } from "@/composables/Nuggets";
+const route = useRoute();
+const router = useRouter();
+
+const {
+  saveVideoSource,
+  saveVideoChunk,
+  showCamera,
+  showCameraDialog,
+  startNuggetExport,
+  tmpStore,
+  videoSource,
+  selectedVideoDevice,
+  preferredCamera,
+} = useNuggets();
+
+const leftDrawer = ref(false);
+const appMenu = ref("nugget");
+
+const toggleLeftDrawer = () => {
+  leftDrawer.value = !leftDrawer.value;
+};
+
+const exportCurrentNugget = async () => {
+  console.log(`START EXPORT for ${route.params.id}`);
+  const exportObj = await startNuggetExport(route.params.id);
+  console.log("STARTED EXPORT", exportObj);
+};
+</script>
+
 <template>
   <v-app>
     <v-app-bar :elevation="1">
@@ -20,45 +54,37 @@
             <v-list-item
               @click="route.params.nuggetId ? exportCurrentNugget() : ''"
               append-icon="mdi-link"
-
-            >Linked Nugget
+              >Linked Nugget
             </v-list-item>
 
             <v-divider></v-divider>
 
-            <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
-              append-icon="mdi-camera"
-
-            >Camera
+            <v-list-item @click="showCamera()" append-icon="mdi-camera"
+              >Camera
             </v-list-item>
 
             <v-list-item
               @click="route.params.id ? exportCurrentNugget() : ''"
               append-icon="mdi-microphone"
-
-            >Record Audio
+              >Record Audio
             </v-list-item>
 
             <v-list-item
               @click="route.params.id ? exportCurrentNugget() : ''"
               append-icon="mdi-pin"
-
-            >Geo Location
+              >Geo Location
             </v-list-item>
 
             <v-list-item
               @click="route.params.id ? exportCurrentNugget() : ''"
               append-icon="mdi-monitor"
-
-            >Screenshare
+              >Screenshare
             </v-list-item>
 
             <v-list-item
               @click="route.params.id ? exportCurrentNugget() : ''"
               append-icon="mdi-paperclip"
-
-            >Attach Files
+              >Attach Files
             </v-list-item>
 
             <v-divider></v-divider>
@@ -66,10 +92,12 @@
             <v-list-item
               @click="route.params.id ? exportCurrentNugget() : ''"
               append-icon="mdi-export"
-
-            >Export Nugget
+              >Export Nugget
             </v-list-item>
-            <v-list-item @click="router.push('/exports')" append-icon="mdi-download" >
+            <v-list-item
+              @click="router.push('/exports')"
+              append-icon="mdi-download"
+            >
               Downloads
             </v-list-item>
           </v-list>
@@ -123,30 +151,34 @@
     </v-navigation-drawer>
     <v-main>
       <router-view />
+      <v-dialog v-model="showCameraDialog" class="flex ma-0 pa-0">
+        <template v-slot:default="{ isActive }">
+          <v-card
+            prepend-icon="mdi-video"
+            :title="videoSource"
+            class="ma-0 pa-0"
+          >
+            <v-card-text class="flex ma-1 pa-1">
+              <VideoCapture
+                :targetSource="selectedVideoDevice"
+                @snapshot="(assetObj) => tmpStore('image', assetObj)"
+                @deviceSelected="saveVideoSource"
+                @chunk="saveVideoChunk"
+                @recordedVideo="(assetObj) => tmpStore('video', assetObj)"
+              ></VideoCapture>
+            </v-card-text>
+            <template v-slot:actions>
+              <v-btn
+                prepend-icon="mdi-close"
+                size="xl"
+                color="grey"
+                @click="isActive.value = false"
+              ></v-btn>
+            </template>
+          </v-card>
+        </template>
+      </v-dialog>
     </v-main>
-
     <AppFooter />
   </v-app>
 </template>
-
-<script setup>
-import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
-import { useNuggetStore } from "@/stores/nugget";
-const route = useRoute();
-const router = useRouter();
-const nug = useNuggetStore();
-const leftDrawer = ref(false);
-const appMenu = ref("nugget");
-
-const toggleLeftDrawer = () => {
-  leftDrawer.value = !leftDrawer.value;
-};
-
-const exportCurrentNugget = async () => {
-  console.log(`START EXPORT for ${route.params.id}`);
-  const exportObj = await nug.startNuggetExport(route.params.id);
-  console.log("STARTED EXPORT", exportObj);
-};
-</script>
