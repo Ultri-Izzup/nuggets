@@ -166,6 +166,11 @@ const saveVideoChunk = (chunk) => {
   console.log("VIDEO CHUNK ADDED", chunk);
 };
 
+
+const showAudio = async () => {
+  showAudioCaptureDialog.value = true;
+};
+
 /**
  *
  * @param {number} nuggetId
@@ -237,7 +242,6 @@ export function useNuggets() {
   return {
     tmpImages: readonly(tmpImages),
     tmpVideos: readonly(tmpVideos),
-    tmpAudios: readonly(tmpAudios),
     saveVideoSource,
     saveVideoChunk,
     selectedVideoDevice,
@@ -245,6 +249,11 @@ export function useNuggets() {
     showCamera,
     showCameraDialog,
     videoSource,
+
+    tmpAudios: readonly(tmpAudios),
+    showAudio,
+    showAudioCaptureDialog,
+    selectedAudioDevice,
 
 
     addNuggetAttachments,

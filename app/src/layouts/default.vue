@@ -7,15 +7,23 @@ const route = useRoute();
 const router = useRouter();
 
 const {
+  // Temporarily store images, video or audio
+  tmpStore,
+
+  // CAMERA / VIDEO / IMAGES
   saveVideoSource,
-  saveVideoChunk,
   showCamera,
   showCameraDialog,
   startNuggetExport,
-  tmpStore,
   videoSource,
   selectedVideoDevice,
-  preferredCamera,
+
+  // MICROPHONE / AUDIO RECORDINGS
+  selectedAudioDevice,
+  showAudio,
+  showAudioCaptureDialog,
+  saveAudioSource,
+
 } = useNuggets();
 
 const leftDrawer = ref(false);
@@ -64,7 +72,7 @@ const exportCurrentNugget = async () => {
             </v-list-item>
 
             <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
+              @click="showAudio()"
               append-icon="mdi-microphone"
               >Record Audio
             </v-list-item>
@@ -163,7 +171,6 @@ const exportCurrentNugget = async () => {
                 :targetSource="selectedVideoDevice"
                 @snapshot="(assetObj) => tmpStore('image', assetObj)"
                 @deviceSelected="saveVideoSource"
-                @chunk="saveVideoChunk"
                 @recordedVideo="(assetObj) => tmpStore('video', assetObj)"
               ></VideoCapture>
             </v-card-text>
@@ -178,6 +185,33 @@ const exportCurrentNugget = async () => {
           </v-card>
         </template>
       </v-dialog>
+
+      <v-dialog v-model="showAudioCaptureDialog" class="flex ma-0 pa-0">
+          <template v-slot:default="{ isActive }">
+            <v-card
+              prepend-icon="mdi-microphone"
+              title="Audio Recorder"
+              class="ma-0 pa-0"
+            >
+              <v-card-text class="flex ma-1 pa-1">
+                <AudioCapture
+                  :targetSource="selectedAudioDevice"
+                  @recordedAudio="(assetObj) => tmpStore('audio', assetObj)"
+                  @deviceSelected="saveAudioSource"
+                ></AudioCapture>
+              </v-card-text>
+
+              <template v-slot:actions>
+                <v-btn
+                  prepend-icon="mdi-close"
+                  size="xl"
+                  color="grey"
+                  @click="isActive.value = false"
+                ></v-btn>
+              </template>
+            </v-card>
+          </template>
+        </v-dialog>
     </v-main>
     <AppFooter />
   </v-app>

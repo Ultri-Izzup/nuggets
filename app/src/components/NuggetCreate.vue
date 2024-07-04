@@ -112,7 +112,7 @@ const submitCreate = async () => {
     fullNugget.videoRecordings = tmpVideos;
   }
 
-  if (tmpAudios && tmpAudios > 0) {
+  if (tmpAudios && tmpAudios.length > 0) {
     fullNugget.audioRecordings = tmpAudios;
   }
 
@@ -238,7 +238,6 @@ const getGeoLocation = async () => {
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
       </div>
-      {{ tmpVideos }}test
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
           <v-row class="align-center">
