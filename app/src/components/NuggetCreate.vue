@@ -31,6 +31,7 @@ const {
   showCamera,
   showCameraDialog,
   showAudioCaptureDailog,
+  showScreenPicker
 } = useNuggetStore();
 
 const router = useRouter();
@@ -195,11 +196,11 @@ const showFilePicker = async () => {
   }
 };
 
-const showScreenPicker = async () => {
-  videoSource.value = "Screen";
-  selectedVideoDevice.value = "screen";
-  showCameraDialog.value = true;
-};
+// const showScreenPicker = async () => {
+//   videoSource.value = "Screen";
+//   selectedVideoDevice.value = "screen";
+//   showCameraDialog.value = true;
+// };
 
 // const showCamera = async () => {
 //   videoSource.value = "Camera";

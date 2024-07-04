@@ -76,6 +76,14 @@ const showCamera = async () => {
   showCameraDialog.value = true;
 };
 
+const showScreenPicker = async () => {
+  console.log("showinf screen picjer")
+  videoSource.value = "Screen";
+  selectedVideoDevice.value = "screen";
+  showCameraDialog.value = true;
+}
+
+
 
 /**
  * export for use as a composable
@@ -83,6 +91,9 @@ const showCamera = async () => {
 export function useMulticorder() {
 
   return {
+
+    showScreenPicker,
+
     tmpImages: readonly(tmpImages),
     tmpVideos: readonly(tmpVideos),
     saveVideoSource,

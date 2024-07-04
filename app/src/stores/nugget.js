@@ -21,6 +21,10 @@ const {
 
   //AUDIO
   tmpAudios,
+
+  // SCREEN
+  showScreenPicker
+
 } = useMulticorder();
 
 const {
@@ -80,6 +84,7 @@ export const useNuggetStore = defineStore("nugget", () => {
     saveVideoSource,
     showCamera,
     tmpStore,
+    showScreenPicker,
 
 
     // NUGGETS

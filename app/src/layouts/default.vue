@@ -24,6 +24,9 @@ const {
   showAudioCaptureDialog,
   saveAudioSource,
 
+  // SCREEN
+  showScreenPicker
+
 } = useMulticorder();
 
 const leftDrawer = ref(false);
@@ -98,7 +101,7 @@ const exportCurrentNugget = async () => {
             <v-divider></v-divider>
 
             <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
+              @click="showScreenPicker()"
               append-icon="mdi-export"
               >Export Nugget
             </v-list-item>
