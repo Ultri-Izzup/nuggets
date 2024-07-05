@@ -86,277 +86,328 @@
 
       <v-divider></v-divider>
       <!--IMAGES -->
-      <v-row class="my-5">
-        <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-image-multiple"  size="x-small" /> Images</h2>
-        </v-col>
-        <v-col v-if="savedImages && savedImages.length > 0" cols="12">
-          <v-row>
-            <v-col
-              v-for="(file, index) in savedImages"
-              :key="index"
-              class="text-body-2"
-            >
-              <v-row>
-                <v-col cols="12" class="pb-0">
-                  <v-card>
-                    <v-card-text>
-                      <OPFSImage
-                        :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
-                        width="100%"
-                      ></OPFSImage>
-                      {{ file.fileName }}
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-
-      <v-divider></v-divider>
-      <!-- VIDEO -->
-      <v-row class="my-5">
-        <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-video"  size="small" /> Videos</h2>
-        </v-col>
-        <v-col v-if="savedVideo && savedVideo.length > 0" cols="12">
-          <v-row>
-            <v-col
-              v-for="(file, index) in savedVideo"
-              :key="index"
-              class="text-body-2"
-            >
-              <v-row>
-                <v-col cols="12" class="pb-0">
-                  <v-card>
-                    <v-card-text>
-                      <OPFSVideo
-                        :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
-                        width="100%"
-                      ></OPFSVideo>
-                      {{ file.fileName }}
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-
-      <v-divider></v-divider>
-      <!-- AUDIO -->
-      <v-row class="my-5">
-        <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-speaker"  size="sx-mall"> </v-icon> Audio</h2>
-        </v-col>
-        <v-col v-if="savedAudio && savedAudio.length > 0" cols="12">
-          <v-row>
-            <v-col
-              v-for="(file, index) in savedAudio"
-              :key="index"
-              class="text-body-2"
-            >
-              <v-row>
-                <v-col cols="12" class="pb-0">
-                  <v-card>
-                    <v-card-text class="text-center">
-                      <OPFSAudio
-                        :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
-                        width="100%"
-                      ></OPFSAudio>
-                      {{ file.fileName }}
-                      <v-icon icon="mdi-dots-vertical" size="x-large"></v-icon>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-
-      <v-divider></v-divider>
-      <!-- FILES -->
-      <v-row class="my-5">
-        <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-file-multiple"  size="x-small" /> Files</h2>
-        </v-col>
-        <v-col v-if="savedFiles && savedFiles.length > 0" cols="12">
-          <v-row>
-            <v-col
-              v-for="(file, index) in savedFiles"
-              :key="index"
-              class="text-body-2"
-            >
-              <v-row>
-                <v-col cols="12" class="pb-0">
-                  <v-card>
-                    <v-card-actions>
+      <v-container
+        v-if="savedImages && savedImages.length > 0"
+        class="pa-0 ma-0"
+      >
+        <v-row class="my-5">
+          <v-col cols="12" class="pb-3">
+            <h2 class="text-h5 font-weight-bold">
+              <v-icon icon="mdi-image-multiple" size="x-small" /> Images
+            </h2>
+          </v-col>
+          <v-col cols="12">
+            <v-row>
+              <v-col
+                v-for="(file, index) in savedImages"
+                :key="index"
+                class="text-body-2"
+              >
+                <v-row>
+                  <v-col cols="12" class="pb-0">
+                    <v-card>
+                      <v-card-text>
+                        <OPFSImage
+                          :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                          width="100%"
+                        ></OPFSImage>
                         {{ file.fileName }}
-                        <v-icon icon="mdi-dots-vertical" size="x-large"></v-icon>
-                    </v-card-actions>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-divider></v-divider>
+      </v-container>
 
-      <v-divider></v-divider>
+      <!-- VIDEO -->
+      <v-container
+        v-if="savedVideo && savedVideo.length > 0"
+        no-
+        class="pa-0 ma-0"
+      >
+        <v-row class="my-5">
+          <v-col cols="12" class="pb-3">
+            <h2 class="text-h5 font-weight-bold">
+              <v-icon icon="mdi-video" size="small" /> Videos
+            </h2>
+          </v-col>
+          <v-col cols="12">
+            <v-row>
+              <v-col
+                v-for="(file, index) in savedVideo"
+                :key="index"
+                class="text-body-2"
+              >
+                <v-row>
+                  <v-col cols="12" class="pb-0">
+                    <v-card>
+                      <v-card-text>
+                        <OPFSVideo
+                          :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                          width="100%"
+                        ></OPFSVideo>
+                        {{ file.fileName }}
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-divider></v-divider>
+      </v-container>
+
+      <!-- AUDIO -->
+      <v-container v-if="savedAudio && savedAudio.length > 0" class="pa-0 ma-0">
+        <v-row class="my-5">
+          <v-col cols="12" class="pb-3">
+            <h2 class="text-h5 font-weight-bold">
+              <v-icon icon="mdi-speaker" size="sx-mall"> </v-icon> Audio
+            </h2>
+          </v-col>
+          <v-col cols="12">
+            <v-row>
+              <v-col
+                v-for="(file, index) in savedAudio"
+                :key="index"
+                class="text-body-2"
+              >
+                <v-row>
+                  <v-col cols="12" class="pb-0">
+                    <v-card>
+                      <v-card-text class="text-center">
+                        <OPFSAudio
+                          :filePath="`nugget/${file.nuggetId}/${file.subDir}/${file.fileName}`"
+                          width="100%"
+                        ></OPFSAudio>
+                        {{ file.fileName }}
+                        <v-icon
+                          icon="mdi-dots-vertical"
+                          size="x-large"
+                        ></v-icon>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-divider></v-divider>
+      </v-container>
+
+      <!-- FILES -->
+      <v-container
+        v-if="savedFiles && savedFiles.length > 0"
+        class="pa-0 mx-0 my-5"
+      >
+        <v-row class="mb-5">
+          <v-col cols="12" class="pb-3">
+            <h2 class="text-h5 font-weight-bold">
+              <v-icon icon="mdi-file-multiple" size="x-small" /> Files
+            </h2>
+          </v-col>
+          <v-col cols="12">
+            <v-row>
+              <v-col
+                v-for="(file, index) in savedFiles"
+                :key="index"
+                class="text-body-2"
+              >
+                <v-row>
+                  <v-col cols="12" class="pb-0">
+                    <v-card>
+                      <v-card-actions>
+                        <v-icon
+                          icon="mdi-dots-vertical"
+                          size="x-large"
+                        ></v-icon>
+                        {{ file.fileName }}
+                      </v-card-actions>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-divider></v-divider>
+      </v-container>
+
       <!-- GEOLOCATION -->
-      <v-row class="my-5">
-        <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"> <v-icon icon="mdi-map-marker" size="small"/> Location</h2>
-        </v-col>
-        <v-col v-if="nuggetData && nuggetData.geoLocation" cols="12">
-          <v-row>
-            <v-col>
-              <GeoLocation :geoLocation="nuggetData.geoLocation"></GeoLocation>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
+      <v-container
+        v-if="nuggetData && nuggetData.geoLocation"
+        class="pa-0 ma-0"
+      >
+        <v-row class="my-5">
+          <v-col cols="12" class="pb-3">
+            <h2 class="text-h5 font-weight-bold">
+              <v-icon icon="mdi-map-marker" size="small" /> Location
+            </h2>
+          </v-col>
+          <v-col cols="12">
+            <v-row>
+              <v-col>
+                <GeoLocation
+                  :geoLocation="nuggetData.geoLocation"
+                ></GeoLocation>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
 
-      <v-divider></v-divider>
-      <!-- GEOPOSITIONS -->
-      <v-row v-if="nuggetData && nuggetData.geoPositions" class="my-5">
-        <v-col cols="12" class="pb-3">
-          <h2 class="text-h5 font-weight-bold"><v-icon icon="mdi-map" /> Waypoints</h2>
-        </v-col>
+      <v-container
+        v-if="nuggetData && nuggetData.geoPositions"
+        class="pa-0 ma-0"
+      >
+        <v-divider></v-divider>
+        <!-- GEOPOSITIONS -->
+        <v-row class="my-5">
+          <v-col cols="12" class="pb-3">
+            <h2 class="text-h5 font-weight-bold">
+              <v-icon icon="mdi-map" /> Waypoints
+            </h2>
+          </v-col>
 
-        <v-col cols="12">
-          <v-row>
-            <v-col
-              v-for="(position, index) in nuggetData.geoPositions"
-              :key="index"
-              cols="12"
-            >
-              <GeoLocation
-                v-if="index !== 0"
-                :geoLocation="position"
-              ></GeoLocation>
-              <v-divider></v-divider>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-
-      <v-divider v-if="!nuggetData || !nuggetData.geoPositions"></v-divider>
+          <v-col cols="12">
+            <v-row>
+              <v-col
+                v-for="(position, index) in nuggetData.geoPositions"
+                :key="index"
+                cols="12"
+              >
+                <GeoLocation
+                  v-if="index !== 0"
+                  :geoLocation="position"
+                ></GeoLocation>
+                <v-divider></v-divider>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-divider v-if="!nuggetData || !nuggetData.geoPositions"></v-divider>
+      </v-container>
 
       <v-dialog v-model="showVideoDialog" class="flex ma-0 pa-0">
-      <template v-slot:default="{ isActive }">
-        <v-card prepend-icon="mdi-video" :title="videoSource" class="ma-0 pa-0">
-          <v-card-text class="flex ma-1 pa-1">
-            <VideoCapture
-              emitAs="dataURL"
-              :targetSource="selectedVideoDevice"
-              @snapshot="storeSnapshot"
-              @deviceSelected="saveVideoSource"
-              @chunk="saveVideoChunk"
-              @recordedVideo="storeVideo"
-            ></VideoCapture>
-          </v-card-text>
-          <template v-slot:actions>
-            <v-btn
-              prepend-icon="mdi-close"
-              size="xl"
-              color="grey"
-              @click="isActive.value = false"
-            ></v-btn>
-          </template>
-        </v-card>
-      </template>
-    </v-dialog>
+        <template v-slot:default="{ isActive }">
+          <v-card
+            prepend-icon="mdi-video"
+            :title="videoSource"
+            class="ma-0 pa-0"
+          >
+            <v-card-text class="flex ma-1 pa-1">
+              <VideoCapture
+                emitAs="dataURL"
+                :targetSource="selectedVideoDevice"
+                @snapshot="storeSnapshot"
+                @deviceSelected="saveVideoSource"
+                @chunk="saveVideoChunk"
+                @recordedVideo="storeVideo"
+              ></VideoCapture>
+            </v-card-text>
+            <template v-slot:actions>
+              <v-btn
+                prepend-icon="mdi-close"
+                size="xl"
+                color="grey"
+                @click="isActive.value = false"
+              ></v-btn>
+            </template>
+          </v-card>
+        </template>
+      </v-dialog>
 
-    <v-dialog v-model="showAudioCaptureDialog" class="flex ma-0 pa-0">
-      <template v-slot:default="{ isActive }">
-        <v-card
-          prepend-icon="mdi-microphone"
-          title="Audio Recorder"
-          class="ma-0 pa-0"
-        >
-          <v-card-text class="flex ma-1 pa-1">
-            <AudioCapture
-              :targetSource="selectedAudioDevice"
-              @recordedAudio="storeAudio"
-              @deviceSelected="saveAudioSource"
-              @chunk="saveAudioChunk"
-            ></AudioCapture>
-          </v-card-text>
+      <v-dialog v-model="showAudioCaptureDialog" class="flex ma-0 pa-0">
+        <template v-slot:default="{ isActive }">
+          <v-card
+            prepend-icon="mdi-microphone"
+            title="Audio Recorder"
+            class="ma-0 pa-0"
+          >
+            <v-card-text class="flex ma-1 pa-1">
+              <AudioCapture
+                :targetSource="selectedAudioDevice"
+                @recordedAudio="storeAudio"
+                @deviceSelected="saveAudioSource"
+                @chunk="saveAudioChunk"
+              ></AudioCapture>
+            </v-card-text>
 
-          <template v-slot:actions>
-            <v-btn
-              prepend-icon="mdi-close"
-              size="xl"
-              color="grey"
-              @click="isActive.value = false"
-            ></v-btn>
-          </template>
-        </v-card>
-      </template>
-    </v-dialog>
+            <template v-slot:actions>
+              <v-btn
+                prepend-icon="mdi-close"
+                size="xl"
+                color="grey"
+                @click="isActive.value = false"
+              ></v-btn>
+            </template>
+          </v-card>
+        </template>
+      </v-dialog>
 
-    <v-dialog v-model="showTextToSpeechDialog" class="flex ma-0 pa-0">
-      <template v-slot:default="{ isActive }">
-        <v-card
-          prepend-icon="mdi-account-voice"
-          title="Text Reader"
-          class="ma-0 pa-0"
-        >
-          <v-card-text class="flex ma-1 pa-1">
-            {{textToRead}} {{nug.supportedVoices}}
+      <v-dialog v-model="showTextToSpeechDialog" class="flex ma-0 pa-0">
+        <template v-slot:default="{ isActive }">
+          <v-card
+            prepend-icon="mdi-account-voice"
+            title="Text Reader"
+            class="ma-0 pa-0"
+          >
+            <v-card-text class="flex ma-1 pa-1">
+              {{ textToRead }} {{ nug.supportedVoices }}
 
+              {{ selectedVoice }}
+            </v-card-text>
 
+            <template v-slot:actions>
+              <v-btn
+                prepend-icon="mdi-close"
+                size="xl"
+                color="grey"
+                @click="isActive.value = false"
+              ></v-btn>
+            </template>
+          </v-card>
+        </template>
+      </v-dialog>
 
-          {{selectedVoice}}
-          </v-card-text>
+      <v-dialog v-model="showLinkNewNuggetDialog" class="flex ma-0 pa-0">
+        <template v-slot:default="{ isActive }">
+          <v-card
+            prepend-icon="mdi-link"
+            title="Link New Nugget"
+            class="ma-0 pa-0"
+          >
+            <v-card-text class="flex ma-1 pa-1">
+              <v-select
+                v-model="newRelationType"
+                label="Relation"
+                :items="relationTypes"
+                item-title="label"
+                item-value="value"
+              ></v-select>
+              <NuggetCreate
+                :nuggetId="nuggetId"
+                :relationType="newRelationType"
+              ></NuggetCreate>
+            </v-card-text>
 
-          <template v-slot:actions>
-            <v-btn
-              prepend-icon="mdi-close"
-              size="xl"
-              color="grey"
-              @click="isActive.value = false"
-            ></v-btn>
-          </template>
-        </v-card>
-      </template>
-    </v-dialog>
-
-    <v-dialog v-model="showLinkNewNuggetDialog" class="flex ma-0 pa-0">
-      <template v-slot:default="{ isActive }">
-        <v-card
-          prepend-icon="mdi-link"
-          title="Link New Nugget"
-          class="ma-0 pa-0"
-        >
-          <v-card-text class="flex ma-1 pa-1">
-            <v-select
-              v-model="newRelationType"
-              label="Relation"
-              :items="relationTypes"
-              item-title="label"
-              item-value="value"
-            ></v-select>
-            <NuggetCreate :nuggetId="nuggetId" :relationType="newRelationType"></NuggetCreate>
-          </v-card-text>
-
-          <template v-slot:actions>
-            <v-btn
-              prepend-icon="mdi-close"
-              size="xl"
-              color="grey"
-              @click="isActive.value = false"
-            ></v-btn>
-          </template>
-        </v-card>
-      </template>
-    </v-dialog>
-
+            <template v-slot:actions>
+              <v-btn
+                prepend-icon="mdi-close"
+                size="xl"
+                color="grey"
+                @click="isActive.value = false"
+              ></v-btn>
+            </template>
+          </v-card>
+        </template>
+      </v-dialog>
     </v-responsive>
   </v-container>
 </template>
@@ -385,16 +436,16 @@ const newRelationType = ref();
 // TEXT TO SPEECH
 const showTextToSpeechDialog = ref(false);
 const textToRead = ref();
-const selectedVoice = useStorage('selectedVoice', null);
+const selectedVoice = useStorage("selectedVoice", null);
 const voicePitch = ref(1);
 const voiceRate = ref(1);
 const voices = ref();
 
-if(voices.value === null) {
+if (voices.value === null) {
   voices.value = speechSynthesis.getVoices();
 }
 
-console.log(voices.value)
+console.log(voices.value);
 
 // FILES
 const tmpFiles = ref(); // Filehandles from local file picker
@@ -447,15 +498,11 @@ const descriptionRules = [
 const tags = ref([]);
 
 const outLoud = async (txt) => {
-  console.log("READ OUT LOUD", txt)
+  console.log("READ OUT LOUD", txt);
   textToRead.value = txt;
 
   showTextToSpeechDialog.value = true;
-
-
-
-}
-
+};
 
 // These become reactive through the Dexie liveQuery observable
 let nuggetData;
@@ -469,7 +516,7 @@ const tempStoreSnapshot = (snapshotObj) => {
 };
 
 const storeSnapshot = async (snapshotObj) => {
-  await nug.addNuggetAsset(props.nuggetId, 'images', snapshotObj)
+  await nug.addNuggetAsset(props.nuggetId, "images", snapshotObj);
 };
 
 const tempStoreAudio = (audioCaptureObj) => {
@@ -477,7 +524,7 @@ const tempStoreAudio = (audioCaptureObj) => {
 };
 
 const storeAudio = async (audioCaptureObj) => {
-  await nug.addNuggetAsset(props.nuggetId, 'audio', audioCaptureObj)
+  await nug.addNuggetAsset(props.nuggetId, "audio", audioCaptureObj);
 };
 
 const tempStoreVideo = (videoCaptureObj) => {
@@ -485,7 +532,7 @@ const tempStoreVideo = (videoCaptureObj) => {
 };
 
 const storeVideo = async (audioCaptureObj) => {
-  await nug.addNuggetAsset(props.nuggetId, 'videos', audioCaptureObj)
+  await nug.addNuggetAsset(props.nuggetId, "videos", audioCaptureObj);
 };
 
 const saveVideoSource = (newSource) => {
@@ -530,7 +577,7 @@ const showFilePicker = async () => {
   };
   tmpFiles.value = await window.showOpenFilePicker(pickerOpts);
   // Auto save to OPFS
-  await nug.addNuggetAttachments(props.nuggetId, tmpFiles.value)
+  await nug.addNuggetAttachments(props.nuggetId, tmpFiles.value);
 };
 
 const showScreenPicker = async () => {
@@ -541,7 +588,9 @@ const showScreenPicker = async () => {
 
 const showCamera = async () => {
   videoSource.value = "Camera";
-  selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : nug.preferredCamera;
+  selectedVideoDevice.value = preferredCamera.value
+    ? preferredCamera.value
+    : nug.preferredCamera;
   showVideoDialog.value = true;
 };
 
@@ -549,28 +598,28 @@ const showAudio = async () => {
   showAudioCaptureDialog.value = true;
 };
 
-const getGeoLocation = async() => {
-  console.log('Request GeoLocation')
+const getGeoLocation = async () => {
+  console.log("Request GeoLocation");
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(async (position) => {
-      console.log( position.coords );
+      console.log(position.coords);
       const jsonPos = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         accuracy: position.coords.accuracy,
-        timestamp: position.timestamp
+        timestamp: position.timestamp,
+      };
+
+      if (position.coords.speed) {
+        jsonPos.speed = position.coords.speed;
       }
 
-      if(position.coords.speed) {
-        jsonPos.speed = position.coords.speed
-      }
-
-      await nug.setGeoLocation(props.nuggetId, jsonPos)
+      await nug.setGeoLocation(props.nuggetId, jsonPos);
       // geoLocation.value = jsonPos;
       // waypoints.value.push(jsonPos);
     });
   }
-}
+};
 
 // watch(
 //   () => textToRead.value,
