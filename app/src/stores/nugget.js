@@ -30,7 +30,8 @@ const {
   geoLocation,
   waypoints,
 
-  // FILES
+  // FILES Broken?
+  // These need to be accessed directly from Muticorder composable in each component.
   showFilePicker,
   tmpFiles,
   showFileSelectDialog,
@@ -83,7 +84,7 @@ export const useNuggetStore = defineStore("nugget", () => {
 
     const nuggetId =  createNugget(fullNugget);
 
-    await resetMulticorderAssets();
+    // await resetMulticorderAssets();
 
     return nuggetId;
 
@@ -107,9 +108,13 @@ export const useNuggetStore = defineStore("nugget", () => {
     getGeoLocation,
     geoLocation,
     waypoints,
+    resetMulticorderAssets,
+    // FILES Broken?
+    // These need to be accessed directly from Muticorder composable in each component.
     showFilePicker,
     tmpFiles,
     showFileSelectDialog,
+
 
 
 

@@ -37,7 +37,7 @@ const $reset = () => {
   geoLocation.value = null;
   waypoints.value = [];
 
-  tmpFiles.value = [];
+  tmpFiles.value = null;
   showFileSelectDialog.value = false;
 }
 
@@ -174,7 +174,7 @@ export function useMulticorder() {
 
     // FILES
     showFilePicker,
-    tmpFiles,
+    tmpFiles: readonly(tmpFiles),
     showFileSelectDialog,
 
     // CLEAR CHANGES, BACK TO DEFAULT

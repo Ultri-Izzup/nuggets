@@ -33,6 +33,7 @@ const {
 
   // FILES
   showFilePicker,
+  tmpFiles
 
 } = useMulticorder();
 
@@ -56,7 +57,6 @@ const exportCurrentNugget = async () => {
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click="toggleLeftDrawer"></v-app-bar-nav-icon>
       </template>
-
       <v-app-bar-title>Ultri.Space</v-app-bar-title>
 
       <template v-slot:append>

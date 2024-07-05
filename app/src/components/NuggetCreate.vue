@@ -2,7 +2,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { useNuggetStore } from "../stores/nugget";
+import { useNuggetStore } from "@/stores/nugget";
+
+import { useMulticorder } from "@/composables/Multicorder";
 
 const props = defineProps({
   originNuggetId: {
@@ -18,7 +20,7 @@ const props = defineProps({
 
 console.log("PROPS", props);
 
-const nug = useNuggetStore();
+// const nug = useNuggetStore();
 const {
   //createNugget,
   makeNugget,
@@ -31,15 +33,21 @@ const {
   tmpAudios,
   showCamera,
   showCameraDialog,
-  showAudioCaptureDailog,
   showScreenPicker,
   getGeoLocation,
   geoLocation,
   waypoints,
+  // showFilePicker,
+  // tmpFiles,
+  // showFileSelectDialog,
+  resetMulticorderAssets,
+} = useNuggetStore();
+
+const {
   showFilePicker,
   tmpFiles,
-  showFileSelectDialog,
-} = useNuggetStore();
+  showFileSelectDialog
+} = useMulticorder();
 
 const router = useRouter();
 
@@ -94,8 +102,8 @@ const submitCreate = async () => {
     data: data,
   };
 
-  if (tmpFiles && tmpFiles.length > 0) {
-    fullNugget.selectedFiles = tmpFiles;
+  if (tmpFiles.value && tmpFiles.value.length > 0) {
+    fullNugget.selectedFiles = tmpFiles.value;
   }
 
   if (tmpImages && tmpImages.length > 0) {
@@ -117,6 +125,7 @@ const submitCreate = async () => {
   try {
     nuggetId = await makeNugget(fullNugget);
     console.log("NEW NUGGET ID:", nuggetId);
+    await resetMulticorderAssets();
     router.push(`/nuggets/${nuggetId}`);
   } catch (e) {
     console.error("FAILED to create record", e);
@@ -135,7 +144,6 @@ const voiceType = async (refName) => {
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
       </div>
-      {{tmpFiles}}
       <v-form v-model="valid" @submit.prevent="submitCreate">
         <v-container>
           <v-row class="align-center">
