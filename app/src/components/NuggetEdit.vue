@@ -92,9 +92,9 @@
       >
         <v-row class="my-5">
           <v-col cols="12" class="pb-3">
-            <h2 class="text-h5 font-weight-bold">
+           <h3 class="text-h5 font-weight-bold">
               <v-icon icon="mdi-image-multiple" size="x-small" /> Images
-            </h2>
+           </h3>
           </v-col>
           <v-col cols="12">
             <v-row>
@@ -134,9 +134,9 @@
       >
         <v-row class="my-5">
           <v-col cols="12" class="pb-3">
-            <h2 class="text-h5 font-weight-bold">
+           <h3 class="text-h5 font-weight-bold">
               <v-icon icon="mdi-video" size="small" /> Videos
-            </h2>
+           </h3>
           </v-col>
           <v-col cols="12">
             <v-row>
@@ -169,9 +169,9 @@
       <v-container v-if="savedAudio && savedAudio.length > 0" class="pa-0 ma-0">
         <v-row class="my-5">
           <v-col cols="12" class="pb-3">
-            <h2 class="text-h5 font-weight-bold">
+           <h3 class="text-h5 font-weight-bold">
               <v-icon icon="mdi-speaker" size="sx-mall"> </v-icon> Audio
-            </h2>
+           </h3>
           </v-col>
           <v-col cols="12">
             <v-row>
@@ -211,9 +211,9 @@
       >
         <v-row class="mb-5">
           <v-col cols="12" class="pb-3">
-            <h2 class="text-h5 font-weight-bold">
+           <h3 class="text-h5 font-weight-bold">
               <v-icon icon="mdi-file-multiple" size="x-small" /> Files
-            </h2>
+           </h3>
           </v-col>
           <v-col cols="12">
             <v-row>
@@ -249,9 +249,9 @@
       >
         <v-row class="my-5">
           <v-col cols="12" class="pb-3">
-            <h2 class="text-h5 font-weight-bold">
+           <h3 class="text-h5 font-weight-bold">
               <v-icon icon="mdi-map-marker" size="small" /> Location
-            </h2>
+           </h3>
           </v-col>
           <v-col cols="12">
             <v-row>
@@ -273,9 +273,9 @@
         <!-- GEOPOSITIONS -->
         <v-row class="my-5">
           <v-col cols="12" class="pb-3">
-            <h2 class="text-h5 font-weight-bold">
+           <h3 class="text-h5 font-weight-bold">
               <v-icon icon="mdi-map" /> Waypoints
-            </h2>
+           </h3>
           </v-col>
 
           <v-col cols="12">

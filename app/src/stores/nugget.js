@@ -20,6 +20,7 @@ const {
   tmpVideos,
 
   //AUDIO
+  showAudio,
   tmpAudios,
 
   // SCREEN
@@ -103,6 +104,7 @@ export const useNuggetStore = defineStore("nugget", () => {
     tmpAudios,
     saveVideoSource,
     showCamera,
+    showAudio,
     tmpStore,
     showScreenPicker,
     getGeoLocation,

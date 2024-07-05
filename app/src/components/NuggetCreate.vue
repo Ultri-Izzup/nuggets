@@ -188,12 +188,12 @@ const voiceType = async (refName) => {
               color="gray"
               icon="mdi-paperclip"
               size="x-large"
-              @click="showFilePicker"
+              @click="showFilePicker(null)"
             ></v-icon>
 
             <v-spacer />
             <v-icon
-              @click="showAudio"
+              @click="showAudio()"
               color="gray"
               icon="mdi-microphone"
               size="x-large"

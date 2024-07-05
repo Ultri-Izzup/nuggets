@@ -159,7 +159,7 @@ const showFilePicker = async (nuggetId=null, description="File Assets", accept={
     const pickedFiles = await window.showOpenFilePicker(pickerOpts);
 
     if(nuggetId) {
-      console.log('MFNFILES', pickedFiles)
+      console.log('MFNFILES', nuggetId, pickedFiles)
 
     } else {
       tmpFiles.value = pickedFiles;
