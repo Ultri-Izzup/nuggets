@@ -38,7 +38,7 @@ const toggleLeftDrawer = () => {
   leftDrawer.value = !leftDrawer.value;
 };
 
-const currentNugget = computed(() => {
+const currentNuggetId = computed(() => {
   return route.params.nuggetId;
 })
 
@@ -81,7 +81,7 @@ const exportCurrentNugget = async () => {
             </v-list-item>
 
             <v-list-item
-              @click="showAudio(currentNugget)"
+              @click="showAudio()"
               append-icon="mdi-microphone"
               >Record Audio
             </v-list-item>
@@ -99,7 +99,7 @@ const exportCurrentNugget = async () => {
             </v-list-item>
 
             <v-list-item
-              @click="showFilePicker()"
+              @click="showFilePicker(currentNuggetId)"
               append-icon="mdi-paperclip"
               >Attach Files
             </v-list-item>
@@ -178,9 +178,9 @@ const exportCurrentNugget = async () => {
             <v-card-text class="flex ma-1 pa-1">
               <VideoCapture
                 :targetSource="selectedVideoDevice"
-                @snapshot="(assetObj) => currentNugget ? opfsStore(currentNugget, 'images', assetObj) : tmpStore('image', assetObj)"
+                @snapshot="(assetObj) => currentNuggetId ? opfsStore(currentNuggetId, 'images', assetObj) : tmpStore('image', assetObj)"
                 @deviceSelected="saveVideoSource"
-                @recordedVideo="(assetObj) => currentNugget ? opfsStore(currentNugget, 'videos', assetObj) : tmpStore('video', assetObj)"
+                @recordedVideo="(assetObj) => currentNuggetId ? opfsStore(currentNuggetId, 'videos', assetObj) : tmpStore('video', assetObj)"
               ></VideoCapture>
             </v-card-text>
             <template v-slot:actions>
@@ -205,7 +205,7 @@ const exportCurrentNugget = async () => {
               <v-card-text class="flex ma-1 pa-1">
                 <AudioCapture
                   :targetSource="selectedAudioDevice"
-                  @recordedAudio="(assetObj) => currentNugget ? opfsStore(currentNugget, 'audio', assetObj) : tmpStore('audio', assetObj)"
+                  @recordedAudio="(assetObj) => currentNuggetId ? opfsStore(currentNuggetId, 'audio', assetObj) : tmpStore('audio', assetObj)"
                   @deviceSelected="saveAudioSource"
                 ></AudioCapture>
               </v-card-text>

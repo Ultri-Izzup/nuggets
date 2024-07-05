@@ -84,7 +84,8 @@ const createNugget = async (fullNugget) => {
     for(const imgObj of fullNugget.capturedImages) {
       cleanImgObjs.push({ name: imgObj.name, dataURL: imgObj.dataURL})
     }
-    dataURLWorker.postMessage({ nuggetId: nuggetId, subDir: "images", dataURLObjs: cleanImgObjs });
+    console.log(cleanImgObjs)
+    blobWorker.postMessage({ nuggetId: nuggetId, subDir: "images", blobs: cleanImgObjs });
   }
 
   if (fullNugget.videoRecordings && fullNugget.videoRecordings.length > 0) {

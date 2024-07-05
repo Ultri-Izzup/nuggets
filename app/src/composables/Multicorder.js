@@ -143,7 +143,7 @@ const showScreenPicker = async () => {
   showCameraDialog.value = true;
 }
 
-const showFilePicker = async (description="File Assets", accept={'*/*': ['.png', '.gif', '.jpeg', '.jpg']}) => {
+const showFilePicker = async (nuggetId=null, description="File Assets", accept={'*/*': ['.png', '.gif', '.jpeg', '.jpg']}) => {
   if (window.showOpenFilePicker) {
     const pickerOpts = {
       types: [
@@ -155,8 +155,17 @@ const showFilePicker = async (description="File Assets", accept={'*/*': ['.png',
       excludeAcceptAllOption: false,
       multiple: true,
     };
-    tmpFiles.value = await window.showOpenFilePicker(pickerOpts);
-    console.log('MFNFILES', tmpFiles.value)
+
+    const pickedFiles = await window.showOpenFilePicker(pickerOpts);
+
+    if(nuggetId) {
+      console.log('MFNFILES', pickedFiles)
+
+    } else {
+      tmpFiles.value = pickedFiles;
+    }
+
+
   } else {
     showFileSelectDialog.value = true;
     // Show dialog with file input field

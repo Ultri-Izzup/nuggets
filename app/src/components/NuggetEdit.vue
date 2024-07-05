@@ -98,9 +98,12 @@
           </v-col>
           <v-col cols="12">
             <v-row>
+              <!-- <pre>
+              {{savedImages}}
+            </pre> -->
               <v-col
-                v-for="(file, index) in savedImages"
-                :key="index"
+                v-for="(file) in savedImages"
+                :key="file.uniq"
                 class="text-body-2"
               >
                 <v-row>
@@ -138,8 +141,8 @@
           <v-col cols="12">
             <v-row>
               <v-col
-                v-for="(file, index) in savedVideo"
-                :key="index"
+                v-for="(file) in savedVideo"
+                :key="file.uniq"
                 class="text-body-2"
               >
                 <v-row>
@@ -173,8 +176,8 @@
           <v-col cols="12">
             <v-row>
               <v-col
-                v-for="(file, index) in savedAudio"
-                :key="index"
+                v-for="(file) in savedAudio"
+                :key="file.uniq"
                 class="text-body-2"
               >
                 <v-row>
@@ -215,8 +218,8 @@
           <v-col cols="12">
             <v-row>
               <v-col
-                v-for="(file, index) in savedFiles"
-                :key="index"
+                v-for="(file) in savedFiles"
+                :key="file.uniq"
                 class="text-body-2"
               >
                 <v-row>
