@@ -7,7 +7,7 @@ import { useNuggetStore } from "@/stores/nugget";
 import { useMulticorder } from "@/composables/Multicorder";
 
 const props = defineProps({
-  originNuggetId: {
+  linkedNuggetId: {
     type: Number,
   },
   relationType: {
@@ -16,6 +16,10 @@ const props = defineProps({
   title: {
     type: String,
   },
+  redirect: {
+    type: Boolean,
+    default: true
+  }
 });
 
 console.log("PROPS", props);
@@ -90,7 +94,7 @@ const clearForm = () => {
   tags.value = [];
 }
 
-const submitCreate = async (redirect=true) => {
+const submitCreate = async () => {
   const data = {
     name: name.value,
     description: description.value,
@@ -135,7 +139,7 @@ const submitCreate = async (redirect=true) => {
     console.log("NEW NUGGET ID:", nuggetId);
     clearForm();
     await resetMulticorderAssets();
-    if(redirect) {
+    if(props.redirect) {
       router.push(`/nuggets/${nuggetId}`);
     }
   } catch (e) {
@@ -155,7 +159,7 @@ const voiceType = async (refName) => {
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
       </div>
-      <v-form v-model="valid" @submit.prevent="submitCreate(redirectOnCreate)">
+      <v-form v-model="valid" @submit.prevent="submitCreate()">
         <v-container>
           <v-row class="align-center">
             <v-text-field

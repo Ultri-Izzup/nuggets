@@ -263,10 +263,11 @@ const exportCurrentNugget = async () => {
         <v-dialog v-model="showNewLinkedDialog" class="flex ma-0 pa-0">
           <template v-slot:default="{ isActive }">
             <v-card
+              :title="`Link to ${currentNuggetId}`"
               class="ma-0 pa-0"
             >
               <v-card-text class="flex ma-1 pa-1">
-                <NuggetCreate title="Linked Nugget"></NuggetCreate>
+                <NuggetCreate title="Linked Nugget" :linkedNuggetId="currentNuggetId" :redirect="false"></NuggetCreate>
               </v-card-text>
 
               <template v-slot:actions>
