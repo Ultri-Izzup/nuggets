@@ -1,6 +1,9 @@
 /**
  * NUGGETS LOGIC AND FUNCTIONALITY
  */
+
+import { ref } from "vue";
+
 // Use shared data lookup lists
 import { nuggetRelationTypes } from '@/shared/lookupLists'
 
@@ -59,6 +62,12 @@ if (window.Worker) {
     );
   };
   console.log("EXPORT WORKER LOADED IN Nuggets Composable");
+}
+
+const showNewLinkedDialog = ref(false)
+
+const showNewLinked = (nuggetId, relation='contains') => {
+  showNewLinkedDialog.value = true;
 }
 
 
@@ -182,5 +191,7 @@ export function useNuggets() {
     readOPFSFile,
     setGeoLocation,
     startExport,
+    showNewLinked,
+    showNewLinkedDialog
   };
 }

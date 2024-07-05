@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+import { useNuggets } from "@/composables/Nuggets";
 import { useMulticorder } from "@/composables/Multicorder";
 const route = useRoute();
 const router = useRouter();
@@ -31,6 +32,11 @@ const {
   showFilePicker,
   showFileSelectDialog,
 } = useMulticorder();
+
+const {
+  showNewLinked,
+  showNewLinkedDialog
+} = useNuggets();
 
 const leftDrawer = ref(false);
 const appMenu = ref("nugget");
@@ -71,7 +77,7 @@ const exportCurrentNugget = async () => {
 
             <v-list-item
               v-if="currentNuggetId"
-              @click="showNewLinkedDialog"
+              @click="showNewLinked"
               append-icon="mdi-link"
               >Linked Nugget
             </v-list-item>
@@ -256,16 +262,10 @@ const exportCurrentNugget = async () => {
         <v-dialog v-model="showNewLinkedDialog" class="flex ma-0 pa-0">
           <template v-slot:default="{ isActive }">
             <v-card
-              prepend-icon="mdi-microphone"
-              title="New Linked Nugget"
               class="ma-0 pa-0"
             >
               <v-card-text class="flex ma-1 pa-1">
-                <AudioCapture
-                  :targetSource="selectedAudioDevice"
-                  @recordedAudio="(assetObj) => currentNuggetId ? opfsStore(currentNuggetId, 'audio', assetObj) : tmpStore('audio', assetObj)"
-                  @deviceSelected="saveAudioSource"
-                ></AudioCapture>
+                <NuggetCreate title="Linked Nugget"></NuggetCreate>
               </v-card-text>
 
               <template v-slot:actions>
