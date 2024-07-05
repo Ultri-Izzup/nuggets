@@ -41,6 +41,7 @@ const {
   // tmpFiles,
   // showFileSelectDialog,
   resetMulticorderAssets,
+  redirectOnCreate,
 } = useNuggetStore();
 
 const {
@@ -82,7 +83,14 @@ const descriptionRules = [
 const tags = ref([]);
 
 // FUNCTIONS
-const submitCreate = async () => {
+const clearForm = () => {
+  valid.value = null;
+  name.value = null;
+  description.value = null;
+  tags.value = [];
+}
+
+const submitCreate = async (redirect=true) => {
   const data = {
     name: name.value,
     description: description.value,
@@ -125,8 +133,11 @@ const submitCreate = async () => {
   try {
     nuggetId = await makeNugget(fullNugget);
     console.log("NEW NUGGET ID:", nuggetId);
+    clearForm();
     await resetMulticorderAssets();
-    router.push(`/nuggets/${nuggetId}`);
+    if(redirect) {
+      router.push(`/nuggets/${nuggetId}`);
+    }
   } catch (e) {
     console.error("FAILED to create record", e);
   }
@@ -144,7 +155,7 @@ const voiceType = async (refName) => {
       <div v-if="title" class="text-center">
         <h1 class="text-h3 font-weight-bold">{{ title }}</h1>
       </div>
-      <v-form v-model="valid" @submit.prevent="submitCreate">
+      <v-form v-model="valid" @submit.prevent="submitCreate(redirectOnCreate)">
         <v-container>
           <v-row class="align-center">
             <v-text-field

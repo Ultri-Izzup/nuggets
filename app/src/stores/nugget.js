@@ -51,6 +51,7 @@ const {
   newFileTimestamp,
   readOPFSFile,
   setGeoLocation,
+  redirectOnCreate,
 } = useNuggets();
 
 export const useNuggetStore = defineStore("nugget", () => {
@@ -130,8 +131,9 @@ export const useNuggetStore = defineStore("nugget", () => {
     readOPFSFile,
     setGeoLocation,
     startNuggetExport,
+    redirectOnCreate,
 
     // LOCAL FUNCTIONS
-    makeNugget
+    makeNugget,
   }
 });

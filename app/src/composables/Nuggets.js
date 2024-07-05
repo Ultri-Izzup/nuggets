@@ -68,7 +68,10 @@ const showNewLinkedDialog = ref(false)
 
 const showNewLinked = (nuggetId, relation='contains') => {
   showNewLinkedDialog.value = true;
+  redirectOnCreate.value = false;
 }
+
+const redirectOnCreate = ref(true);
 
 
 /**
@@ -192,6 +195,7 @@ export function useNuggets() {
     setGeoLocation,
     startExport,
     showNewLinked,
-    showNewLinkedDialog
+    showNewLinkedDialog,
+    redirectOnCreate,
   };
 }
