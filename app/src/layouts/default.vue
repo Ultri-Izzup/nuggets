@@ -28,7 +28,8 @@ const {
   // GEOLOCATION
   getGeoLocation,
   // FILES
-  showFilePicker
+  showFilePicker,
+  showFileSelectDialog,
 } = useMulticorder();
 
 const leftDrawer = ref(false);
@@ -69,7 +70,8 @@ const exportCurrentNugget = async () => {
           <v-list v-if="appMenu === 'nugget'" density="compact">
 
             <v-list-item
-              @click="route.params.nuggetId ? exportCurrentNugget() : ''"
+              v-if="currentNuggetId"
+              @click="showNewLinkedDialog"
               append-icon="mdi-link"
               >Linked Nugget
             </v-list-item>
@@ -107,7 +109,8 @@ const exportCurrentNugget = async () => {
             <v-divider></v-divider>
 
             <v-list-item
-              @click="route.params.id ? exportCurrentNugget() : ''"
+              v-if="currentNuggetId"
+              @click="route.params.nuggetId ? exportCurrentNugget() : ''"
               append-icon="mdi-export"
               >Export Nugget
             </v-list-item>
@@ -200,6 +203,61 @@ const exportCurrentNugget = async () => {
             <v-card
               prepend-icon="mdi-microphone"
               title="Audio Recorder"
+              class="ma-0 pa-0"
+            >
+              <v-card-text class="flex ma-1 pa-1">
+                <AudioCapture
+                  :targetSource="selectedAudioDevice"
+                  @recordedAudio="(assetObj) => currentNuggetId ? opfsStore(currentNuggetId, 'audio', assetObj) : tmpStore('audio', assetObj)"
+                  @deviceSelected="saveAudioSource"
+                ></AudioCapture>
+              </v-card-text>
+
+              <template v-slot:actions>
+                <v-btn
+                  prepend-icon="mdi-close"
+                  size="xl"
+                  color="grey"
+                  @click="isActive.value = false"
+                ></v-btn>
+              </template>
+            </v-card>
+          </template>
+        </v-dialog>
+
+        <v-dialog v-model="showFileSelectDialog" class="flex ma-0 pa-0">
+          <template v-slot:default="{ isActive }">
+            <v-card
+              prepend-icon="mdi-file-multiple"
+              title="Select Files"
+              class="ma-0 py-0 px-5"
+            >
+              <v-card-text class="flex ma-1 pa-1 text-center">
+                <v-file-input
+                  v-model="selectedFiles"
+                  multiple
+                  label="Select files"
+                  @change="showFileSelectDialog = false"
+                ></v-file-input>
+              </v-card-text>
+
+              <template v-slot:actions>
+                <v-btn
+                  prepend-icon="mdi-close"
+                  size="xl"
+                  color="grey"
+                  @click="isActive.value = false"
+                ></v-btn>
+              </template>
+            </v-card>
+          </template>
+        </v-dialog>
+
+        <v-dialog v-model="showNewLinkedDialog" class="flex ma-0 pa-0">
+          <template v-slot:default="{ isActive }">
+            <v-card
+              prepend-icon="mdi-microphone"
+              title="New Linked Nugget"
               class="ma-0 pa-0"
             >
               <v-card-text class="flex ma-1 pa-1">
