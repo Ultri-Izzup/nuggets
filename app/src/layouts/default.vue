@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { useMulticorder } from "@/composables/Multicorder";
@@ -9,7 +9,8 @@ const router = useRouter();
 const {
   // Temporarily store images, video or audio
   tmpStore,
-
+  // Store directly to OPFS, must be in a nuggetId space
+  opfsStore,
   // CAMERA / VIDEO / IMAGES
   saveVideoSource,
   showCamera,
@@ -17,24 +18,17 @@ const {
   startNuggetExport,
   videoSource,
   selectedVideoDevice,
-
   // MICROPHONE / AUDIO RECORDINGS
   selectedAudioDevice,
   showAudio,
   showAudioCaptureDialog,
   saveAudioSource,
-
   // SCREEN
   showScreenPicker,
-
   // GEOLOCATION
-  geoLocation,
-  waypoints,
-
+  getGeoLocation,
   // FILES
-  showFilePicker,
-  tmpFiles
-
+  showFilePicker
 } = useMulticorder();
 
 const leftDrawer = ref(false);
@@ -44,9 +38,13 @@ const toggleLeftDrawer = () => {
   leftDrawer.value = !leftDrawer.value;
 };
 
+const currentNugget = computed(() => {
+  return route.params.nuggetId;
+})
+
 const exportCurrentNugget = async () => {
-  console.log(`START EXPORT for ${route.params.id}`);
-  const exportObj = await startNuggetExport(route.params.id);
+  console.log(`START EXPORT for ${route.params.nuggetId}`);
+  const exportObj = await startNuggetExport(route.params.nuggetId);
   console.log("STARTED EXPORT", exportObj);
 };
 </script>
@@ -69,6 +67,7 @@ const exportCurrentNugget = async () => {
             <v-btn icon="mdi-dots-vertical" v-bind="props"></v-btn>
           </template>
           <v-list v-if="appMenu === 'nugget'" density="compact">
+
             <v-list-item
               @click="route.params.nuggetId ? exportCurrentNugget() : ''"
               append-icon="mdi-link"
@@ -82,7 +81,7 @@ const exportCurrentNugget = async () => {
             </v-list-item>
 
             <v-list-item
-              @click="showAudio()"
+              @click="showAudio(currentNugget)"
               append-icon="mdi-microphone"
               >Record Audio
             </v-list-item>
@@ -179,9 +178,9 @@ const exportCurrentNugget = async () => {
             <v-card-text class="flex ma-1 pa-1">
               <VideoCapture
                 :targetSource="selectedVideoDevice"
-                @snapshot="(assetObj) => tmpStore('image', assetObj)"
+                @snapshot="(assetObj) => currentNugget ? opfsStore(currentNugget, 'images', assetObj) : tmpStore('image', assetObj)"
                 @deviceSelected="saveVideoSource"
-                @recordedVideo="(assetObj) => tmpStore('video', assetObj)"
+                @recordedVideo="(assetObj) => currentNugget ? opfsStore(currentNugget, 'videos', assetObj) : tmpStore('video', assetObj)"
               ></VideoCapture>
             </v-card-text>
             <template v-slot:actions>
@@ -206,7 +205,7 @@ const exportCurrentNugget = async () => {
               <v-card-text class="flex ma-1 pa-1">
                 <AudioCapture
                   :targetSource="selectedAudioDevice"
-                  @recordedAudio="(assetObj) => tmpStore('audio', assetObj)"
+                  @recordedAudio="(assetObj) => currentNugget ? opfsStore(currentNugget, 'audio', assetObj) : tmpStore('audio', assetObj)"
                   @deviceSelected="saveAudioSource"
                 ></AudioCapture>
               </v-card-text>

@@ -3,6 +3,55 @@
  */
 import { ref, readonly } from "vue";
 
+// Worker scripts
+/**
+  * Initialize Ultri Worker
+  */
+let fileHandleWorker = null;  // Used for local file attachments
+// let dataURLWorker = null;     // Used for images
+let blobWorker = null;        // Used for audio, images and video
+let exportWorker = null;      // Used for exporting Nuggets
+
+if (window.Worker) {
+
+  fileHandleWorker = new Worker("/workers/fileHandleWorker.js", { type: "module" });
+  fileHandleWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED FileHandle WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+  console.log("FILE WORKER LOADED IN Nuggets Composable");
+
+  // dataURLWorker = new Worker("/workers/dataURLWorker.js", { type: "module" });
+  // dataURLWorker.onmessage = (msg) => {
+  //   console.log(
+  //     "DEDICATED URLDATA WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+  //     msg
+  //   );
+  // };
+  // console.log("DATAURL WORKER LOADED IN Nuggets Composable");
+
+  blobWorker = new Worker("/workers/blobWorker.js", { type: "module" });
+  blobWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED BLOB WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+  console.log("BLOB WORKER LOADED IN Nuggets Composable");
+
+  exportWorker = new Worker("/workers/exportWorker.js", { type: "module" });
+  exportWorker.onmessage = (msg) => {
+    console.log(
+      "DEDICATED EXPORT WORKER EVENT RETURNED DATA TO Nuggets Composable \n",
+      msg
+    );
+  };
+  console.log("EXPORT WORKER LOADED IN Nuggets Composable");
+}
+
+
 // SHARED AUDIO / MICROPHONE
 const showAudioCaptureDialog = ref(false);
 const selectedAudioDevice = ref();
@@ -44,7 +93,6 @@ const $reset = () => {
 // Add to the temporary assets
 const tmpStore = (assetType, assetObj) => {
 
-  console.log("WTF", assetType, assetObj)
   switch(assetType) {
     case 'image':
       tmpImages.value.push(assetObj);
@@ -58,6 +106,13 @@ const tmpStore = (assetType, assetObj) => {
       tmpAudios.value.push(assetObj);
       break;
   }
+};
+
+// Add to persisted OPFS assets
+const opfsStore = (nuggetId, assetType, assetObj) => {
+
+  blobWorker.postMessage({ nuggetId: Number(nuggetId), subDir: assetType, blobs: [assetObj] });
+
 };
 
 const saveVideoSource = (newSource) => {
@@ -166,6 +221,8 @@ export function useMulticorder() {
 
     // FUNCTION TO STORE IMAGES, VIDEO, AUDIO IN MEMORY
     tmpStore,
+    // FUNCTION TO STORE IMAGES, VIDEO, AUDIO IN DIRECTLY TO OPFS
+    opfsStore,
 
     // GEOLOCATION
     getGeoLocation,

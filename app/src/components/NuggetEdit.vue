@@ -335,7 +335,6 @@
                 :targetSource="selectedAudioDevice"
                 @recordedAudio="storeAudio"
                 @deviceSelected="saveAudioSource"
-                @chunk="saveAudioChunk"
               ></AudioCapture>
             </v-card-text>
 
