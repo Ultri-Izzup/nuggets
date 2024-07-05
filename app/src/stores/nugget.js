@@ -35,7 +35,8 @@ const {
   tmpFiles,
   showFileSelectDialog,
 
-  mcReset: $reset
+  // DELETE TMP ASSETS FROM MULTICORDER
+  resetMulticorderAssets,
 
 } = useMulticorder();
 
@@ -82,13 +83,9 @@ export const useNuggetStore = defineStore("nugget", () => {
 
     const nuggetId =  createNugget(fullNugget);
 
-    await resetMulticorder();
+    await resetMulticorderAssets();
 
     return nuggetId;
-
-  }
-
-  const resetMulticorder = async () => {
 
   }
 
@@ -113,7 +110,6 @@ export const useNuggetStore = defineStore("nugget", () => {
     showFilePicker,
     tmpFiles,
     showFileSelectDialog,
-    resetMulticorder,
 
 
 
@@ -129,7 +125,6 @@ export const useNuggetStore = defineStore("nugget", () => {
     startNuggetExport,
 
     // LOCAL FUNCTIONS
-    makeNugget,
-    resetMulticorder,
+    makeNugget
   }
 });

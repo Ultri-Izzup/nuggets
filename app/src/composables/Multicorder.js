@@ -21,20 +21,19 @@ const geoLocation = ref();
 const waypoints = ref([]);
 
 // FILES
-const tmpFiles = ref([]);
+const tmpFiles = ref();
 const showFileSelectDialog = ref(false);
 
 const $reset = () => {
   tmpAudios.value=[];
   showAudioCaptureDialog.value = false;
-  selectedAudioDevice.value=null;
+  //selectedAudioDevice.value=null;
   tmpVideos.value=[];
   tmpImages.value=[];
-  videoSource.value = ref("Video");
-  selectedVideoDevice = ref();
-  preferredCamera.value = ref();
-  showCameraDialog.value = ref(false);
-  selectedFiles.value = null;
+  videoSource.value = "Video";
+  //selectedVideoDevice.value = null;
+  preferredCamera.value = null;
+  showCameraDialog.value = false;
   geoLocation.value = null;
   waypoints.value = [];
 
@@ -131,7 +130,9 @@ const getGeoLocation = async () => {
   }
 };
 
-
+const resetMulticorderAssets = async () => {
+  $reset();
+}
 
 
 
@@ -173,10 +174,10 @@ export function useMulticorder() {
 
     // FILES
     showFilePicker,
-    tmpFiles: readonly(tmpFiles),
+    tmpFiles,
     showFileSelectDialog,
 
     // CLEAR CHANGES, BACK TO DEFAULT
-    $reset
+    resetMulticorderAssets,
   };
 }

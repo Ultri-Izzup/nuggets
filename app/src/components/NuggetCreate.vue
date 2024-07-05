@@ -118,7 +118,6 @@ const submitCreate = async () => {
     nuggetId = await makeNugget(fullNugget);
     console.log("NEW NUGGET ID:", nuggetId);
     router.push(`/nuggets/${nuggetId}`);
-    await resetMulticorder();
   } catch (e) {
     console.error("FAILED to create record", e);
   }
