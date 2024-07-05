@@ -24,6 +24,7 @@ const {
   showAudio,
   showAudioCaptureDialog,
   saveAudioSource,
+  audioCaptureMode,
   // SCREEN
   showScreenPicker,
   // GEOLOCATION
@@ -89,7 +90,7 @@ const exportCurrentNugget = async () => {
             </v-list-item>
 
             <v-list-item
-              @click="showAudio()"
+              @click="showAudio('ospf')"
               append-icon="mdi-microphone"
               >Record Audio
             </v-list-item>
@@ -214,7 +215,7 @@ const exportCurrentNugget = async () => {
               <v-card-text class="flex ma-1 pa-1">
                 <AudioCapture
                   :targetSource="selectedAudioDevice"
-                  @recordedAudio="(assetObj) => currentNuggetId ? opfsStore(currentNuggetId, 'audio', assetObj) : tmpStore('audio', assetObj)"
+                  @recordedAudio="(assetObj) => audioCaptureMode === 'ospf' ? opfsStore(currentNuggetId, 'audio', assetObj) : tmpStore('audio', assetObj)"
                   @deviceSelected="saveAudioSource"
                 ></AudioCapture>
               </v-card-text>

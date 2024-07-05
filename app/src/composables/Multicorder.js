@@ -54,6 +54,7 @@ if (window.Worker) {
 
 // SHARED AUDIO / MICROPHONE
 const showAudioCaptureDialog = ref(false);
+const audioCaptureMode = ref('tmp');
 const selectedAudioDevice = ref();
 const tmpAudios = ref([]);
 
@@ -64,6 +65,7 @@ const videoSource = ref("Video");
 const selectedVideoDevice = ref();
 const preferredCamera = ref();
 const showCameraDialog = ref(false);
+const vidCaptureMode = ref('tmp');
 
 // GEOLOCATION
 const geoLocation = ref();
@@ -72,6 +74,7 @@ const waypoints = ref([]);
 // FILES
 const tmpFiles = ref();
 const showFileSelectDialog = ref(false);
+const fileCaptureMode = ref('tmp');
 
 const $reset = () => {
   tmpAudios.value=[];
@@ -88,6 +91,10 @@ const $reset = () => {
 
   tmpFiles.value = null;
   showFileSelectDialog.value = false;
+
+  audioCaptureMode.value = 'tmp'
+  vidCaptureMode.value = 'tmp'
+  fileCaptureMode.value = 'tmp'
 }
 
 // Add to the temporary assets
@@ -127,20 +134,23 @@ const saveVideoChunk = (chunk) => {
 };
 
 
-const showAudio = async () => {
+const showAudio = async (saveMode='tmp') => {
   showAudioCaptureDialog.value = true;
+  audioCaptureMode.value = saveMode;
 };
 
-const showCamera = async () => {
+const showCamera = async (saveMode='tmp') => {
   videoSource.value = "Camera";
   selectedVideoDevice.value = preferredCamera.value ? preferredCamera.value : '';
   showCameraDialog.value = true;
+  vidCaptureMode.value = saveMode;
 };
 
-const showScreenPicker = async () => {
+const showScreenPicker = async (saveMode='tmp') => {
   videoSource.value = "Screen";
   selectedVideoDevice.value = "screen";
   showCameraDialog.value = true;
+  vidCaptureMode.value = saveMode;
 }
 
 const showFilePicker = async (nuggetId=null, description="File Assets", accept={'*/*': ['.png', '.gif', '.jpeg', '.jpg']}) => {
@@ -221,12 +231,14 @@ export function useMulticorder() {
     showCamera,
     showCameraDialog,
     videoSource,
+    vidCaptureMode,
 
     // AUDIO
     tmpAudios: readonly(tmpAudios),
     showAudio,
     showAudioCaptureDialog,
     selectedAudioDevice,
+    audioCaptureMode,
 
     // FUNCTION TO STORE IMAGES, VIDEO, AUDIO IN MEMORY
     tmpStore,
@@ -242,6 +254,7 @@ export function useMulticorder() {
     showFilePicker,
     tmpFiles: readonly(tmpFiles),
     showFileSelectDialog,
+    fileCaptureMode,
 
     // CLEAR CHANGES, BACK TO DEFAULT
     resetMulticorderAssets,
