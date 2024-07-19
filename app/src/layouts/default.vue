@@ -63,7 +63,7 @@ const exportCurrentNugget = async () => {
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click="toggleLeftDrawer"></v-app-bar-nav-icon>
       </template>
-      <v-app-bar-title>Ultri.Space</v-app-bar-title>
+      <v-app-bar-title>Ultri Space</v-app-bar-title>
 
       <template v-slot:append>
         <v-btn icon="mdi-plus" to="/nuggets/create"></v-btn>
@@ -267,7 +267,7 @@ const exportCurrentNugget = async () => {
               class="ma-0 pa-0"
             >
               <v-card-text class="flex ma-1 pa-1">
-                <NuggetCreate title="Linked Nugget" :linkedNuggetId="currentNuggetId" :redirect="false"></NuggetCreate>
+                <NuggetCreate title="New Nugget" :linkedNugget="linkedNugget"></NuggetCreate>
               </v-card-text>
 
               <template v-slot:actions>
