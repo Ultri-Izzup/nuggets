@@ -7,19 +7,25 @@ import { useNuggetStore } from "@/stores/nugget";
 import { useMulticorder } from "@/composables/Multicorder";
 
 const props = defineProps({
-  linkedNuggetId: {
-    type: Number,
-  },
-  relationType: {
-    type: String,
-  },
   title: {
     type: String,
   },
   redirect: {
     type: Boolean,
     default: true
-  }
+  },
+  linkedNugget: {
+    type: Object,
+    props: {
+      nuggetId: Number,
+      name: String,
+      relationType: String,
+      participation: {
+        type: String,
+        default: 'origin'
+      }
+    }
+  },
 });
 
 console.log("PROPS", props);

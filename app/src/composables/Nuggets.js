@@ -65,14 +65,12 @@ if (window.Worker) {
 }
 
 const showNewLinkedDialog = ref(false)
-
-const showNewLinked = (nuggetId, relation='contains') => {
-  showNewLinkedDialog.value = true;
-  redirectOnCreate.value = false;
-}
-
 const redirectOnCreate = ref(true);
 
+const showNewLinked = (nuggetId, relation='contains') => {
+  redirectOnCreate.value = false;
+  showNewLinkedDialog.value = true;
+}
 
 /**
  * Create a new nugget from related parts.
