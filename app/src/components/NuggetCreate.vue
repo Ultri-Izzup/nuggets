@@ -249,7 +249,7 @@ const voiceType = async (refName) => {
           <v-row justify="center">
             <v-col cols="5">
               <v-btn type="submit" block color="primary" :disabled="!valid"
-                >Save</v-btn
+                >Create</v-btn
               >
             </v-col>
           </v-row>
