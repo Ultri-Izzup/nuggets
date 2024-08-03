@@ -2,6 +2,8 @@
  * NUGGETS LOGIC AND FUNCTIONALITY
  */
 
+import { ref } from "vue";
+
 // Use shared data lookup lists
 import { nuggetRelationTypes } from '@/shared/lookupLists'
 
@@ -62,12 +64,21 @@ if (window.Worker) {
   console.log("EXPORT WORKER LOADED IN Nuggets Composable");
 }
 
+const showNewLinkedDialog = ref(false)
+const redirectOnCreate = ref(true);
+
+const showNewLinked = (nuggetId, relation='contains') => {
+  redirectOnCreate.value = false;
+  showNewLinkedDialog.value = true;
+}
+
 /**
  * Create a new nugget from related parts.
  * @param {object} fullNugget
  * @returns {number}
  */
 const createNugget = async (fullNugget) => {
+
   const nuggetId = await dexCreateNugget(fullNugget.data);
 
   if (fullNugget.selectedFiles && fullNugget.selectedFiles.length > 0) {
@@ -83,7 +94,8 @@ const createNugget = async (fullNugget) => {
     for(const imgObj of fullNugget.capturedImages) {
       cleanImgObjs.push({ name: imgObj.name, dataURL: imgObj.dataURL})
     }
-    dataURLWorker.postMessage({ nuggetId: nuggetId, subDir: "images", dataURLObjs: cleanImgObjs });
+    console.log(cleanImgObjs)
+    blobWorker.postMessage({ nuggetId: nuggetId, subDir: "images", blobs: cleanImgObjs });
   }
 
   if (fullNugget.videoRecordings && fullNugget.videoRecordings.length > 0) {
@@ -107,7 +119,11 @@ const createNugget = async (fullNugget) => {
   return nuggetId;
 }
 
-
+/**
+ *
+ * @param {number} nuggetId
+ * @param {array} selectedFiles
+ */
 const addNuggetAttachments = async (nuggetId, selectedFiles) => {
   const fhArray = Array.from(selectedFiles)
   fileHandleWorker.postMessage({ nuggetId: nuggetId, subDir: "files", fileHandles: fhArray });
@@ -175,6 +191,9 @@ export function useNuggets() {
     nuggetRelationTypes,
     readOPFSFile,
     setGeoLocation,
-    startExport
+    startExport,
+    showNewLinked,
+    showNewLinkedDialog,
+    redirectOnCreate,
   };
 }

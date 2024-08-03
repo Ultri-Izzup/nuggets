@@ -4,10 +4,12 @@ const dirHandles = new Map();
 const fileHandles = new Map();
 
 export async function readOPFSFile (filePath) {
+  console.log('PATH', filePath)
   const fh = await opfsFile(filePath);
   const file = await fh.getFile();
   const reader = new FileReader();
   reader.readAsDataURL(file);
+  console.log(reader)
   return reader;
 }
 

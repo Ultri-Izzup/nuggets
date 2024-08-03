@@ -3,15 +3,63 @@ import { defineStore } from "pinia";
 import { useStorage } from "@vueuse/core";
 
 import { useNuggets } from "@/composables/Nuggets";
+import { useMulticorder } from "@/composables/Multicorder";
 
-const Nug = useNuggets();
+const {
+  tmpStore,
+
+  // VIDEO / IMAGES
+  showCamera,
+  showCameraDialog,
+  saveVideoSource,
+  videoSource,
+  selectedVideoDevice,
+  preferredCamera,
+  saveVideoChunk,
+  tmpImages,
+  tmpVideos,
+
+  //AUDIO
+  showAudio,
+  tmpAudios,
+
+  // SCREEN
+  showScreenPicker,
+
+  // GEO LOCATION
+  getGeoLocation,
+  geoLocation,
+  waypoints,
+
+  // FILES Broken?
+  // These need to be accessed directly from Muticorder composable in each component.
+  showFilePicker,
+  tmpFiles,
+  showFileSelectDialog,
+
+  // DELETE TMP ASSETS FROM MULTICORDER
+  resetMulticorderAssets,
+
+} = useMulticorder();
+
+const {
+  addNuggetAttachments,
+  addNuggetAsset,
+  createNugget,
+  getNugget,
+  getNuggetAssets,
+  newFileTimestamp,
+  readOPFSFile,
+  setGeoLocation,
+  redirectOnCreate,
+} = useNuggets();
 
 export const useNuggetStore = defineStore("nugget", () => {
 
   // STATE
   const recentNuggets = useStorage('recentNuggets', []);
   const lastNugget = useStorage('lastNugget', 0);
-  const preferredCamera = useStorage('preferredCamera', null);
+  // const preferredCamera = useStorage('preferredCamera', null);
   const pendingExports = useStorage('pendingExports', new Map());
   const dowloadedExports = useStorage('downloadedExports', []);
 
@@ -19,38 +67,73 @@ export const useNuggetStore = defineStore("nugget", () => {
 
 
   // ACTIONS / FUNCTIONS
-  const startNuggetExport = async(nuggetId) => {
+  const startNuggetExport = async (nuggetId) => {
 
-    if(pendingExports.value.has(nuggetId)) {
-      console.log(`Export already in process for nugget ${nuggetId}` )
+    if (pendingExports.value.has(nuggetId)) {
+      console.log(`Export already in process for nugget ${nuggetId}`)
       // return;
     } // else {
-      const nowTime = new Date().toISOString();
-      pendingExports.value.set(nuggetId, { createdAt: nowTime });
-      const exportId = await Nug.startExport(nuggetId);
-      const jobData = { nuggetId: nuggetId, createdAt: nowTime, exportId: exportId };
-      pendingExports.value.set(nuggetId, jobData);
-      return jobData;
-   //}
+    const nowTime = new Date().toISOString();
+    pendingExports.value.set(nuggetId, { createdAt: nowTime });
+    const exportId = await Nug.startExport(nuggetId);
+    const jobData = { nuggetId: nuggetId, createdAt: nowTime, exportId: exportId };
+    pendingExports.value.set(nuggetId, jobData);
+    return jobData;
+    //}
+  }
+
+  const makeNugget = async (fullNugget) => {
+
+    const nuggetId =  createNugget(fullNugget);
+
+    // await resetMulticorderAssets();
+
+    return nuggetId;
+
   }
 
   return {
     // State
+
+    // MULTICORDER
+    tmpImages,
+    tmpVideos,
+    selectedVideoDevice,
     preferredCamera,
+    showCameraDialog,
+    videoSource,
+    tmpAudios,
+    saveVideoSource,
+    showCamera,
+    showAudio,
+    tmpStore,
+    showScreenPicker,
+    getGeoLocation,
+    geoLocation,
+    waypoints,
+    resetMulticorderAssets,
+    // FILES Broken?
+    // These need to be accessed directly from Muticorder composable in each component.
+    showFilePicker,
+    tmpFiles,
+    showFileSelectDialog,
 
-    // Getters
 
-    // Actions/Functions
 
-    addNuggetAttachments: Nug.addNuggetAttachments,
-    addNuggetAsset: Nug.addNuggetAsset,
-    createNugget: Nug.createNugget,
-    getNugget: Nug.getNugget,
-    getNuggetAssets: Nug.getNuggetAssets,
-    newFileTimestamp: Nug.newFileTimestamp,
-    readOPFSFile: Nug.readOPFSFile,
+
+    // NUGGETS
+    addNuggetAttachments,
+    addNuggetAsset,
+    // createNugget,
+    getNugget,
+    getNuggetAssets,
+    newFileTimestamp,
+    readOPFSFile,
+    setGeoLocation,
     startNuggetExport,
-    setGeoLocation: Nug.setGeoLocation,
-    supportedVoices: Nug.supportedVoices
+    redirectOnCreate,
+
+    // LOCAL FUNCTIONS
+    makeNugget,
   }
 });
