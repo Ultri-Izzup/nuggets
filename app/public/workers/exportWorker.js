@@ -5,7 +5,7 @@ import { getZipWriter } from './shared/zip.js';
 import {
   TextReader,
   BlobReader
-} from "../../../node_modules/@zip.js/zip.js/index.js";
+} from "@/node_modules/@zip.js/zip.js/index.js";
 
 const textDecoder = new TextDecoder();
 

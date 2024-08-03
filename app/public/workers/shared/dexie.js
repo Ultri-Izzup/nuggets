@@ -1,5 +1,5 @@
-import { db } from "../../src/dexie/db.js";
-import { nanoid } from '../../node_modules/nanoid';
+import { db } from "@/src/dexie/db.js";
+import { nanoid } from '@/node_modules/nanoid';
 
 export async function putAssetRecord (record) {
   record.uniq =  nanoid();
